@@ -10,7 +10,7 @@ This registry coordinates concurrent/subsequent AI coding agents working in this
 | Agent Name | Role / Specialty | Status | Branch | Current Task / Active Scope | Reserved / Active Files | Port(s) Used |
 |---|---|---|---|---|---|---|
 | **Code1** | Lead UI Designer | **ACTIVE** | `ff` | Phase 1-B Step 5: Preset System (Presets CRUD in SQLite, interactive creation screen with steppers, emoji selector, category app restrictions, YouTube 3-way radio, and automated field tests per `ui_preset.md`). | `fluxfoxus/lib/features/presets/`, `fluxfoxus/lib/presentation/screens/preset_create_screen.dart`, `progress_tracker.md`, `agent_worklog.md` | `8085` |
-| **Code2** | Companion UI Designer | **IDLE** | `ff` | Phase 1-A UI: Planner Screen Preview (`ui_mockups/planner.html`) completed and served on port 8089; automated test suites passing on all screens (Home, App Limits, Planner). | `ui_mockups/planner.html`, `ui_mockups/home_screen.html`, `ui_mockups/app_limits.html`, `progress_tracker.md`, `agent_worklog.md` | `8086`, `8088`, `8089` |
+| **Code2** | Companion UI Designer | **IDLE** | `ff` | Phase 1-A UI: Usage Stats Screen Preview (`ui_mockups/usage_stats.html`) completed and served on port 8090; 10 automated test gates passing. All 5 primary tab screens now built and interlinked. | `ui_mockups/usage_stats.html`, `ui_mockups/planner.html`, `ui_mockups/home_screen.html`, `ui_mockups/app_limits.html`, `progress_tracker.md`, `agent_worklog.md` | `8086`, `8088`, `8089`, `8090` |
 
 ---
 
@@ -92,16 +92,29 @@ This registry coordinates concurrent/subsequent AI coding agents working in this
     - Floating 5-tab pill navigation bar with Tab 4 ("Planner") active in `#CA9C68`.
     - In-browser automated test runner (`#auto-test-modal`) testing all 10 feature gates (100% passing).
     - Local preview served on port `8089`.
-  - Built standalone verification test scripts (`test_planner_screen.js`, `test_code2_screens.js`) passing 100% of DOM, color tokens, and state assertions across all screens.
+  - Built static HTML/Tailwind preview of the **Usage Stats Screen** (`ui_mockups/usage_stats.html`) per `ui_usage_stats.md` & `ff_design_override.md`, featuring:
+    - Top bar with back arrow to home, centered title, and Help pill button.
+    - 3-Tab Selector ("Today" | "Daily" | "Weekly") with text labels and Amber Autumn (`#CA9C68`) underline indicator.
+    - Today Tab: 24h smooth Bézier stacked area chart (Productive → Semi → Distracting → Others) with 6am, 12pm, 6pm, 12am timeline markers and horizontal reference grid lines.
+    - Daily Tab: Interactive 7-day stacked bar chart (Mon–Sun) with full category coloring on selected day and dark greyscale on non-selected days, with reactive legend grid and app list updates.
+    - Weekly Tab: 5-week stacked bar chart with full category colors + Sunday In-App Weekly Summary Card (current streak, total focused, comparison vs previous week, max/min focus days, summary text, dismissible `✕`).
+    - 2×2 Category Legend Grid with dividers (Productive `#4E7D56`, Semi-Productive `#906D4B`, Distracting `#38332B`, Others `#94A3B8`).
+    - App Section (All Tabs): Search bar with dynamic text filtering, app item rows (40×40 icon, app name, category pill, time spent), sorted descending by time, with interactive App Detail bottom sheet.
+    - Floating 5-tab pill navigation bar with Tab 2 (**Usage**) active in `#CA9C68`.
+    - In-browser automated test runner (`#auto-test-modal`) testing all 10 feature gates (100% passing).
+    - Local preview served on port `8090`.
+  - Built standalone verification test scripts (`test_usage_stats.js`, `test_code2_screens.js`) passing 100% of DOM, color tokens, and state assertions across all screens.
 * **What `Code2` is doing right now:**
-  - `IDLE` / Awaiting user feedback on Planner screen preview (`ui_mockups/planner.html` on port 8089) or instruction for the next UI screen (e.g., Usage Stats or Distracted Intervention).
+  - `IDLE` / Awaiting user review on Usage Stats screen preview (`ui_mockups/usage_stats.html` on port 8090) or instructions for the next task (e.g., 2/5/10/20 Distraction Intervention screens).
 * **Exclusive Resources / Do Not Overwrite:**
+  - `ui_mockups/usage_stats.html` (Code2 screen)
   - `ui_mockups/planner.html` (Code2 screen)
   - `ui_mockups/home_screen.html` (Code2 screen)
   - `ui_mockups/app_limits.html` (Code2 screen)
   - Port `8086` (Home Screen preview)
   - Port `8088` (App Limits preview)
   - Port `8089` (Planner preview)
+  - Port `8090` (Usage Stats preview)
 
 ---
 

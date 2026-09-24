@@ -35,6 +35,7 @@
 - [x] Phase 1-A Step 2 completed: SQLite tables with foreign keys and performance indexes (`app_database.dart`), Hive boxes for preferences/categories/metadata (`hive_storage_service.dart`), 11 automated unit tests passing, 0 lints.
 - [x] Phase 1-A Step 3 completed: Navigation shell with `go_router`, floating pill bottom nav bar with [Usage+Focus] & [Planner+Block] sub-containers, active session full-screen takeover nav hide logic, 10 widget/route tests passing, 0 lints.
 - [x] Planner Screen UI Mockup completed and served with 10 automated assertion gates (served by `Code2` on port 8089).
+- [x] Usage Stats Screen UI Mockup completed and served with 10 automated assertion gates, Today Bézier chart, Daily 7-day interactive bar chart, Weekly summary card, and searchable app list (served by `Code2` on port 8090).
 - [x] Phase 1-A Step 4 completed: 4-step sequential permissions onboarding wizard (`POST_NOTIFICATIONS`, `PACKAGE_USAGE_STATS`, `SYSTEM_ALERT_WINDOW`, `ACCESSIBILITY_SERVICE`), permission services, Riverpod notifier, and 13 automated tests passing, 0 lints.
 
 ---
@@ -104,10 +105,22 @@
 - [x] In-browser automated test runner modal (`#auto-test-modal`) testing day selection, session filtering, state badge styles, duration tickers, and IPC sync contracts.
 - [x] Local preview served on port 8089 (`ui_mockups/planner.html`).
 
+### 3.5 Active Work: Usage Stats Screen UI (`Code2`)
+- [x] Top Bar with back arrow, centered title ("Usage Stats"), and Help pill button.
+- [x] 3-Tab Selector ("Today" | "Daily" | "Weekly") with text labels and Amber Autumn (`#CA9C68`) underline indicator.
+- [x] Today Tab: 24-hour smooth Bézier stacked area chart (~200px) with 6am, 12pm, 6pm, 12am X-axis labels and horizontal reference lines.
+- [x] Daily Tab: 7-day stacked bar chart (Mon–Sun) with interactive bar selection (selected day fully colored, others in greyscale).
+- [x] Weekly Tab: 5-week stacked bar chart with full category colors + Sunday In-App Weekly Summary Card (streak, total focused, delta comparison, max/min focus days, summary text, dismissible).
+- [x] 2×2 Category Legend Grid with dividers (Productive `#4E7D56`, Semi-Productive `#906D4B`, Distracting `#38332B`, Others `#94A3B8`).
+- [x] App Section (All Tabs): Search bar with dynamic text filtering, app item rows (40×40 icon, app name, category pill, time spent), sorted descending by time, with interactive App Detail bottom sheet.
+- [x] Floating 5-tab pill navigation bar with Tab 2 (**Usage**) active in `#CA9C68`.
+- [x] In-browser automated test runner modal (`#auto-test-modal`) testing all 10 feature gates.
+- [x] Local preview served on port 8090 (`ui_mockups/usage_stats.html`).
+
 ---
 
 ## 4. Backlog
-- [ ] Remaining UI screens generation (Usage Stats, 2/5/10/20 Distraction Intervention, Home Widget).
+- [ ] Remaining UI screens generation (2/5/10/20 Distraction Intervention, Home Widget).
 - [ ] Database schema & Hive box implementations (`lib/core/database/`).
 - [ ] Riverpod state management providers and navigation shell (`go_router`).
 - [ ] Foreground timer service and background workers (`flutter_foreground_task`, `workmanager`).

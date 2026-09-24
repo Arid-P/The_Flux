@@ -137,8 +137,56 @@ assert(plannerHtml.includes('function jumpToToday()'), 'Must contain jumpToToday
 assert(plannerHtml.includes('function runPlannerAutoTests()'), 'Must contain runPlannerAutoTests()');
 console.log('  ✓ Planner Calendar & Session state engines verified');
 
-// 4. Logic Unit Simulation for Limits CRUD
-console.log('\n--- 4. Testing App Limits In-Memory Reactivity Logic ---');
+// 4. Verify Usage Stats Screen (ui_mockups/usage_stats.html)
+console.log('\n--- 4. Testing usage_stats.html ---');
+const usagePath = path.join(__dirname, 'ui_mockups', 'usage_stats.html');
+assert(fs.existsSync(usagePath), 'usage_stats.html must exist');
+const usageHtml = fs.readFileSync(usagePath, 'utf8');
+
+const usageRequiredIds = [
+  'screen-title',
+  'btn-back-home',
+  'btn-open-help',
+  'tab-selector',
+  'tab-btn-today',
+  'tab-btn-daily',
+  'tab-btn-weekly',
+  'weekly-summary-card',
+  'chart-section',
+  'view-chart-today',
+  'view-chart-daily',
+  'view-chart-weekly',
+  'legend-grid',
+  'app-search-input',
+  'apps-list-container',
+  'apps-empty-state',
+  'app-detail-sheet',
+  'help-modal',
+  'auto-test-modal',
+  'test-results-list'
+];
+
+usageRequiredIds.forEach(id => {
+  assert(usageHtml.includes(`id="${id}"`), `Missing required ID in usage_stats.html: #${id}`);
+  console.log(`  ✓ Usage Stats ID present: #${id}`);
+});
+
+['#13191F', '#2B2F2E', '#594C3D', '#906D4B', '#CA9C68', '#F8FAFC', '#94A3B8', '#4E7D56'].forEach(color => {
+  assert(usageHtml.includes(color), `Must include ${color} in usage_stats.html`);
+  console.log(`  ✓ Usage Stats Rustic Medley color token verified: ${color}`);
+});
+
+assert(usageHtml.includes('function switchTab('), 'Must contain switchTab()');
+assert(usageHtml.includes('function renderDailyBars()'), 'Must contain renderDailyBars()');
+assert(usageHtml.includes('function renderWeeklyBars()'), 'Must contain renderWeeklyBars()');
+assert(usageHtml.includes('function renderAppList()'), 'Must contain renderAppList()');
+assert(usageHtml.includes('function handleAppSearch('), 'Must contain handleAppSearch()');
+assert(usageHtml.includes('function openAppDetail('), 'Must contain openAppDetail()');
+assert(usageHtml.includes('function runUsageStatsAutoTests()'), 'Must contain runUsageStatsAutoTests()');
+console.log('  ✓ Usage Stats charts, search, and detail sheets verified');
+
+// 5. Logic Unit Simulation for Limits CRUD
+console.log('\n--- 5. Testing App Limits In-Memory Reactivity Logic ---');
 let limitsStore = [
   { id: 'instagram', name: 'Instagram', category: 'distracting', spentMins: 42, limitHours: 0, limitMins: 45, status: 'blocking', streak: 12 },
   { id: 'youtube', name: 'YouTube', category: 'distracting', spentMins: 70, limitHours: 1, limitMins: 30, status: 'blocking', streak: 24 }
@@ -170,6 +218,6 @@ assert.strictEqual(limitsStore.length, 2, 'Must have 2 apps after delete');
 console.log('  ✓ Delete limit logic: PASS');
 
 console.log('\n======================================================');
-console.log('🎉 ALL CODE2 SCREEN TESTS PASSED (Home, App Limits, Planner - 100%)');
+console.log('🎉 ALL CODE2 SCREEN TESTS PASSED (Home, App Limits, Planner, Usage Stats - 100%)');
 console.log('======================================================\n');
 

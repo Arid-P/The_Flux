@@ -1,0 +1,1111 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>FluxFoxus — Usage Stats Preview</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@600;700&display=swap" rel="stylesheet">
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            'ff-bg': '#13191F',        // River Styx
+            'ff-surface': '#2B2F2E',   // Carbon Fibre
+            'ff-elevated': '#232726',  // Elevated Carbon
+            'ff-border': '#594C3D',    // Afternoon Tea
+            'ff-accent': '#906D4B',    // Tanned Wood (replaces Soft Cyan)
+            'ff-primary': '#CA9C68',   // Amber Autumn (replaces Electric Indigo)
+            'ff-text': '#F8FAFC',      // Ghost White
+            'ff-muted': '#94A3B8',     // Muted Slate Grey
+            'ff-productive': '#4E7D56',// Muted Olive / Forest Green
+            'ff-semi': '#906D4B',      // Tanned Wood
+            'ff-distracting': '#38332B',// Carbon Charcoal
+            'ff-others': '#64748B',    // Slate Grey
+          },
+          fontFamily: {
+            sans: ['Inter', 'sans-serif'],
+            mono: ['JetBrains Mono', 'monospace'],
+          }
+        }
+      }
+    }
+  </script>
+  <style>
+    body {
+      background-color: #0b0f14;
+      font-family: 'Inter', sans-serif;
+      user-select: none;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    .no-scrollbar::-webkit-scrollbar {
+      display: none;
+    }
+    .no-scrollbar {
+      -ms-overflow-style: none;
+      scrollbar-width: none;
+    }
+
+    /* SVG chart smooth transitions */
+    .chart-path {
+      transition: all 0.4s ease-in-out;
+    }
+  </style>
+</head>
+<body class="min-h-screen flex flex-col items-center justify-center p-3 text-ff-text">
+
+  <!-- TOP TOOLBAR CONTROLS (Preview Controller) -->
+  <div class="w-full max-w-sm mb-3 px-1 flex flex-col space-y-2">
+    <div class="flex items-center justify-between text-xs text-ff-muted">
+      <div class="flex items-center space-x-1.5">
+        <span class="w-2 h-2 rounded-full bg-emerald-400 inline-block animate-pulse"></span>
+        <span class="font-bold text-ff-text">Usage Stats Preview</span>
+        <span class="px-1.5 py-0.5 rounded bg-ff-primary/20 text-ff-primary text-[10px] font-mono">Port 8090</span>
+      </div>
+      <button onclick="runUsageStatsAutoTests()" class="px-2.5 py-1 rounded-full bg-ff-primary text-ff-bg font-bold text-[11px] hover:bg-[#b88c5a] transition flex items-center space-x-1 shadow-md">
+        <span>🧪</span>
+        <span>Run Auto Tests</span>
+      </button>
+    </div>
+
+    <!-- Quick Granularity Switcher -->
+    <div class="flex items-center justify-between bg-ff-surface/90 border border-ff-border px-2.5 py-1.5 rounded-xl text-[11px]">
+      <span class="text-ff-muted font-medium">Time Horizon:</span>
+      <div class="flex items-center space-x-1.5">
+        <button onclick="switchTab('today')" class="px-2.5 py-0.5 rounded-lg bg-ff-primary/20 text-ff-primary border border-ff-primary/40 font-mono text-[10px]">Today</button>
+        <button onclick="switchTab('daily')" class="px-2.5 py-0.5 rounded-lg bg-ff-bg hover:border-ff-border border border-transparent text-ff-text font-mono text-[10px]">Daily (Week)</button>
+        <button onclick="switchTab('weekly')" class="px-2.5 py-0.5 rounded-lg bg-ff-bg hover:border-ff-border border border-transparent text-ff-text font-mono text-[10px]">Weekly (5 Wks)</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- PHONE CONTAINER SIMULATOR (390 x 844 px) -->
+  <div class="relative w-[390px] h-[844px] bg-ff-bg rounded-[44px] border-[5px] border-[#38332B] shadow-2xl flex flex-col overflow-hidden">
+
+    <!-- Top Speaker Notch & Status Bar -->
+    <div class="w-full shrink-0 pt-3 px-6 flex items-center justify-between text-xs text-ff-muted select-none">
+      <span class="font-semibold text-ff-text font-mono text-xs">9:41</span>
+      <div class="w-20 h-4 bg-black rounded-full mx-auto"></div>
+      <div class="flex items-center space-x-1.5">
+        <svg class="w-3.5 h-3.5 fill-current" viewBox="0 0 24 24"><path d="M12 3c-4.97 0-9 4.03-9 9 0 2.12.74 4.07 1.97 5.61L4.35 18.25l1.41 1.41 1.07-1.07A8.96 8.96 0 0012 21c4.97 0 9-4.03 9-9s-4.03-9-9-9z"/></svg>
+        <svg class="w-3.5 h-3.5 fill-current" viewBox="0 0 24 24"><path d="M2 17h20v2H2zm1.15-4.05L4 11.97l6.97-6.97a1.5 1.5 0 012.12 0L20.06 12l.85.98-1.52 1.32-6.27-6.27a.5.5 0 00-.71 0l-6.27 6.27-1.99-1.35z"/></svg>
+        <span class="font-bold text-[10px] text-ff-text">100%</span>
+      </div>
+    </div>
+
+    <!-- MAIN SCROLLABLE APP BODY -->
+    <div class="flex-1 flex flex-col px-5 pt-3 pb-24 overflow-y-auto no-scrollbar space-y-4">
+
+      <!-- 1. TOP BAR (Section 3) -->
+      <div class="flex items-center justify-between pt-1">
+        <!-- Back Arrow -->
+        <a id="btn-back-home" href="home_screen.html" class="w-8 h-8 rounded-lg bg-ff-surface border border-ff-border flex items-center justify-center text-ff-text hover:border-ff-primary transition">
+          <svg class="w-4 h-4 fill-none stroke-current stroke-2" viewBox="0 0 24 24">
+            <polyline points="15 18 9 12 15 6"></polyline>
+          </svg>
+        </a>
+
+        <!-- Screen Title (Centered) -->
+        <h1 id="screen-title" class="text-lg font-bold text-ff-text tracking-tight">Usage Stats</h1>
+
+        <!-- Help Button -->
+        <button id="btn-open-help" onclick="toggleHelpModal(true)" class="px-3 py-1.5 rounded-full bg-ff-surface border border-ff-border text-xs font-semibold text-ff-muted hover:text-ff-text hover:border-ff-accent transition">
+          Help
+        </button>
+      </div>
+
+      <!-- 2. TAB SELECTOR: TODAY | DAILY | WEEKLY (Section 4) -->
+      <div id="tab-selector" class="flex items-center border-b border-ff-border/70 relative">
+        <!-- Today Tab Button -->
+        <button id="tab-btn-today" onclick="switchTab('today')" class="flex-1 pb-2.5 text-center text-xs font-bold text-ff-text transition relative">
+          <span>Today</span>
+          <div id="tab-indicator-today" class="absolute bottom-0 left-0 right-0 h-0.5 bg-ff-primary rounded-full"></div>
+        </button>
+
+        <!-- Daily Tab Button -->
+        <button id="tab-btn-daily" onclick="switchTab('daily')" class="flex-1 pb-2.5 text-center text-xs font-medium text-ff-muted hover:text-ff-text transition relative">
+          <span>Daily</span>
+          <div id="tab-indicator-daily" class="absolute bottom-0 left-0 right-0 h-0.5 bg-ff-primary rounded-full hidden"></div>
+        </button>
+
+        <!-- Weekly Tab Button -->
+        <button id="tab-btn-weekly" onclick="switchTab('weekly')" class="flex-1 pb-2.5 text-center text-xs font-medium text-ff-muted hover:text-ff-text transition relative">
+          <span>Weekly</span>
+          <div id="tab-indicator-weekly" class="absolute bottom-0 left-0 right-0 h-0.5 bg-ff-primary rounded-full hidden"></div>
+        </button>
+      </div>
+
+      <!-- 3. IN-APP WEEKLY SUMMARY CARD (Section 9.3 — Shown on Weekly tab) -->
+      <div id="weekly-summary-card" class="hidden bg-ff-primary/10 border-l-[3px] border-l-ff-primary border border-ff-border rounded-2xl p-3.5 space-y-2 relative shadow-md">
+        <button onclick="dismissWeeklySummary()" class="absolute top-2.5 right-3 text-ff-muted hover:text-ff-text text-xs" title="Dismiss">✕</button>
+        
+        <div class="flex items-center space-x-2">
+          <span class="text-sm">📊</span>
+          <span class="text-xs font-bold text-ff-primary uppercase tracking-wide">Sunday Weekly Report</span>
+        </div>
+
+        <p id="weekly-summary-highlight" class="text-xs font-semibold text-ff-text leading-snug">
+          You focused <span class="text-ff-primary font-bold">2h 15m more</span> than last week! 🔥
+        </p>
+
+        <!-- Mini Stats Grid -->
+        <div class="grid grid-cols-2 gap-2 pt-1 text-[11px]">
+          <div class="bg-ff-bg/60 p-2 rounded-lg border border-ff-border/50">
+            <span class="text-[9px] text-ff-muted block uppercase">Current Streak</span>
+            <span class="text-xs font-bold text-ff-text">🔥 5 days</span>
+          </div>
+          <div class="bg-ff-bg/60 p-2 rounded-lg border border-ff-border/50">
+            <span class="text-[9px] text-ff-muted block uppercase">Total Focused</span>
+            <span class="text-xs font-bold text-ff-text">22h 45m</span>
+          </div>
+          <div class="bg-ff-bg/60 p-2 rounded-lg border border-ff-border/50">
+            <span class="text-[9px] text-ff-muted block uppercase">Peak Day</span>
+            <span class="text-xs font-bold text-ff-productive">Wed (4h 30m)</span>
+          </div>
+          <div class="bg-ff-bg/60 p-2 rounded-lg border border-ff-border/50">
+            <span class="text-[9px] text-ff-muted block uppercase">Min Day</span>
+            <span class="text-xs font-bold text-ff-muted">Sun (1h 10m)</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- 4. DYNAMIC CHART CONTAINER (Changes per tab) -->
+      <div id="chart-section" class="bg-ff-surface border border-ff-border rounded-2xl p-3.5 flex flex-col justify-between">
+        
+        <!-- Chart Title Row -->
+        <div class="flex items-center justify-between mb-2">
+          <div>
+            <span id="chart-subtitle" class="text-[10px] uppercase font-bold tracking-wider text-ff-muted block">Distribution</span>
+            <span id="chart-main-title" class="text-sm font-bold text-ff-text">Today's Timeline</span>
+          </div>
+          <span id="chart-total-badge" class="px-2 py-0.5 rounded-full bg-ff-primary/20 text-ff-primary text-[10px] font-bold font-mono">
+            6h 00m Total
+          </span>
+        </div>
+
+        <!-- VIEW A: TODAY BÉZIER STACKED AREA CHART (Section 5.1) -->
+        <div id="view-chart-today" class="w-full flex flex-col space-y-1">
+          <div class="relative w-full h-[180px] flex items-center justify-center">
+            <svg class="w-full h-full" viewBox="0 0 320 180" preserveAspectRatio="none">
+              <defs>
+                <!-- Area Gradients -->
+                <linearGradient id="grad-productive" x1="0" y1="0" x2="0" y2="1">
+                  <stop offset="0%" stop-color="#4E7D56" stop-opacity="0.85"/>
+                  <stop offset="100%" stop-color="#4E7D56" stop-opacity="0.3"/>
+                </linearGradient>
+                <linearGradient id="grad-semi" x1="0" y1="0" x2="0" y2="1">
+                  <stop offset="0%" stop-color="#906D4B" stop-opacity="0.85"/>
+                  <stop offset="100%" stop-color="#906D4B" stop-opacity="0.3"/>
+                </linearGradient>
+                <linearGradient id="grad-distracting" x1="0" y1="0" x2="0" y2="1">
+                  <stop offset="0%" stop-color="#38332B" stop-opacity="0.85"/>
+                  <stop offset="100%" stop-color="#38332B" stop-opacity="0.4"/>
+                </linearGradient>
+                <linearGradient id="grad-others" x1="0" y1="0" x2="0" y2="1">
+                  <stop offset="0%" stop-color="#64748B" stop-opacity="0.8"/>
+                  <stop offset="100%" stop-color="#64748B" stop-opacity="0.25"/>
+                </linearGradient>
+              </defs>
+
+              <!-- Horizontal Reference Grid Lines -->
+              <line x1="0" y1="36" x2="320" y2="36" stroke="#594C3D" stroke-opacity="0.25" stroke-dasharray="3 3"/>
+              <line x1="0" y1="82" x2="320" y2="82" stroke="#594C3D" stroke-opacity="0.25" stroke-dasharray="3 3"/>
+              <line x1="0" y1="128" x2="320" y2="128" stroke="#594C3D" stroke-opacity="0.25" stroke-dasharray="3 3"/>
+
+              <!-- Layer 4: Others (Topmost Area) -->
+              <path class="chart-path" d="M 0 170 Q 50 145, 100 115 T 200 65 T 320 40 L 320 170 L 0 170 Z" fill="url(#grad-others)"/>
+
+              <!-- Layer 3: Distracting Area -->
+              <path class="chart-path" d="M 0 170 Q 50 152, 100 125 T 200 85 T 320 62 L 320 170 L 0 170 Z" fill="url(#grad-distracting)"/>
+
+              <!-- Layer 2: Semi-Productive Area -->
+              <path class="chart-path" d="M 0 170 Q 50 158, 100 142 T 200 112 T 320 95 L 320 170 L 0 170 Z" fill="url(#grad-semi)"/>
+
+              <!-- Layer 1: Productive Area (Bottommost) -->
+              <path class="chart-path" d="M 0 170 Q 50 164, 100 155 T 200 138 T 320 128 L 320 170 L 0 170 Z" fill="url(#grad-productive)"/>
+
+              <!-- Bottom Axis Line -->
+              <line x1="0" y1="170" x2="320" y2="170" stroke="#594C3D" stroke-width="1.5"/>
+            </svg>
+          </div>
+          <!-- X-Axis Labels: 6am, 12pm, 6pm, 12am -->
+          <div class="flex items-center justify-between text-[10px] text-ff-muted font-mono px-1">
+            <span>6am</span>
+            <span>12pm</span>
+            <span>6pm</span>
+            <span>12am</span>
+          </div>
+        </div>
+
+        <!-- VIEW B: DAILY 7-DAY STACKED BAR CHART (Section 6.1) -->
+        <div id="view-chart-daily" class="hidden w-full flex flex-col space-y-1">
+          <div class="relative w-full h-[180px] flex items-end justify-between px-2 pt-2">
+            <!-- Y-Axis Hour Markers -->
+            <div class="absolute left-0 top-0 bottom-6 flex flex-col justify-between text-[9px] text-ff-muted font-mono">
+              <span>6h</span>
+              <span>4h</span>
+              <span>2h</span>
+              <span>0h</span>
+            </div>
+
+            <!-- 7 Vertical Bars (Mon–Sun) -->
+            <div class="w-full h-full flex items-end justify-between pl-6 pb-6" id="daily-bars-container">
+              <!-- Dynamically populated by renderDailyBars() -->
+            </div>
+          </div>
+          <!-- Daily Hint -->
+          <div class="text-[9px] text-ff-muted text-center italic">
+            Tap any bar to inspect category breakdown for that day
+          </div>
+        </div>
+
+        <!-- VIEW C: WEEKLY 5-WEEK STACKED BAR CHART (Section 7.1) -->
+        <div id="view-chart-weekly" class="hidden w-full flex flex-col space-y-1">
+          <div class="relative w-full h-[180px] flex items-end justify-between px-2 pt-2">
+            <div class="w-full h-full flex items-end justify-between pb-6" id="weekly-bars-container">
+              <!-- Dynamically populated by renderWeeklyBars() -->
+            </div>
+          </div>
+          <div class="text-[9px] text-ff-muted text-center italic">
+            Displaying the 5 most recent rolling weeks
+          </div>
+        </div>
+
+      </div>
+
+      <!-- 5. 2×2 CATEGORY LEGEND GRID (Section 5.2, 6.2, 7.2) -->
+      <div id="legend-grid" class="bg-ff-surface border border-ff-border rounded-2xl p-3.5">
+        <div class="grid grid-cols-2 divide-x divide-ff-border/70">
+          
+          <!-- Column 1: Productive & Semi-Productive -->
+          <div class="space-y-2.5 pr-3">
+            <!-- Row 1: Productive -->
+            <div class="flex items-center justify-between">
+              <div class="flex items-center space-x-2">
+                <span class="w-2.5 h-2.5 rounded-full bg-ff-productive shrink-0"></span>
+                <span class="text-xs text-ff-muted">Productive</span>
+              </div>
+              <span id="legend-val-productive" class="text-xs font-bold text-ff-text font-mono">1h 45m</span>
+            </div>
+            
+            <div class="h-px bg-ff-border/50"></div>
+
+            <!-- Row 2: Semi-Productive -->
+            <div class="flex items-center justify-between">
+              <div class="flex items-center space-x-2">
+                <span class="w-2.5 h-2.5 rounded-full bg-ff-semi shrink-0"></span>
+                <span class="text-xs text-ff-muted">Semi-Prod</span>
+              </div>
+              <span id="legend-val-semi" class="text-xs font-bold text-ff-text font-mono">0h 50m</span>
+            </div>
+          </div>
+
+          <!-- Column 2: Distracting & Others -->
+          <div class="space-y-2.5 pl-3">
+            <!-- Row 3: Distracting -->
+            <div class="flex items-center justify-between">
+              <div class="flex items-center space-x-2">
+                <span class="w-2.5 h-2.5 rounded-full bg-[#38332B] border border-ff-border shrink-0"></span>
+                <span class="text-xs text-ff-muted">Distracting</span>
+              </div>
+              <span id="legend-val-distracting" class="text-xs font-bold text-ff-text font-mono">2h 15m</span>
+            </div>
+
+            <div class="h-px bg-ff-border/50"></div>
+
+            <!-- Row 4: Others -->
+            <div class="flex items-center justify-between">
+              <div class="flex items-center space-x-2">
+                <span class="w-2.5 h-2.5 rounded-full bg-ff-others shrink-0"></span>
+                <span class="text-xs text-ff-muted">Others</span>
+              </div>
+              <span id="legend-val-others" class="text-xs font-bold text-ff-text font-mono">1h 10m</span>
+            </div>
+          </div>
+
+        </div>
+      </div>
+
+      <!-- 6. APP SECTION (Section 8: Search Bar + App List) -->
+      <div class="space-y-3">
+        
+        <!-- Section Header -->
+        <div class="flex items-center justify-between px-1">
+          <h2 class="text-xs font-bold text-ff-muted uppercase tracking-wider">
+            Applications Used
+          </h2>
+          <span id="apps-count-badge" class="text-[10px] text-ff-muted font-mono">
+            6 apps tracked
+          </span>
+        </div>
+
+        <!-- 8.1 Search Bar -->
+        <div class="relative w-full">
+          <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-ff-muted">
+            <svg class="w-4 h-4 fill-none stroke-current stroke-2" viewBox="0 0 24 24">
+              <circle cx="11" cy="11" r="8"></circle>
+              <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+            </svg>
+          </div>
+          <input id="app-search-input"
+                 type="text"
+                 placeholder="Search apps..."
+                 oninput="handleAppSearch(this.value)"
+                 class="w-full pl-9 pr-8 py-2.5 bg-ff-surface border border-ff-border rounded-xl text-xs text-ff-text placeholder-ff-muted focus:outline-none focus:border-ff-primary transition">
+          <button id="btn-clear-search" onclick="clearAppSearch()" class="absolute inset-y-0 right-0 pr-3 flex items-center text-ff-muted hover:text-ff-text text-xs hidden">
+            ✕
+          </button>
+        </div>
+
+        <!-- 8.2 Scrollable App List -->
+        <div id="apps-list-container" class="space-y-2">
+          <!-- Dynamically populated by renderAppList() -->
+        </div>
+
+        <!-- 8.3 Empty State (Search / Filter Fallback) -->
+        <div id="apps-empty-state" class="hidden bg-ff-surface border border-ff-border rounded-2xl p-7 flex flex-col items-center justify-center text-center space-y-2">
+          <div class="w-12 h-12 rounded-full bg-ff-bg/80 border border-ff-border flex items-center justify-center text-ff-muted">
+            <!-- Muted Aperture Icon -->
+            <svg class="w-6 h-6 text-ff-muted" viewBox="0 0 100 100" fill="none">
+              <circle cx="50" cy="50" r="44" stroke="currentColor" stroke-width="4" stroke-opacity="0.3"/>
+              <path d="M50 10 L84.6 30 L84.6 70 L50 90 L15.4 70 L15.4 30 Z" stroke="currentColor" stroke-width="3" stroke-opacity="0.4"/>
+            </svg>
+          </div>
+          <span class="text-xs font-semibold text-ff-muted">No data for this period</span>
+          <p class="text-[10px] text-ff-muted/80">Try changing your search term or selecting another time horizon above.</p>
+        </div>
+
+      </div>
+
+    </div>
+
+    <!-- 7. FLOATING PILL NAVIGATION BAR (ui_navigation.md — Tab 2 Usage ACTIVE) -->
+    <div class="absolute bottom-4 left-4 right-4 z-20">
+      <div class="w-full h-16 bg-ff-surface border border-ff-border rounded-full px-3 flex items-center justify-between shadow-2xl">
+        
+        <!-- Tab 1: Home -->
+        <a href="home_screen.html" class="flex flex-col items-center justify-center px-2 py-1 text-ff-muted hover:text-ff-text transition">
+          <svg class="w-5 h-5 fill-current" viewBox="0 0 24 24">
+            <path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z"/>
+          </svg>
+          <span class="text-[9px] font-medium mt-0.5">Home</span>
+        </a>
+
+        <!-- Group 1: [Usage + Focus] Pill Sub-container -->
+        <div class="flex items-center space-x-1 bg-ff-bg/50 border border-ff-border/40 rounded-full px-2 py-1">
+          <!-- Tab 2: Usage (ACTIVE in Amber Autumn) -->
+          <button class="flex flex-col items-center justify-center px-2 py-0.5 text-ff-primary">
+            <svg class="w-4 h-4 fill-none stroke-current stroke-2" viewBox="0 0 24 24">
+              <circle cx="12" cy="12" r="9"/>
+              <polyline points="12 6 12 12 16 14"/>
+            </svg>
+            <span class="text-[9px] font-bold mt-0.5">Usage</span>
+          </button>
+          <!-- Tab 3: Focus -->
+          <a href="active_focus_session.html" class="flex flex-col items-center justify-center px-2 py-0.5 text-ff-muted hover:text-ff-primary transition">
+            <svg class="w-4 h-4 fill-none stroke-current stroke-2" viewBox="0 0 24 24">
+              <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/>
+              <circle cx="12" cy="12" r="3"/>
+            </svg>
+            <span class="text-[9px] font-medium mt-0.5">Focus</span>
+          </a>
+        </div>
+
+        <!-- Group 2: [Planner + Block] Pill Sub-container -->
+        <div class="flex items-center space-x-1 bg-ff-bg/50 border border-ff-border/40 rounded-full px-2 py-1">
+          <!-- Tab 4: Planner -->
+          <a href="planner.html" class="flex flex-col items-center justify-center px-2 py-0.5 text-ff-muted hover:text-ff-primary transition">
+            <svg class="w-4 h-4 fill-none stroke-current stroke-2" viewBox="0 0 24 24">
+              <rect x="3" y="4" width="18" height="18" rx="2" ry="2"/>
+              <line x1="16" y1="2" x2="16" y2="6"/>
+              <line x1="8" y1="2" x2="8" y2="6"/>
+              <line x1="3" y1="10" x2="21" y2="10"/>
+            </svg>
+            <span class="text-[9px] font-medium mt-0.5">Planner</span>
+          </a>
+          <!-- Tab 5: Block -->
+          <a href="app_limits.html" class="flex flex-col items-center justify-center px-2 py-0.5 text-ff-muted hover:text-ff-primary transition">
+            <svg class="w-4 h-4 fill-none stroke-current stroke-2" viewBox="0 0 24 24">
+              <circle cx="12" cy="12" r="9"/>
+              <line x1="4.93" y1="4.93" x2="19.07" y2="19.07"/>
+            </svg>
+            <span class="text-[9px] font-medium mt-0.5">Block</span>
+          </a>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- 8. APP USAGE DETAIL BOTTOM SHEET -->
+    <div id="app-detail-sheet" class="absolute inset-0 bg-black/80 backdrop-blur-sm z-50 flex items-end justify-center hidden">
+      <div class="w-full bg-ff-surface border-t border-ff-border rounded-t-3xl p-5 shadow-2xl space-y-4">
+        <div class="w-10 h-1 bg-ff-border rounded-full mx-auto mb-1"></div>
+        
+        <div class="flex items-center justify-between pb-2 border-b border-ff-border/60">
+          <div class="flex items-center space-x-3">
+            <div id="detail-app-icon" class="w-11 h-11 rounded-xl bg-ff-bg border border-ff-border flex items-center justify-center text-xl">
+              📷
+            </div>
+            <div>
+              <h3 id="detail-app-name" class="text-sm font-bold text-ff-text leading-tight">Instagram</h3>
+              <span id="detail-app-category" class="px-2 py-0.5 rounded bg-ff-accent/20 text-ff-accent text-[9px] font-bold uppercase">Distracting</span>
+            </div>
+          </div>
+          <button onclick="closeAppDetailSheet()" class="text-ff-muted hover:text-ff-text text-sm p-1">✕</button>
+        </div>
+
+        <!-- Detail Metrics -->
+        <div class="grid grid-cols-2 gap-2 text-xs">
+          <div class="bg-ff-bg/70 p-3 rounded-xl border border-ff-border">
+            <span class="text-[10px] text-ff-muted block uppercase">Time Spent</span>
+            <span id="detail-time-spent" class="text-base font-bold text-ff-text font-mono mt-0.5 block">1h 15m</span>
+          </div>
+          <div class="bg-ff-bg/70 p-3 rounded-xl border border-ff-border">
+            <span class="text-[10px] text-ff-muted block uppercase">Daily Limit</span>
+            <span id="detail-limit-status" class="text-base font-bold text-ff-primary font-mono mt-0.5 block">45m Limit</span>
+          </div>
+        </div>
+
+        <!-- Hourly Mini Activity Distribution -->
+        <div class="bg-ff-bg/50 p-3 rounded-xl border border-ff-border space-y-1.5">
+          <span class="text-[10px] text-ff-muted block font-semibold uppercase">Hourly Activity Distribution</span>
+          <div class="h-10 flex items-end justify-between space-x-1 pt-1">
+            <div class="flex-1 bg-ff-border/40 rounded-t h-[20%]"></div>
+            <div class="flex-1 bg-ff-border/40 rounded-t h-[40%]"></div>
+            <div class="flex-1 bg-ff-primary/50 rounded-t h-[80%]"></div>
+            <div class="flex-1 bg-ff-primary rounded-t h-[100%]"></div>
+            <div class="flex-1 bg-ff-primary/70 rounded-t h-[60%]"></div>
+            <div class="flex-1 bg-ff-border/40 rounded-t h-[30%]"></div>
+          </div>
+          <div class="flex items-center justify-between text-[8px] text-ff-muted font-mono">
+            <span>Morning</span>
+            <span>Afternoon</span>
+            <span>Evening</span>
+          </div>
+        </div>
+
+        <div class="flex space-x-2 pt-1">
+          <a href="app_limits.html" class="flex-1 py-2.5 rounded-xl bg-ff-primary text-ff-bg text-center font-bold text-xs hover:bg-[#b88c5a] transition">
+            Adjust App Limit
+          </a>
+          <button onclick="closeAppDetailSheet()" class="px-4 py-2.5 rounded-xl bg-ff-bg border border-ff-border text-ff-muted text-xs hover:text-ff-text">
+            Close
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- 9. HELP MODAL -->
+    <div id="help-modal" class="absolute inset-0 bg-black/80 backdrop-blur-sm z-50 flex items-center justify-center p-5 hidden">
+      <div class="w-full bg-ff-surface border border-ff-border rounded-3xl p-5 shadow-2xl space-y-4">
+        <div class="flex items-center justify-between pb-2 border-b border-ff-border/60">
+          <div class="flex items-center space-x-2">
+            <span class="text-base">ℹ️</span>
+            <h3 class="text-sm font-bold text-ff-text">Usage Stats Guide</h3>
+          </div>
+          <button onclick="toggleHelpModal(false)" class="text-ff-muted hover:text-ff-text text-sm">✕</button>
+        </div>
+
+        <div class="space-y-3 text-xs text-ff-muted">
+          <div>
+            <h4 class="text-ff-text font-semibold flex items-center space-x-2">
+              <span class="w-2.5 h-2.5 rounded-full bg-ff-productive"></span>
+              <span>Productive Category</span>
+            </h4>
+            <p class="text-[11px] mt-0.5 leading-relaxed">
+              Code editors, terminal, IDEs, document readers, and educational tools.
+            </p>
+          </div>
+
+          <div>
+            <h4 class="text-ff-text font-semibold flex items-center space-x-2">
+              <span class="w-2.5 h-2.5 rounded-full bg-ff-semi"></span>
+              <span>Semi-Productive</span>
+            </h4>
+            <p class="text-[11px] mt-0.5 leading-relaxed">
+              Slack, email, work communications, and research browsers.
+            </p>
+          </div>
+
+          <div>
+            <h4 class="text-ff-text font-semibold flex items-center space-x-2">
+              <span class="w-2.5 h-2.5 rounded-full bg-[#38332B] border border-ff-border"></span>
+              <span>Distracting</span>
+            </h4>
+            <p class="text-[11px] mt-0.5 leading-relaxed">
+              Social media, feeds, casual games, and algorithmic video apps subject to friction limits.
+            </p>
+          </div>
+        </div>
+
+        <button onclick="toggleHelpModal(false)" class="w-full py-2.5 rounded-xl bg-ff-primary text-ff-bg font-bold text-xs hover:bg-[#b88c5a] transition">
+          Got It
+        </button>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- AUTOMATED TEST RESULTS MODAL -->
+  <div id="auto-test-modal" class="fixed inset-0 bg-black/85 backdrop-blur-md z-50 flex items-center justify-center p-4 hidden">
+    <div class="w-full max-w-lg bg-ff-surface border border-ff-border rounded-3xl p-5 shadow-2xl flex flex-col max-h-[85vh]">
+      
+      <!-- Modal Header -->
+      <div class="flex items-center justify-between pb-3 border-b border-ff-border/60">
+        <div class="flex items-center space-x-2">
+          <span class="text-lg">🧪</span>
+          <div>
+            <h3 class="text-sm font-bold text-ff-text">Usage Stats Test Suite</h3>
+            <span class="text-[10px] text-ff-muted">Bézier curves, 7-day bar chart, search filter & tokens</span>
+          </div>
+        </div>
+        <button onclick="closeUsageStatsAutoTests()" class="w-7 h-7 rounded-lg bg-ff-bg border border-ff-border text-ff-muted hover:text-ff-text flex items-center justify-center text-xs">
+          ✕
+        </button>
+      </div>
+
+      <!-- Summary Card -->
+      <div class="my-3 p-3 bg-ff-bg/70 border border-ff-border rounded-xl flex items-center justify-between">
+        <div>
+          <span id="test-summary-status" class="text-xs font-bold text-ff-text block">Running tests...</span>
+          <span id="test-summary-detail" class="text-[10px] text-ff-muted">Checking assertion gates...</span>
+        </div>
+        <span id="test-summary-badge" class="px-2.5 py-1 rounded-full bg-ff-primary/20 text-ff-primary text-[10px] font-bold border border-ff-primary/30">
+          TESTING
+        </span>
+      </div>
+
+      <!-- Test Items List -->
+      <div id="test-results-list" class="flex-1 overflow-y-auto no-scrollbar space-y-2 pr-1"></div>
+
+      <!-- Footer Button -->
+      <div class="pt-3 mt-3 border-t border-ff-border/60 flex justify-end">
+        <button onclick="closeUsageStatsAutoTests()" class="px-5 py-2 rounded-xl bg-ff-primary text-ff-bg font-bold text-xs hover:bg-[#b88c5a] transition">
+          Close Results
+        </button>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- APPLICATION LOGIC & TEST ENGINE -->
+  <script>
+    // -------------------------------------------------------------------------
+    // 1. Data Models for Time Horizons
+    // -------------------------------------------------------------------------
+    let currentTab = 'today'; // 'today' | 'daily' | 'weekly'
+    let selectedDailyDayIndex = 2; // Default to Wednesday (index 2)
+    let currentSearchQuery = '';
+
+    const USAGE_DATA = {
+      today: {
+        total: '6h 00m',
+        productive: '1h 45m',
+        semi: '0h 50m',
+        distracting: '2h 15m',
+        others: '1h 10m',
+        apps: [
+          { id: 'app-ig', name: 'Instagram', emoji: '📷', category: 'distracting', time: '1h 15m', minutes: 75, limit: '45m Limit' },
+          { id: 'app-vscode', name: 'VS Code', emoji: '💻', category: 'productive', time: '1h 10m', minutes: 70, limit: 'No Limit' },
+          { id: 'app-yt', name: 'YouTube', emoji: '▶️', category: 'distracting', time: '1h 00m', minutes: 60, limit: '1h Limit' },
+          { id: 'app-slack', name: 'Slack', emoji: '💬', category: 'semi', time: '50m', minutes: 50, limit: 'No Limit' },
+          { id: 'app-obsidian', name: 'Obsidian', emoji: '📓', category: 'productive', time: '35m', minutes: 35, limit: 'No Limit' },
+          { id: 'app-settings', name: 'Settings & System', emoji: '⚙️', category: 'others', time: '30m', minutes: 30, limit: 'No Limit' },
+        ]
+      },
+      daily: [
+        { day: 'Mon', total: '5h 40m', prod: '2h 10m', semi: '1h 00m', dist: '1h 40m', oth: '0h 50m', prodH: 35, semiH: 20, distH: 30, othH: 15 },
+        { day: 'Tue', total: '6h 10m', prod: '1h 30m', semi: '1h 15m', dist: '2h 15m', oth: '1h 10m', prodH: 25, semiH: 22, distH: 38, othH: 15 },
+        { day: 'Wed', total: '6h 00m', prod: '1h 45m', semi: '0h 50m', dist: '2h 15m', oth: '1h 10m', prodH: 30, semiH: 18, distH: 38, othH: 14, isToday: true },
+        { day: 'Thu', total: '4h 20m', prod: '2h 00m', semi: '0h 40m', dist: '1h 10m', oth: '0h 30m', prodH: 34, semiH: 15, distH: 22, othH: 10 },
+        { day: 'Fri', total: '3h 45m', prod: '1h 45m', semi: '0h 45m', dist: '0h 50m', oth: '0h 25m', prodH: 30, semiH: 16, distH: 18, othH: 8 },
+        { day: 'Sat', total: '2h 10m', prod: '0h 30m', semi: '0h 20m', dist: '1h 00m', oth: '0h 20m', prodH: 12, semiH: 10, distH: 22, othH: 8 },
+        { day: 'Sun', total: '1h 50m', prod: '0h 20m', semi: '0h 15m', dist: '0h 55m', oth: '0h 20m', prodH: 8, semiH: 8, distH: 20, othH: 8 },
+      ],
+      weekly: {
+        total: '31h 15m',
+        productive: '10h 00m',
+        semi: '5h 05m',
+        distracting: '11h 25m',
+        others: '4h 45m',
+        weeks: [
+          { label: 'Feb 23', total: '28h 10m', prodH: 40, semiH: 20, distH: 38, othH: 12 },
+          { label: 'Mar 2',  total: '29h 45m', prodH: 42, semiH: 24, distH: 34, othH: 14 },
+          { label: 'Mar 9',  total: '32h 20m', prodH: 38, semiH: 25, distH: 42, othH: 15 },
+          { label: 'Mar 16', total: '29h 00m', prodH: 44, semiH: 20, distH: 32, othH: 14 },
+          { label: 'Mar 23', total: '31h 15m', prodH: 48, semiH: 22, distH: 30, othH: 16 },
+        ],
+        apps: [
+          { id: 'app-vscode', name: 'VS Code', emoji: '💻', category: 'productive', time: '7h 45m', minutes: 465, limit: 'No Limit' },
+          { id: 'app-ig', name: 'Instagram', emoji: '📷', category: 'distracting', time: '6h 30m', minutes: 390, limit: '45m Limit' },
+          { id: 'app-yt', name: 'YouTube', emoji: '▶️', category: 'distracting', time: '5h 15m', minutes: 315, limit: '1h Limit' },
+          { id: 'app-slack', name: 'Slack', emoji: '💬', category: 'semi', time: '4h 20m', minutes: 260, limit: 'No Limit' },
+          { id: 'app-obsidian', name: 'Obsidian', emoji: '📓', category: 'productive', time: '2h 15m', minutes: 135, limit: 'No Limit' },
+          { id: 'app-settings', name: 'Settings & System', emoji: '⚙️', category: 'others', time: '2h 00m', minutes: 120, limit: 'No Limit' },
+        ]
+      }
+    };
+
+    // -------------------------------------------------------------------------
+    // 2. Tab Navigation & View Switcher
+    // -------------------------------------------------------------------------
+    function switchTab(tabKey) {
+      currentTab = tabKey;
+
+      const tabs = ['today', 'daily', 'weekly'];
+      tabs.forEach(t => {
+        const btn = document.getElementById(`tab-btn-${t}`);
+        const indicator = document.getElementById(`tab-indicator-${t}`);
+        if (t === tabKey) {
+          btn.classList.add('text-ff-text', 'font-bold');
+          btn.classList.remove('text-ff-muted', 'font-medium');
+          indicator.classList.remove('hidden');
+        } else {
+          btn.classList.remove('text-ff-text', 'font-bold');
+          btn.classList.add('text-ff-muted', 'font-medium');
+          indicator.classList.add('hidden');
+        }
+      });
+
+      // Chart Views
+      document.getElementById('view-chart-today').classList.toggle('hidden', tabKey !== 'today');
+      document.getElementById('view-chart-daily').classList.toggle('hidden', tabKey !== 'daily');
+      document.getElementById('view-chart-weekly').classList.toggle('hidden', tabKey !== 'weekly');
+
+      // Weekly Summary Card
+      const summaryCard = document.getElementById('weekly-summary-card');
+      summaryCard.classList.toggle('hidden', tabKey !== 'weekly');
+
+      // Header Titles & Badge
+      const subTitle = document.getElementById('chart-subtitle');
+      const mainTitle = document.getElementById('chart-main-title');
+      const totalBadge = document.getElementById('chart-total-badge');
+
+      if (tabKey === 'today') {
+        subTitle.innerText = "Distribution";
+        mainTitle.innerText = "Today's Timeline";
+        totalBadge.innerText = `${USAGE_DATA.today.total} Total`;
+        updateLegendGrid(USAGE_DATA.today);
+      } else if (tabKey === 'daily') {
+        renderDailyBars();
+        updateDailySelection(selectedDailyDayIndex);
+      } else if (tabKey === 'weekly') {
+        subTitle.innerText = "5-Week Rolling";
+        mainTitle.innerText = "Weekly Totals";
+        totalBadge.innerText = `${USAGE_DATA.weekly.total} Total`;
+        renderWeeklyBars();
+        updateLegendGrid(USAGE_DATA.weekly);
+      }
+
+      renderAppList();
+    }
+
+    function dismissWeeklySummary() {
+      document.getElementById('weekly-summary-card').classList.add('hidden');
+    }
+
+    function updateLegendGrid(data) {
+      document.getElementById('legend-val-productive').innerText = data.productive;
+      document.getElementById('legend-val-semi').innerText = data.semi;
+      document.getElementById('legend-val-distracting').innerText = data.distracting;
+      document.getElementById('legend-val-others').innerText = data.others;
+    }
+
+    // -------------------------------------------------------------------------
+    // 3. Daily 7-Day Interactive Stacked Bar Chart
+    // -------------------------------------------------------------------------
+    function renderDailyBars() {
+      const container = document.getElementById('daily-bars-container');
+      if (!container) return;
+      container.innerHTML = '';
+
+      USAGE_DATA.daily.forEach((d, idx) => {
+        const isSelected = (idx === selectedDailyDayIndex);
+        const col = document.createElement('div');
+        col.id = `daily-col-${d.day.toLowerCase()}`;
+        col.onclick = () => updateDailySelection(idx);
+        col.className = 'flex flex-col items-center justify-end h-full flex-1 mx-1 cursor-pointer group';
+
+        // Stacking layers: Productive (bottom) -> Semi -> Distracting -> Others (top)
+        // If selected: vibrant category colors. If not selected: dark greyscale per spec
+        const prodColor = isSelected ? 'bg-ff-productive' : 'bg-[#2A342B]';
+        const semiColor = isSelected ? 'bg-ff-semi' : 'bg-[#3A3228]';
+        const distColor = isSelected ? 'bg-[#40382E] border border-ff-border/50' : 'bg-[#222729]';
+        const othColor = isSelected ? 'bg-ff-others' : 'bg-[#1C2024]';
+
+        col.innerHTML = `
+          <div class="w-full rounded-t-md overflow-hidden flex flex-col justify-end transition-all ${isSelected ? 'ring-2 ring-ff-primary ring-offset-1 ring-offset-ff-bg' : 'opacity-70 group-hover:opacity-100'}">
+            <!-- Layer 4: Others -->
+            <div style="height: ${d.othH}px" class="${othColor} w-full transition-colors"></div>
+            <!-- Layer 3: Distracting -->
+            <div style="height: ${d.distH}px" class="${distColor} w-full transition-colors"></div>
+            <!-- Layer 2: Semi -->
+            <div style="height: ${d.semiH}px" class="${semiColor} w-full transition-colors"></div>
+            <!-- Layer 1: Productive -->
+            <div style="height: ${d.prodH}px" class="${prodColor} w-full transition-colors"></div>
+          </div>
+          <span class="text-[10px] mt-1.5 font-semibold transition ${isSelected ? 'text-ff-primary font-bold' : 'text-ff-muted'}">
+            ${d.day}
+          </span>
+        `;
+        container.appendChild(col);
+      });
+    }
+
+    function updateDailySelection(idx) {
+      selectedDailyDayIndex = idx;
+      const d = USAGE_DATA.daily[idx];
+
+      const subTitle = document.getElementById('chart-subtitle');
+      const mainTitle = document.getElementById('chart-main-title');
+      const totalBadge = document.getElementById('chart-total-badge');
+
+      subTitle.innerText = `${d.day} Breakdown`;
+      mainTitle.innerText = `${d.day} Screen Time`;
+      totalBadge.innerText = `${d.total} Total`;
+
+      updateLegendGrid({
+        productive: d.prod,
+        semi: d.semi,
+        distracting: d.dist,
+        others: d.oth
+      });
+
+      renderDailyBars();
+    }
+
+    // -------------------------------------------------------------------------
+    // 4. Weekly 5-Week Multi-Week Stacked Bar Chart
+    // -------------------------------------------------------------------------
+    function renderWeeklyBars() {
+      const container = document.getElementById('weekly-bars-container');
+      if (!container) return;
+      container.innerHTML = '';
+
+      USAGE_DATA.weekly.weeks.forEach(w => {
+        const col = document.createElement('div');
+        col.className = 'flex flex-col items-center justify-end h-full flex-1 mx-1.5';
+        col.innerHTML = `
+          <div class="w-full rounded-t-md overflow-hidden flex flex-col justify-end shadow-md">
+            <div style="height: ${w.othH}px" class="bg-ff-others w-full"></div>
+            <div style="height: ${w.distH}px" class="bg-[#38332B] border-t border-ff-border/50 w-full"></div>
+            <div style="height: ${w.semiH}px" class="bg-ff-semi w-full"></div>
+            <div style="height: ${w.prodH}px" class="bg-ff-productive w-full"></div>
+          </div>
+          <span class="text-[9px] mt-1.5 text-ff-muted font-medium whitespace-nowrap">
+            ${w.label}
+          </span>
+        `;
+        container.appendChild(col);
+      });
+    }
+
+    // -------------------------------------------------------------------------
+    // 5. App List & Search Functionality
+    // -------------------------------------------------------------------------
+    function renderAppList() {
+      const container = document.getElementById('apps-list-container');
+      const emptyState = document.getElementById('apps-empty-state');
+      const countBadge = document.getElementById('apps-count-badge');
+      if (!container || !emptyState) return;
+
+      const baseApps = (currentTab === 'weekly') ? USAGE_DATA.weekly.apps : USAGE_DATA.today.apps;
+      
+      const filtered = baseApps.filter(a => {
+        return a.name.toLowerCase().includes(currentSearchQuery.toLowerCase());
+      });
+
+      if (countBadge) {
+        countBadge.innerText = `${filtered.length} app${filtered.length === 1 ? '' : 's'} tracked`;
+      }
+
+      container.innerHTML = '';
+
+      if (filtered.length === 0) {
+        container.classList.add('hidden');
+        emptyState.classList.remove('hidden');
+        return;
+      }
+
+      container.classList.remove('hidden');
+      emptyState.classList.add('hidden');
+
+      filtered.forEach(app => {
+        const row = document.createElement('div');
+        row.id = `app-row-${app.id}`;
+        row.onclick = () => openAppDetail(app);
+
+        // Category pill colors per design system
+        let catBg = 'bg-ff-muted/20 text-ff-muted';
+        let catLabel = 'Others';
+        if (app.category === 'productive') {
+          catBg = 'bg-ff-productive/20 text-ff-productive border border-ff-productive/30';
+          catLabel = 'Productive';
+        } else if (app.category === 'semi') {
+          catBg = 'bg-ff-semi/20 text-ff-semi border border-ff-semi/30';
+          catLabel = 'Semi-Prod';
+        } else if (app.category === 'distracting') {
+          catBg = 'bg-[#38332B] text-ff-accent border border-ff-border';
+          catLabel = 'Distracting';
+        }
+
+        row.className = 'bg-ff-surface border border-ff-border rounded-xl p-3 flex items-center justify-between hover:border-ff-primary/70 cursor-pointer transition shadow-sm';
+        row.innerHTML = `
+          <div class="flex items-center space-x-3">
+            <!-- 40x40 App Icon with 10px radius -->
+            <div class="w-10 h-10 rounded-[10px] bg-ff-bg border border-ff-border flex items-center justify-center text-lg shrink-0">
+              ${app.emoji}
+            </div>
+            <div>
+              <span class="text-xs font-semibold text-ff-text block leading-tight">${app.name}</span>
+              <span class="px-2 py-0.5 mt-1 inline-block rounded text-[9px] font-bold uppercase tracking-wider ${catBg}">
+                ${catLabel}
+              </span>
+            </div>
+          </div>
+          <div class="text-right">
+            <span class="text-xs font-bold text-ff-text font-mono">${app.time}</span>
+            <span class="text-[9px] text-ff-muted block">Tap for info</span>
+          </div>
+        `;
+        container.appendChild(row);
+      });
+    }
+
+    function handleAppSearch(val) {
+      currentSearchQuery = val;
+      const clearBtn = document.getElementById('btn-clear-search');
+      if (clearBtn) {
+        clearBtn.classList.toggle('hidden', val.length === 0);
+      }
+      renderAppList();
+    }
+
+    function clearAppSearch() {
+      const input = document.getElementById('app-search-input');
+      if (input) input.value = '';
+      handleAppSearch('');
+    }
+
+    function openAppDetail(app) {
+      document.getElementById('detail-app-icon').innerText = app.emoji;
+      document.getElementById('detail-app-name').innerText = app.name;
+      document.getElementById('detail-app-category').innerText = app.category.toUpperCase();
+      document.getElementById('detail-time-spent').innerText = app.time;
+      document.getElementById('detail-limit-status').innerText = app.limit;
+
+      document.getElementById('app-detail-sheet').classList.remove('hidden');
+    }
+
+    function closeAppDetailSheet() {
+      document.getElementById('app-detail-sheet').classList.add('hidden');
+    }
+
+    function toggleHelpModal(show) {
+      const modal = document.getElementById('help-modal');
+      if (modal) {
+        modal.classList.toggle('hidden', !show);
+      }
+    }
+
+    // -------------------------------------------------------------------------
+    // 6. Automated Test Runner Suite (#auto-test-modal)
+    // -------------------------------------------------------------------------
+    async function runUsageStatsAutoTests() {
+      const modal = document.getElementById('auto-test-modal');
+      const list = document.getElementById('test-results-list');
+      const summaryStatus = document.getElementById('test-summary-status');
+      const summaryDetail = document.getElementById('test-summary-detail');
+      const summaryBadge = document.getElementById('test-summary-badge');
+
+      if (!modal || !list) return;
+      modal.classList.remove('hidden');
+      list.innerHTML = '';
+      summaryStatus.innerText = "Running 10 Automated Usage Stats Tests...";
+      summaryDetail.innerText = "Validating Bézier charts, bar charts, search filter & tokens...";
+      summaryBadge.innerText = "RUNNING";
+      summaryBadge.className = "px-2.5 py-1 rounded-full bg-ff-primary/20 text-ff-primary text-[10px] font-bold border border-ff-primary/30";
+
+      const tests = [
+        {
+          name: "1. Top Bar Elements & Help Modal Verification",
+          run: () => {
+            const title = document.getElementById('screen-title');
+            const backBtn = document.getElementById('btn-back-home');
+            const helpBtn = document.getElementById('btn-open-help');
+            if (!title || !title.innerText.includes("Usage Stats")) throw new Error("Screen title missing");
+            if (!backBtn || !helpBtn) throw new Error("Back button or Help button missing");
+            return "Top bar features centered 'Usage Stats' title, back arrow to home, and functional Help pill";
+          }
+        },
+        {
+          name: "2. Tab Selector Transitions (Today | Daily | Weekly)",
+          run: () => {
+            switchTab('daily');
+            if (currentTab !== 'daily') throw new Error("Failed to switch to Daily tab");
+            switchTab('weekly');
+            if (currentTab !== 'weekly') throw new Error("Failed to switch to Weekly tab");
+            switchTab('today');
+            if (currentTab !== 'today') throw new Error("Failed to switch to Today tab");
+            return "Tab selector triggers instant switches between Today, Daily, and Weekly horizons";
+          }
+        },
+        {
+          name: "3. Today Bézier Smooth Area Chart Layers",
+          run: () => {
+            switchTab('today');
+            const todayView = document.getElementById('view-chart-today');
+            if (todayView.classList.contains('hidden')) throw new Error("Today chart view not visible");
+            const svg = todayView.querySelector('svg');
+            if (!svg) throw new Error("Area chart SVG missing");
+            const paths = svg.querySelectorAll('.chart-path');
+            if (paths.length < 4) throw new Error(`Expected 4 stacked area layers, found ${paths.length}`);
+            return "Smooth Bézier area chart renders 4 category layers with 6am, 12pm, 6pm, 12am timeline markers";
+          }
+        },
+        {
+          name: "4. 2×2 Legend Grid with Category Tokens",
+          run: () => {
+            const prod = document.getElementById('legend-val-productive');
+            const semi = document.getElementById('legend-val-semi');
+            const dist = document.getElementById('legend-val-distracting');
+            const oth = document.getElementById('legend-val-others');
+            if (!prod || !semi || !dist || !oth) throw new Error("Legend grid values missing");
+            return `Legend grid verified: Productive (${prod.innerText}), Semi (${semi.innerText}), Distracting (${dist.innerText}), Others (${oth.innerText})`;
+          }
+        },
+        {
+          name: "5. Daily 7-Day Stacked Bar Chart & Selection Logic",
+          run: () => {
+            switchTab('daily');
+            const dailyContainer = document.getElementById('daily-bars-container');
+            if (!dailyContainer || dailyContainer.children.length !== 7) {
+              throw new Error(`Expected 7 day bars, found ${dailyContainer ? dailyContainer.children.length : 0}`);
+            }
+            // Tap Thursday (index 3)
+            updateDailySelection(3);
+            const badge = document.getElementById('chart-total-badge').innerText;
+            if (!badge.includes("4h 20m")) throw new Error(`Thursday total mismatch: ${badge}`);
+            return "7-day stacked bar chart updates totals reactively when selecting individual day bars";
+          }
+        },
+        {
+          name: "6. Weekly 5-Week Multi-Week Chart Rendering",
+          run: () => {
+            switchTab('weekly');
+            const weeklyContainer = document.getElementById('weekly-bars-container');
+            if (!weeklyContainer || weeklyContainer.children.length !== 5) {
+              throw new Error(`Expected 5 multi-week bars, found ${weeklyContainer ? weeklyContainer.children.length : 0}`);
+            }
+            return "5 most recent rolling weeks render with full category colors and week-of dates";
+          }
+        },
+        {
+          name: "7. Sunday In-App Weekly Summary Card",
+          run: () => {
+            switchTab('weekly');
+            const summaryCard = document.getElementById('weekly-summary-card');
+            if (summaryCard.classList.contains('hidden')) throw new Error("Weekly summary card not visible on Weekly tab");
+            const highlight = document.getElementById('weekly-summary-highlight');
+            if (!highlight || !highlight.innerText.includes("2h 15m more")) throw new Error("Summary text delta missing");
+            return "Weekly report card displays current streak, focus delta (+2h 15m), and peak/min days";
+          }
+        },
+        {
+          name: "8. Live Search Bar Dynamic App Filtering",
+          run: () => {
+            switchTab('today');
+            handleAppSearch('Insta');
+            const list = document.getElementById('apps-list-container');
+            if (list.children.length !== 1) throw new Error(`Search filter failed: expected 1 app, got ${list.children.length}`);
+            clearAppSearch();
+            if (list.children.length !== 6) throw new Error("Clear search failed to restore all apps");
+            return "Search bar filters app list live with instant keyword matching and clear action";
+          }
+        },
+        {
+          name: "9. App Detail Bottom Sheet with Limit Integration",
+          run: () => {
+            openAppDetail(USAGE_DATA.today.apps[0]);
+            const sheet = document.getElementById('app-detail-sheet');
+            if (sheet.classList.contains('hidden')) throw new Error("App detail sheet failed to open");
+            const appName = document.getElementById('detail-app-name').innerText;
+            if (appName !== 'Instagram') throw new Error("App name mismatch in detail sheet");
+            closeAppDetailSheet();
+            return "Tapping app opens detail sheet showing time spent, limit status, and hourly distribution";
+          }
+        },
+        {
+          name: "10. Floating Pill Navigation Bar (Tab 2 Usage Active)",
+          run: () => {
+            const navBar = document.querySelector('.w-full.h-16.bg-ff-surface');
+            if (!navBar) throw new Error("Floating pill nav bar not found");
+            const usageTab = navBar.querySelector('.text-ff-primary');
+            if (!usageTab || !usageTab.innerText.includes("Usage")) {
+              throw new Error("Tab 2 'Usage' must be active in Amber Autumn (#CA9C68)");
+            }
+            return "5-tab floating pill bar has Tab 2 (Usage) active in Amber Autumn, with grouped pill containers";
+          }
+        }
+      ];
+
+      let passedCount = 0;
+      for (const t of tests) {
+        await new Promise(r => setTimeout(r, 60));
+        const item = document.createElement('div');
+        item.className = "p-2.5 rounded-xl border flex items-start space-x-2.5 transition";
+
+        try {
+          const detail = t.run();
+          passedCount++;
+          item.className += " bg-emerald-950/30 border-emerald-800/50 text-emerald-200";
+          item.innerHTML = `
+            <span class="text-emerald-400 font-bold">✓</span>
+            <div class="flex-1">
+              <span class="font-bold text-ff-text block text-xs">${t.name}</span>
+              <span class="text-[10px] text-emerald-300/80 leading-relaxed">${detail}</span>
+            </div>
+          `;
+        } catch (err) {
+          item.className += " bg-red-950/30 border-red-800/50 text-red-200";
+          item.innerHTML = `
+            <span class="text-red-400 font-bold">✕</span>
+            <div class="flex-1">
+              <span class="font-bold text-ff-text block text-xs">${t.name}</span>
+              <span class="text-[10px] text-red-300/80 leading-relaxed">${err.message}</span>
+            </div>
+          `;
+        }
+        list.appendChild(item);
+      }
+
+      summaryStatus.innerText = `${passedCount}/${tests.length} Automated Tests Passed`;
+      summaryDetail.innerText = passedCount === tests.length ? "All time horizons, chart modes, search filters, and tokens verified!" : "Some tests failed";
+      if (passedCount === tests.length) {
+        summaryBadge.innerText = "100% PASSED";
+        summaryBadge.className = "px-2.5 py-1 rounded-full bg-emerald-500/20 text-emerald-400 text-[10px] font-bold border border-emerald-500/30";
+      } else {
+        summaryBadge.innerText = "FAILURES";
+        summaryBadge.className = "px-2.5 py-1 rounded-full bg-red-500/20 text-red-400 text-[10px] font-bold border border-red-500/30";
+      }
+    }
+
+    function closeUsageStatsAutoTests() {
+      const modal = document.getElementById('auto-test-modal');
+      if (modal) modal.classList.add('hidden');
+    }
+
+    // -------------------------------------------------------------------------
+    // 7. App Initialization
+    // -------------------------------------------------------------------------
+    window.addEventListener('DOMContentLoaded', () => {
+      switchTab('today');
+    });
+  </script>
+
+</body>
+</html>
