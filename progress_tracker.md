@@ -63,10 +63,22 @@
 - [x] Interactive Emoji Picker sheet & Study Mode Channel Whitelist sheet with friction confirmation sentence flow.
 - [x] Local preview served on port 8087 (`ui_mockups/preset_creation.html`).
 
+### 3.3 Active Work: App Limits Screen (`Code2`)
+- [x] Blocks tab layout structure matching `ui_app_limits.md` and `ui_navigation.md`.
+- [x] Header ("Blocks", "Help" button) and Section Header ("App Limits", "+ Add App").
+- [x] Category groups (Distracting, Semi-Productive, Others) with individual app cards.
+- [x] App Cards with spending vs limit sub-label, status pills ("Blocking", "Paused" with resumption timestamp).
+- [x] App Settings bottom sheet with dual-column scroll time picker, suggestion bar (`💡`), and extra time sessions.
+- [x] Extra time stepper (0–6) and chips (5m, 10m, 15m) with >60m warning calculation.
+- [x] Primary Save button in Ghost White (`#F8FAFC`) per spec exception.
+- [x] Turn-off flow: streak warning sheet (`🔥` to `🌧️`) with 3-second delay button and duration picker sheet.
+- [x] Add App sheet with search and quick-add actions.
+- [x] Local preview served on port 8088 (`ui_mockups/app_limits.html`).
+
 ---
 
 ## 4. Backlog
-- [ ] Remaining UI screens generation (App Limits, Planner, Usage Stats, 2/5/10/20 Distraction Intervention, Home Widget).
+- [ ] Remaining UI screens generation (Planner, Usage Stats, 2/5/10/20 Distraction Intervention, Home Widget).
 - [ ] Database schema & Hive box implementations (`lib/core/database/`).
 - [ ] Riverpod state management providers and navigation shell (`go_router`).
 - [ ] Foreground timer service and background workers (`flutter_foreground_task`, `workmanager`).

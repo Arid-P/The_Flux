@@ -61,7 +61,7 @@
 <body class="min-h-screen flex flex-col items-center justify-center p-4 text-ff-text">
 
   <!-- TOP TOOLBAR (Preview Controller) -->
-  <div class="mb-5 flex flex-wrap items-center justify-center gap-2 bg-[#182028] border border-ff-border px-4 py-2.5 rounded-2xl shadow-xl max-w-xl text-xs">
+  <div class="mb-5 flex flex-wrap items-center justify-center gap-2 bg-[#182028] border border-ff-border px-4 py-2.5 rounded-2xl shadow-xl max-w-2xl text-xs">
     <span class="text-ff-primary font-bold tracking-wide uppercase text-[11px] mr-2">Interactive Sheets:</span>
     <button onclick="toggleEmojiSheet(true)" class="px-3 py-1.5 rounded-lg bg-ff-surface text-ff-text border border-ff-border font-medium hover:border-ff-primary transition">
       Open Emoji Picker
@@ -71,6 +71,9 @@
     </button>
     <button onclick="openAddChannelSheet()" class="px-3 py-1.5 rounded-lg bg-ff-primary text-ff-bg font-bold transition">
       Test Friction Typing Flow
+    </button>
+    <button onclick="runAutomatedTests()" class="px-3.5 py-1.5 rounded-lg bg-emerald-600 hover:bg-emerald-500 text-white font-bold transition flex items-center space-x-1 shadow-md">
+      <span>🧪 Run Auto Tests</span>
     </button>
   </div>
 
@@ -222,37 +225,37 @@
               </div>
 
               <!-- Instagram Row -->
-              <div class="p-3 flex items-center justify-between">
+              <label for="cb-app-instagram" class="p-3 flex items-center justify-between cursor-pointer hover:bg-ff-bg/20 transition">
                 <div class="flex items-center space-x-2.5">
                   <div class="w-7 h-7 rounded-lg bg-pink-900/30 border border-pink-700/50 flex items-center justify-center text-xs">
                     📷
                   </div>
                   <span class="text-xs font-medium text-ff-text">Instagram</span>
                 </div>
-                <input type="checkbox" checked class="w-4 h-4 accent-[#CA9C68]">
-              </div>
+                <input type="checkbox" id="cb-app-instagram" data-category="distracting" checked onchange="updateCategoryAppCount('distracting')" class="w-4 h-4 accent-[#CA9C68] cursor-pointer">
+              </label>
 
               <!-- X / Twitter Row -->
-              <div class="p-3 flex items-center justify-between">
+              <label for="cb-app-twitter" class="p-3 flex items-center justify-between cursor-pointer hover:bg-ff-bg/20 transition">
                 <div class="flex items-center space-x-2.5">
                   <div class="w-7 h-7 rounded-lg bg-slate-800 border border-slate-700 flex items-center justify-center text-xs">
                     𝕏
                   </div>
                   <span class="text-xs font-medium text-ff-text">X (Twitter)</span>
                 </div>
-                <input type="checkbox" checked class="w-4 h-4 accent-[#CA9C68]">
-              </div>
+                <input type="checkbox" id="cb-app-twitter" data-category="distracting" checked onchange="updateCategoryAppCount('distracting')" class="w-4 h-4 accent-[#CA9C68] cursor-pointer">
+              </label>
 
               <!-- Reddit Row -->
-              <div class="p-3 flex items-center justify-between">
+              <label for="cb-app-reddit" class="p-3 flex items-center justify-between cursor-pointer hover:bg-ff-bg/20 transition">
                 <div class="flex items-center space-x-2.5">
                   <div class="w-7 h-7 rounded-lg bg-orange-900/30 border border-orange-700/50 flex items-center justify-center text-xs">
                     🤖
                   </div>
                   <span class="text-xs font-medium text-ff-text">Reddit</span>
                 </div>
-                <input type="checkbox" checked class="w-4 h-4 accent-[#CA9C68]">
-              </div>
+                <input type="checkbox" id="cb-app-reddit" data-category="distracting" checked onchange="updateCategoryAppCount('distracting')" class="w-4 h-4 accent-[#CA9C68] cursor-pointer">
+              </label>
 
             </div>
           </div>
@@ -265,19 +268,19 @@
                 <span class="text-xs font-bold text-ff-text">Productive</span>
               </div>
               <div class="flex items-center space-x-2 text-[11px] text-ff-muted">
-                <span>0 apps blocked</span>
+                <span id="count-productive">0 apps blocked</span>
                 <span id="icon-cat-productive" class="text-xs">▼</span>
               </div>
             </button>
             <div id="list-cat-productive" class="hidden border-t border-ff-border divide-y divide-ff-border/40 p-3 text-xs text-ff-muted">
-              <div class="flex items-center justify-between py-1.5">
+              <label for="cb-app-notewise" class="flex items-center justify-between py-1.5 cursor-pointer hover:text-ff-text transition">
                 <span>Notewise (Notes & Maths)</span>
-                <input type="checkbox" class="w-4 h-4 accent-[#CA9C68]">
-              </div>
-              <div class="flex items-center justify-between py-1.5">
+                <input type="checkbox" id="cb-app-notewise" data-category="productive" onchange="updateCategoryAppCount('productive')" class="w-4 h-4 accent-[#CA9C68] cursor-pointer">
+              </label>
+              <label for="cb-app-pwapp" class="flex items-center justify-between py-1.5 cursor-pointer hover:text-ff-text transition">
                 <span>PW App (Neev Diamond)</span>
-                <input type="checkbox" class="w-4 h-4 accent-[#CA9C68]">
-              </div>
+                <input type="checkbox" id="cb-app-pwapp" data-category="productive" onchange="updateCategoryAppCount('productive')" class="w-4 h-4 accent-[#CA9C68] cursor-pointer">
+              </label>
             </div>
           </div>
 
@@ -289,19 +292,19 @@
                 <span class="text-xs font-bold text-ff-text">Semi-Productive</span>
               </div>
               <div class="flex items-center space-x-2 text-[11px] text-ff-muted">
-                <span>0 apps blocked</span>
+                <span id="count-semi">0 apps blocked</span>
                 <span id="icon-cat-semi" class="text-xs">▼</span>
               </div>
             </button>
             <div id="list-cat-semi" class="hidden border-t border-ff-border divide-y divide-ff-border/40 p-3 text-xs text-ff-muted">
-              <div class="flex items-center justify-between py-1.5">
+              <label for="cb-app-maps" class="flex items-center justify-between py-1.5 cursor-pointer hover:text-ff-text transition">
                 <span>Google Maps</span>
-                <input type="checkbox" class="w-4 h-4 accent-[#CA9C68]">
-              </div>
-              <div class="flex items-center justify-between py-1.5">
+                <input type="checkbox" id="cb-app-maps" data-category="semi" onchange="updateCategoryAppCount('semi')" class="w-4 h-4 accent-[#CA9C68] cursor-pointer">
+              </label>
+              <label for="cb-app-gmail" class="flex items-center justify-between py-1.5 cursor-pointer hover:text-ff-text transition">
                 <span>Gmail</span>
-                <input type="checkbox" class="w-4 h-4 accent-[#CA9C68]">
-              </div>
+                <input type="checkbox" id="cb-app-gmail" data-category="semi" onchange="updateCategoryAppCount('semi')" class="w-4 h-4 accent-[#CA9C68] cursor-pointer">
+              </label>
             </div>
           </div>
 
@@ -313,15 +316,15 @@
                 <span class="text-xs font-bold text-ff-text">Others</span>
               </div>
               <div class="flex items-center space-x-2 text-[11px] text-ff-muted">
-                <span>0 apps blocked</span>
+                <span id="count-others">0 apps blocked</span>
                 <span id="icon-cat-others" class="text-xs">▼</span>
               </div>
             </button>
             <div id="list-cat-others" class="hidden border-t border-ff-border divide-y divide-ff-border/40 p-3 text-xs text-ff-muted">
-              <div class="flex items-center justify-between py-1.5">
+              <label for="cb-app-settings" class="flex items-center justify-between py-1.5 cursor-pointer hover:text-ff-text transition">
                 <span>Settings</span>
-                <input type="checkbox" class="w-4 h-4 accent-[#CA9C68]">
-              </div>
+                <input type="checkbox" id="cb-app-settings" data-category="others" onchange="updateCategoryAppCount('others')" class="w-4 h-4 accent-[#CA9C68] cursor-pointer">
+              </label>
             </div>
           </div>
 
@@ -514,6 +517,38 @@
         </div>
 
       </div>
+    <!-- 9. AUTOMATED TEST SUITE RUNNER MODAL (Hidden by default) -->
+    <div id="auto-test-modal" class="absolute inset-0 bg-black/85 backdrop-blur-md z-50 flex items-center justify-center p-4 hidden">
+      <div class="w-full max-w-sm bg-ff-surface border border-ff-border rounded-3xl p-5 shadow-2xl flex flex-col max-h-[90vh]">
+        <div class="flex items-center justify-between pb-3 border-b border-ff-border">
+          <div class="flex items-center space-x-2">
+            <span class="text-base">🧪</span>
+            <h3 class="text-sm font-bold text-ff-text">Automated Field Test Suite</h3>
+          </div>
+          <button onclick="closeAutoTestModal()" class="w-7 h-7 rounded-full bg-ff-bg border border-ff-border flex items-center justify-center text-xs text-ff-muted hover:text-ff-text">✕</button>
+        </div>
+
+        <!-- Test summary badge -->
+        <div class="my-3 p-3 bg-ff-bg/70 rounded-xl border border-ff-border flex items-center justify-between">
+          <div>
+            <span id="test-summary-status" class="text-xs font-bold text-ff-primary">Running tests...</span>
+            <span id="test-summary-counts" class="text-[11px] text-ff-muted block">Executing assertions</span>
+          </div>
+          <div id="test-summary-badge" class="px-2.5 py-1 rounded-full bg-ff-primary/20 text-ff-primary text-[10px] font-bold">
+            RUNNING
+          </div>
+        </div>
+
+        <!-- Test Results Scrollable List -->
+        <div id="test-results-list" class="flex-1 overflow-y-auto space-y-2 pr-1 text-xs">
+        </div>
+
+        <div class="pt-3 border-t border-ff-border mt-3">
+          <button onclick="closeAutoTestModal()" class="w-full py-2.5 bg-ff-primary hover:bg-[#b88c5a] text-ff-bg font-bold text-xs rounded-full transition">
+            Close & Return to UI
+          </button>
+        </div>
+      </div>
     </div>
 
   </div>
@@ -525,11 +560,32 @@
     let channelCount = 4;
     const requiredSentence = "I am adding this channel strictly for academic focus and olympiad preparation.";
 
+    // Dynamic App Category Count Logic
+    function updateCategoryAppCount(cat) {
+      const container = document.getElementById('list-cat-' + cat);
+      if (!container) return;
+      const checkboxes = container.querySelectorAll('input[type="checkbox"]');
+      let checkedCount = 0;
+      checkboxes.forEach(cb => {
+        if (cb.checked) checkedCount++;
+      });
+      const label = document.getElementById('count-' + cat);
+      if (label) {
+        label.innerText = `${checkedCount} app${checkedCount === 1 ? '' : 's'} blocked`;
+      }
+      return checkedCount;
+    }
+
+    function updateAllCategoryCounts() {
+      ['distracting', 'productive', 'semi', 'others'].forEach(cat => updateCategoryAppCount(cat));
+    }
+
     function adjustBreaks(delta) {
       breaksCount = Math.max(0, Math.min(6, breaksCount + delta));
       document.getElementById('val-breaks').innerText = breaksCount;
       document.getElementById('btn-dec-breaks').disabled = breaksCount === 0;
       document.getElementById('btn-inc-breaks').disabled = breaksCount === 6;
+      return breaksCount;
     }
 
     function adjustDuration(delta) {
@@ -537,6 +593,7 @@
       document.getElementById('val-duration').innerText = breakDuration;
       document.getElementById('btn-dec-duration').disabled = breakDuration === 1;
       document.getElementById('btn-inc-duration').disabled = breakDuration === 15;
+      return breakDuration;
     }
 
     function toggleCategory(cat) {
@@ -637,6 +694,300 @@
       const emoji = document.getElementById('current-emoji').innerText;
       alert(`Preset Saved!\n${emoji} ${name}\nBreaks: ${breaksCount} × ${breakDuration}m\nYouTube Study Channels: ${channelCount}`);
     }
+
+    // -------------------------------------------------------------------------
+    // AUTOMATED FIELD TESTS RUNNER
+    // -------------------------------------------------------------------------
+    function openAutoTestModal() {
+      document.getElementById('auto-test-modal').classList.remove('hidden');
+    }
+
+    function closeAutoTestModal() {
+      document.getElementById('auto-test-modal').classList.add('hidden');
+    }
+
+    async function runAutomatedTests() {
+      openAutoTestModal();
+      const list = document.getElementById('test-results-list');
+      list.innerHTML = '';
+      
+      const summaryStatus = document.getElementById('test-summary-status');
+      const summaryCounts = document.getElementById('test-summary-counts');
+      const summaryBadge = document.getElementById('test-summary-badge');
+      
+      summaryStatus.innerText = "Running Test Suite...";
+      summaryBadge.innerText = "RUNNING";
+      summaryBadge.className = "px-2.5 py-1 rounded-full bg-ff-primary/20 text-ff-primary text-[10px] font-bold";
+
+      const tests = [
+        {
+          name: "Preset Name Field",
+          run: () => {
+            const el = document.getElementById('input-preset-name');
+            const original = el.value;
+            el.value = "Advanced Olympiad Geometry";
+            if (el.value !== "Advanced Olympiad Geometry") throw new Error("Input value did not update");
+            el.value = original;
+            return "Name text updates and reads correctly";
+          }
+        },
+        {
+          name: "Emoji Picker Selection",
+          run: () => {
+            const current = document.getElementById('current-emoji');
+            const original = current.innerText;
+            selectEmoji("🎯");
+            if (current.innerText !== "🎯") throw new Error("Emoji did not change to 🎯");
+            selectEmoji(original);
+            return `Emoji selection successfully updated to 🎯 and restored`;
+          }
+        },
+        {
+          name: "Breaks Stepper (Range 0 - 6)",
+          run: () => {
+            const original = breaksCount;
+            // Step up to maximum
+            for (let i = 0; i < 10; i++) adjustBreaks(1);
+            if (breaksCount !== 6) throw new Error(`Expected max breaks 6, got ${breaksCount}`);
+            if (!document.getElementById('btn-inc-breaks').disabled) throw new Error("Increment button should be disabled at 6");
+            
+            // Step down to 0
+            for (let i = 0; i < 10; i++) adjustBreaks(-1);
+            if (breaksCount !== 0) throw new Error(`Expected min breaks 0, got ${breaksCount}`);
+            if (!document.getElementById('btn-dec-breaks').disabled) throw new Error("Decrement button should be disabled at 0");
+            
+            // Restore
+            for (let i = 0; i < original; i++) adjustBreaks(1);
+            return `Breaks clamped correctly at [0, 6] with button disable states`;
+          }
+        },
+        {
+          name: "Break Duration Stepper (Range 1 - 15m)",
+          run: () => {
+            const original = breakDuration;
+            for (let i = 0; i < 20; i++) adjustDuration(1);
+            if (breakDuration !== 15) throw new Error(`Expected max duration 15, got ${breakDuration}`);
+            if (!document.getElementById('btn-inc-duration').disabled) throw new Error("Increment button should be disabled at 15");
+
+            for (let i = 0; i < 20; i++) adjustDuration(-1);
+            if (breakDuration !== 1) throw new Error(`Expected min duration 1, got ${breakDuration}`);
+            if (!document.getElementById('btn-dec-duration').disabled) throw new Error("Decrement button should be disabled at 1");
+
+            for (let i = 1; i < original; i++) adjustDuration(1);
+            return `Duration clamped correctly at [1, 15] with button disable states`;
+          }
+        },
+        {
+          name: "Distracting Apps Selection & Count (Bug Fix)",
+          run: () => {
+            const ig = document.getElementById('cb-app-instagram');
+            const tw = document.getElementById('cb-app-twitter');
+            const rd = document.getElementById('cb-app-reddit');
+            const label = document.getElementById('count-distracting');
+
+            // Initial: 3 apps blocked
+            updateCategoryAppCount('distracting');
+            if (label.innerText !== "3 apps blocked") throw new Error(`Initial state expected '3 apps blocked', got '${label.innerText}'`);
+
+            // Deselect 1 app (Instagram) -> should show "2 apps blocked"
+            ig.checked = false;
+            updateCategoryAppCount('distracting');
+            if (label.innerText !== "2 apps blocked") throw new Error(`After deselecting 1, expected '2 apps blocked', got '${label.innerText}'`);
+
+            // Deselect 2nd app (Twitter) -> should show "1 app blocked" (singular)
+            tw.checked = false;
+            updateCategoryAppCount('distracting');
+            if (label.innerText !== "1 app blocked") throw new Error(`After deselecting 2, expected '1 app blocked', got '${label.innerText}'`);
+
+            // Deselect 3rd app (Reddit) -> should show "0 apps blocked"
+            rd.checked = false;
+            updateCategoryAppCount('distracting');
+            if (label.innerText !== "0 apps blocked") throw new Error(`After deselecting all, expected '0 apps blocked', got '${label.innerText}'`);
+
+            // Restore all 3
+            ig.checked = true;
+            tw.checked = true;
+            rd.checked = true;
+            updateCategoryAppCount('distracting');
+            if (label.innerText !== "3 apps blocked") throw new Error(`After restore, expected '3 apps blocked', got '${label.innerText}'`);
+
+            return "Count updates dynamically: 3 → 2 → 1 (singular) → 0 → 3";
+          }
+        },
+        {
+          name: "Productive Apps Selection & Count",
+          run: () => {
+            const nw = document.getElementById('cb-app-notewise');
+            const pw = document.getElementById('cb-app-pwapp');
+            const label = document.getElementById('count-productive');
+
+            // Initial: 0 apps blocked
+            updateCategoryAppCount('productive');
+            if (label.innerText !== "0 apps blocked") throw new Error(`Expected '0 apps blocked', got '${label.innerText}'`);
+
+            // Select 1 app -> should show "1 app blocked"
+            nw.checked = true;
+            updateCategoryAppCount('productive');
+            if (label.innerText !== "1 app blocked") throw new Error(`Expected '1 app blocked', got '${label.innerText}'`);
+
+            // Select 2nd app -> should show "2 apps blocked"
+            pw.checked = true;
+            updateCategoryAppCount('productive');
+            if (label.innerText !== "2 apps blocked") throw new Error(`Expected '2 apps blocked', got '${label.innerText}'`);
+
+            // Deselect both -> restore to 0
+            nw.checked = false;
+            pw.checked = false;
+            updateCategoryAppCount('productive');
+            if (label.innerText !== "0 apps blocked") throw new Error(`Expected '0 apps blocked', got '${label.innerText}'`);
+
+            return "Count updates dynamically: 0 → 1 → 2 → 0";
+          }
+        },
+        {
+          name: "Semi-Productive Apps Selection & Count",
+          run: () => {
+            const maps = document.getElementById('cb-app-maps');
+            const label = document.getElementById('count-semi');
+
+            maps.checked = true;
+            updateCategoryAppCount('semi');
+            if (label.innerText !== "1 app blocked") throw new Error(`Expected '1 app blocked', got '${label.innerText}'`);
+
+            maps.checked = false;
+            updateCategoryAppCount('semi');
+            if (label.innerText !== "0 apps blocked") throw new Error(`Expected '0 apps blocked', got '${label.innerText}'`);
+
+            return "Count updates dynamically: 0 → 1 → 0";
+          }
+        },
+        {
+          name: "Others Apps Selection & Count",
+          run: () => {
+            const settings = document.getElementById('cb-app-settings');
+            const label = document.getElementById('count-others');
+
+            settings.checked = true;
+            updateCategoryAppCount('others');
+            if (label.innerText !== "1 app blocked") throw new Error(`Expected '1 app blocked', got '${label.innerText}'`);
+
+            settings.checked = false;
+            updateCategoryAppCount('others');
+            if (label.innerText !== "0 apps blocked") throw new Error(`Expected '0 apps blocked', got '${label.innerText}'`);
+
+            return "Count updates dynamically: 0 → 1 → 0";
+          }
+        },
+        {
+          name: "YouTube 3-Way Radio Modes",
+          run: () => {
+            const radios = document.getElementsByName('yt-mode');
+            if (radios.length !== 3) throw new Error("Expected 3 radio options for YouTube mode");
+            const studyRadio = Array.from(radios).find(r => r.value === 'study');
+            if (!studyRadio.checked) throw new Error("Study Mode should be default selected");
+            return "Block, Allow, and Study Mode options verified";
+          }
+        },
+        {
+          name: "Friction Typing Gate Validation",
+          run: () => {
+            openAddChannelSheet();
+            const input = document.getElementById('input-confirmation-sentence');
+            const btn = document.getElementById('btn-submit-channel');
+
+            // Incomplete sentence
+            input.value = "I am adding this channel";
+            checkFrictionSentence();
+            if (!btn.disabled) throw new Error("Submit button must remain disabled for partial sentence");
+
+            // Exact match
+            input.value = requiredSentence;
+            checkFrictionSentence();
+            if (btn.disabled) throw new Error("Submit button must be enabled for exact character match");
+
+            closeAddChannelSheet();
+            return "Friction gate strictly enforces 100% exact sentence match";
+          }
+        },
+        {
+          name: "Channel Whitelist Add & Count Increment",
+          run: () => {
+            const initialCount = channelCount;
+            openAddChannelSheet();
+            document.getElementById('input-new-channel-name').value = "Olympiad Math Hub";
+            document.getElementById('input-confirmation-sentence').value = requiredSentence;
+            checkFrictionSentence();
+            submitNewChannel();
+
+            if (channelCount !== initialCount + 1) throw new Error(`Expected channelCount ${initialCount + 1}, got ${channelCount}`);
+            
+            // Remove newly added channel
+            const list = document.getElementById('channels-list');
+            const lastRow = list.lastElementChild;
+            const removeBtn = lastRow.querySelector('button');
+            removeChannel(removeBtn);
+
+            if (channelCount !== initialCount) throw new Error(`Expected channelCount to revert to ${initialCount}, got ${channelCount}`);
+            toggleWhitelistScreen(false);
+            return `Dynamic addition (${initialCount} → ${initialCount + 1}) and removal verified`;
+          }
+        },
+        {
+          name: "Description Notes Field",
+          run: () => {
+            const desc = document.getElementById('preset-desc');
+            if (!desc || desc.tagName.toLowerCase() !== 'textarea') throw new Error("Description textarea not found");
+            return "Free-text description field operational";
+          }
+        }
+      ];
+
+      let passedCount = 0;
+
+      for (const t of tests) {
+        await new Promise(r => setTimeout(r, 60)); // subtle visual stagger
+        const item = document.createElement('div');
+        item.className = "p-2.5 rounded-xl border flex items-start space-x-2.5 transition";
+
+        try {
+          const detail = t.run();
+          passedCount++;
+          item.className += " bg-emerald-950/30 border-emerald-800/50 text-emerald-200";
+          item.innerHTML = `
+            <span class="text-emerald-400 font-bold">✓</span>
+            <div class="flex-1">
+              <span class="font-bold text-ff-text block">${t.name}</span>
+              <span class="text-[10px] text-emerald-300/80">${detail}</span>
+            </div>
+          `;
+        } catch (err) {
+          item.className += " bg-red-950/30 border-red-800/50 text-red-200";
+          item.innerHTML = `
+            <span class="text-red-400 font-bold">✕</span>
+            <div class="flex-1">
+              <span class="font-bold text-ff-text block">${t.name}</span>
+              <span class="text-[10px] text-red-300/80">${err.message}</span>
+            </div>
+          `;
+        }
+        list.appendChild(item);
+      }
+
+      summaryStatus.innerText = `${passedCount}/${tests.length} Tests Passed`;
+      summaryCounts.innerText = passedCount === tests.length ? "All field validations & dynamic counts passed!" : "Some tests failed";
+      if (passedCount === tests.length) {
+        summaryBadge.innerText = "100% PASSED";
+        summaryBadge.className = "px-2.5 py-1 rounded-full bg-emerald-500/20 text-emerald-400 text-[10px] font-bold border border-emerald-500/30";
+      } else {
+        summaryBadge.innerText = "FAILURES";
+        summaryBadge.className = "px-2.5 py-1 rounded-full bg-red-500/20 text-red-400 text-[10px] font-bold border border-red-500/30";
+      }
+    }
+
+    // Initialize counts on page ready
+    window.addEventListener('DOMContentLoaded', () => {
+      updateAllCategoryCounts();
+    });
   </script>
 </body>
 </html>

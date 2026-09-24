@@ -10,7 +10,7 @@ This registry coordinates concurrent/subsequent AI coding agents working in this
 | Agent Name | Role / Specialty | Status | Branch | Current Task / Active Scope | Reserved / Active Files | Port(s) Used |
 |---|---|---|---|---|---|---|
 | **Code1** | Lead UI Designer | **ACTIVE** | `ff` | Completed Phase 1-A Step 1 (ThemeTokens, Design System, & Dependencies). Next: Step 2 (Database & Hive + DI). | `fluxfoxus/lib/core/`, `progress_tracker.md`, `agent_worklog.md` | `8085` |
-| **Code2** | Companion UI Designer | **ACTIVE** | `ff` | Generating and serving Preset Creation & Channel Whitelist UI preview (`ui_preset.md` + `ff_design_override.md`) with emoji picker & confirmation flow. | `ui_mockups/preset_creation.html`, `progress_tracker.md`, `agent_worklog.md` | `8086`, `8087` |
+| **Code2** | Companion UI Designer | **ACTIVE** | `ff` | Generating and serving App Limits (Blocks Tab) UI preview (`ui_app_limits.md` + `ff_design_override.md`) with time picker, extra time steppers, and turn-off countdown flow. | `ui_mockups/app_limits.html`, `progress_tracker.md`, `agent_worklog.md` | `8086`, `8087`, `8088` |
 
 ---
 
@@ -51,26 +51,34 @@ This registry coordinates concurrent/subsequent AI coding agents working in this
 * **Current Working Branch:** `ff` (Strict branch lock — DO NOT SWITCH BRANCHES)
 * **Status:** `ACTIVE` (In-progress)
 * **Completed:**
-  - Built static HTML/Tailwind preview of the **Home Screen** (`ui_mockups/home_screen.html`) with 24h Bézier stacked area chart, momentum legend grid, preset selector, and floating 5-tab pill nav bar.
-  - Preview served on port `8086`, reviewed and approved by user.
+  - Built static HTML/Tailwind preview of the **Home Screen** (`ui_mockups/home_screen.html`) with 24h Bézier stacked area chart, momentum legend grid, preset selector, and floating 5-tab pill nav bar. Preview served on port `8086`, reviewed and approved by user.
+  - Built static HTML/Tailwind preview of the **Preset Creation & Channel Whitelist Screen** (`ui_mockups/preset_creation.html`) with break steppers, collapsible app restrictions, YouTube 3-way radio, and discipline friction confirmation typing flow. Preview served on port `8087`.
 * **What `Code2` is doing right now:**
-  1. Generating static HTML/Tailwind preview of the **Preset Creation & YouTube Study Mode Whitelist Screen** (`ui_mockups/preset_creation.html`) adhering strictly to `ui_preset.md` and `ff_design_override.md`.
+  1. Generating static HTML/Tailwind preview of the **App Limits (Blocks Tab) Screen** (`ui_mockups/app_limits.html`) adhering strictly to `ui_app_limits.md` and `ff_design_override.md`.
   2. Features:
-     - Header: "New Preset" centered with Close button (×)
-     - Preset Name card with tappable Emoji picker trigger and text input
-     - Break Configuration 2-card grid: Stepper for Number of Breaks (0–6) and Duration Each (1–15 mins)
-     - App Restrictions: 4 collapsible category sections (Productive, Semi-Productive, Distracting, Others) with toggleable apps
-     - YouTube 3-way radio selection (Block completely, Allow completely, Study Mode with whitelisted channel count)
-     - YouTube Study Mode Configuration card with "Configure →" action
-     - Description textarea card with uppercase section label
-     - Sticky bottom "Save Preset" pill button (`#CA9C68`)
-     - Interactive sheets/modals: Emoji Picker bottom sheet & Channel Whitelist view with confirmation sentence typing flow!
-  3. Serving the preview on port `8087`.
+     - Header: "Blocks" with "Help" surface pill
+     - Section Header: "App Limits" with "+ Add App" action in `#14B8A6`
+     - Category Groups (Distracting, Semi-Productive, Others) with individual app cards
+     - App Cards: icon, name, "[X]m spent / [Y]m limit", chevron, status pills ("Blocking" with teal dot, "Paused" with sub-caption)
+     - Interactive App Settings Bottom Sheet:
+       - Header: App icon, title, streak badge (`🔥 12 days`), close button
+       - Dual Column Time Picker (Hours 0–6, Minutes 0–55 in 5m increments) with range enforcement
+       - Suggestion Bar: `💡 Suggested limit is 1h 30m based on your average usage`
+       - Extra Time Sessions Section: Steppers (0–6 sessions), chips ("5m", "10m", "15m"), total extra time indicator with >60m warning
+       - Primary Save button: Ghost White background `#F8FAFC` (intentional spec exception)
+       - Destructive Turn Off Block button
+     - Turn Off Block Flow:
+       - Streak warning sheet with 3-second countdown delay button
+       - Turn off duration sheet ("Rest of the day", "Till tomorrow", "7 days")
+     - Floating bottom navigation bar (Blocks tab active)
+  3. Serving the preview on port `8088`.
 * **Exclusive Resources / Do Not Overwrite:**
   - `ui_mockups/home_screen.html`
   - `ui_mockups/preset_creation.html`
-  - Port `8086` (Home Screen preview remains up)
+  - `ui_mockups/app_limits.html`
+  - Port `8086` (Home Screen preview)
   - Port `8087` (Preset Creation preview)
+  - Port `8088` (App Limits preview)
 
 ---
 
