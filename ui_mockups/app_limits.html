@@ -1,0 +1,727 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>FluxFoxus — App Limits (Blocks Tab) Preview</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@600;700&display=swap" rel="stylesheet">
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            'ff-bg': '#13191F',        // River Styx
+            'ff-surface': '#2B2F2E',   // Carbon Fibre
+            'ff-border': '#594C3D',    // Afternoon Tea
+            'ff-accent': '#906D4B',    // Tanned Wood (replaces Soft Cyan)
+            'ff-primary': '#CA9C68',   // Amber Autumn (replaces Electric Indigo)
+            'ff-text': '#F8FAFC',      // Ghost White
+            'ff-muted': '#94A3B8',     // Muted caption
+            'ff-productive': '#14B8A6', // Teal
+            'ff-warning': '#FFC107',    // Amber / Gold
+            'ff-danger': '#EF4444',     // Red
+          },
+          fontFamily: {
+            sans: ['Inter', 'sans-serif'],
+            mono: ['JetBrains Mono', 'monospace'],
+          }
+        }
+      }
+    }
+  </script>
+  <style>
+    body {
+      background-color: #0b0f14;
+      font-family: 'Inter', sans-serif;
+      user-select: none;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    .no-scrollbar::-webkit-scrollbar {
+      display: none;
+    }
+    .no-scrollbar {
+      -ms-overflow-style: none;
+      scrollbar-width: none;
+    }
+
+    /* Scroll snap picker column */
+    .snap-col {
+      scroll-snap-type: y mandatory;
+      overflow-y: scroll;
+    }
+    .snap-item {
+      scroll-snap-align: center;
+    }
+  </style>
+</head>
+<body class="min-h-screen flex flex-col items-center justify-center p-4 text-ff-text">
+
+  <!-- TOP TOOLBAR (Preview Controller) -->
+  <div class="mb-5 flex flex-wrap items-center justify-center gap-2 bg-[#182028] border border-ff-border px-4 py-2.5 rounded-2xl shadow-xl max-w-xl text-xs">
+    <span class="text-ff-primary font-bold tracking-wide uppercase text-[11px] mr-2">Interactive Sheets:</span>
+    <button onclick="openSettingsSheet('Instagram', 0, 45, 12, 'blocking')" class="px-3 py-1.5 rounded-lg bg-ff-primary text-ff-bg font-bold transition">
+      Open Instagram Settings
+    </button>
+    <button onclick="openStreakWarning('Instagram', 12)" class="px-3 py-1.5 rounded-lg bg-ff-surface text-ff-text border border-ff-border font-medium hover:border-ff-danger transition">
+      Test Turn-Off Flow (3s Delay)
+    </button>
+    <button onclick="toggleAddAppSheet(true)" class="px-3 py-1.5 rounded-lg bg-ff-surface text-ff-text border border-ff-border font-medium hover:border-ff-primary transition">
+      + Add App Sheet
+    </button>
+  </div>
+
+  <!-- PHONE CONTAINER SIMULATOR -->
+  <div class="relative w-[390px] h-[830px] bg-ff-bg rounded-[44px] border-[3px] border-ff-border shadow-2xl overflow-hidden flex flex-col justify-between">
+    
+    <!-- TOP BAR (Status Bar + Header) -->
+    <div class="w-full shrink-0 pt-5 px-5 pb-3 border-b border-ff-border/60 bg-ff-bg z-10">
+      <!-- ANDROID STATUS BAR -->
+      <div class="w-full flex items-center justify-between text-[11px] text-ff-muted font-medium pb-2 px-1">
+        <span>09:42</span>
+        <div class="flex items-center space-x-1.5">
+          <svg class="w-3.5 h-3.5 fill-current" viewBox="0 0 24 24"><path d="M12 4C7.31 4 3.07 5.9 0 8.98L12 21 24 8.98C20.93 5.9 16.69 4 12 4z"/></svg>
+          <svg class="w-3.5 h-3.5 fill-current" viewBox="0 0 24 24"><path d="M2 22h20V2z"/></svg>
+          <div class="w-4 h-2.5 border border-ff-muted rounded-[2px] p-[1px] flex items-center">
+            <div class="h-full w-3/4 bg-ff-muted rounded-[1px]"></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 3. HEADER ROW -->
+      <div class="w-full flex items-center justify-between pt-1">
+        <h1 class="text-xl font-bold text-ff-text tracking-tight">Blocks</h1>
+        <button onclick="showToast('Help: Set daily usage caps for distracting apps.')"
+                class="px-3 py-1 rounded-full bg-ff-surface border border-ff-border text-xs text-ff-text font-medium hover:border-ff-primary transition">
+          Help
+        </button>
+      </div>
+    </div>
+
+    <!-- MAIN SCROLLABLE CONTENT BODY -->
+    <div class="flex-1 overflow-y-auto no-scrollbar px-5 py-4 space-y-4">
+      
+      <!-- 4. SECTION HEADER ROW -->
+      <div class="flex items-center justify-between pt-1">
+        <h2 class="text-sm font-bold text-ff-text tracking-tight">App Limits</h2>
+        <button onclick="toggleAddAppSheet(true)" class="text-xs font-semibold text-ff-productive hover:underline flex items-center space-x-1">
+          <span>+ Add App</span>
+        </button>
+      </div>
+
+      <!-- 5. CATEGORY GROUP: DISTRACTING -->
+      <div>
+        <!-- Label Row -->
+        <div class="flex items-center space-x-2 pb-2">
+          <span class="w-2 h-2 rounded-full bg-[#1A2333] border border-ff-muted"></span>
+          <span class="text-[11px] font-bold text-ff-muted uppercase tracking-widest">Distracting</span>
+        </div>
+
+        <!-- App Cards Stack -->
+        <div class="space-y-2.5">
+          
+          <!-- Card 1: Instagram (Active Blocking) -->
+          <div onclick="openSettingsSheet('Instagram', 0, 45, 12, 'blocking')"
+               class="bg-ff-surface border border-ff-border rounded-xl p-3.5 cursor-pointer hover:border-ff-primary/70 transition shadow-sm">
+            <div class="flex items-center justify-between">
+              <div class="flex items-center space-x-3">
+                <div class="w-11 h-11 rounded-xl bg-pink-900/30 border border-pink-700/40 flex items-center justify-center text-lg">
+                  📷
+                </div>
+                <div>
+                  <h3 class="text-sm font-semibold text-ff-text">Instagram</h3>
+                  <span class="text-[11px] text-ff-muted font-medium">42m spent / 45m limit</span>
+                </div>
+              </div>
+              <span class="text-ff-muted text-base font-bold">›</span>
+            </div>
+
+            <div class="mt-2.5 flex items-center space-x-2 pt-2 border-t border-ff-border/40">
+              <span class="inline-flex items-center space-x-1 px-2.5 py-0.5 rounded-full bg-ff-productive/15 text-ff-productive text-[10px] font-semibold">
+                <span class="w-1.5 h-1.5 rounded-full bg-ff-productive"></span>
+                <span>Blocking</span>
+              </span>
+              <span class="text-[10px] text-ff-warning font-semibold">🔥 12 days</span>
+            </div>
+          </div>
+
+          <!-- Card 2: YouTube (Active Blocking) -->
+          <div onclick="openSettingsSheet('YouTube', 1, 30, 24, 'blocking')"
+               class="bg-ff-surface border border-ff-border rounded-xl p-3.5 cursor-pointer hover:border-ff-primary/70 transition shadow-sm">
+            <div class="flex items-center justify-between">
+              <div class="flex items-center space-x-3">
+                <div class="w-11 h-11 rounded-xl bg-red-900/30 border border-red-700/40 flex items-center justify-center text-lg">
+                  ▶
+                </div>
+                <div>
+                  <h3 class="text-sm font-semibold text-ff-text">YouTube</h3>
+                  <span class="text-[11px] text-ff-muted font-medium">1h 10m spent / 1h 30m limit</span>
+                </div>
+              </div>
+              <span class="text-ff-muted text-base font-bold">›</span>
+            </div>
+
+            <div class="mt-2.5 flex items-center space-x-2 pt-2 border-t border-ff-border/40">
+              <span class="inline-flex items-center space-x-1 px-2.5 py-0.5 rounded-full bg-ff-productive/15 text-ff-productive text-[10px] font-semibold">
+                <span class="w-1.5 h-1.5 rounded-full bg-ff-productive"></span>
+                <span>Blocking</span>
+              </span>
+              <span class="text-[10px] text-ff-warning font-semibold">🔥 24 days</span>
+            </div>
+          </div>
+
+          <!-- Card 3: Reddit (Paused State) -->
+          <div onclick="openSettingsSheet('Reddit', 0, 30, 0, 'paused')"
+               class="bg-ff-surface border border-ff-border rounded-xl p-3.5 cursor-pointer hover:border-ff-primary/70 transition shadow-sm">
+            <div class="flex items-center justify-between">
+              <div class="flex items-center space-x-3">
+                <div class="w-11 h-11 rounded-xl bg-orange-900/30 border border-orange-700/40 flex items-center justify-center text-lg">
+                  🤖
+                </div>
+                <div>
+                  <h3 class="text-sm font-semibold text-ff-text">Reddit</h3>
+                  <span class="text-[11px] text-ff-muted font-medium">15m spent / 30m limit</span>
+                </div>
+              </div>
+              <span class="text-ff-muted text-base font-bold">›</span>
+            </div>
+
+            <div class="mt-2.5 pt-2 border-t border-ff-border/40">
+              <span class="inline-flex items-center space-x-1 px-2.5 py-0.5 rounded-full bg-ff-muted/15 text-ff-muted text-[10px] font-semibold">
+                <span class="w-1.5 h-1.5 rounded-full bg-ff-muted"></span>
+                <span>Paused</span>
+              </span>
+              <span class="text-[10px] text-ff-muted block mt-1">Turned off till Tomorrow, 9:00 AM</span>
+            </div>
+          </div>
+
+        </div>
+      </div>
+
+      <!-- 5. CATEGORY GROUP: SEMI-PRODUCTIVE -->
+      <div class="pt-1">
+        <div class="flex items-center space-x-2 pb-2">
+          <span class="w-2 h-2 rounded-full bg-ff-accent"></span>
+          <span class="text-[11px] font-bold text-ff-muted uppercase tracking-widest">Semi-Productive</span>
+        </div>
+
+        <div class="space-y-2.5">
+          <!-- Card: Gmail -->
+          <div onclick="openSettingsSheet('Gmail', 0, 45, 8, 'blocking')"
+               class="bg-ff-surface border border-ff-border rounded-xl p-3.5 cursor-pointer hover:border-ff-primary/70 transition shadow-sm">
+            <div class="flex items-center justify-between">
+              <div class="flex items-center space-x-3">
+                <div class="w-11 h-11 rounded-xl bg-slate-800 border border-slate-700 flex items-center justify-center text-lg">
+                  ✉️
+                </div>
+                <div>
+                  <h3 class="text-sm font-semibold text-ff-text">Gmail</h3>
+                  <span class="text-[11px] text-ff-muted font-medium">25m spent / 45m limit</span>
+                </div>
+              </div>
+              <span class="text-ff-muted text-base font-bold">›</span>
+            </div>
+            <div class="mt-2.5 flex items-center space-x-2 pt-2 border-t border-ff-border/40">
+              <span class="inline-flex items-center space-x-1 px-2.5 py-0.5 rounded-full bg-ff-productive/15 text-ff-productive text-[10px] font-semibold">
+                <span class="w-1.5 h-1.5 rounded-full bg-ff-productive"></span>
+                <span>Blocking</span>
+              </span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 5. CATEGORY GROUP: OTHERS -->
+      <div class="pt-1">
+        <div class="flex items-center space-x-2 pb-2">
+          <span class="w-2 h-2 rounded-full bg-ff-muted"></span>
+          <span class="text-[11px] font-bold text-ff-muted uppercase tracking-widest">Others</span>
+        </div>
+
+        <div class="space-y-2.5">
+          <!-- Card: Chrome -->
+          <div onclick="openSettingsSheet('Chrome', 1, 0, 15, 'blocking')"
+               class="bg-ff-surface border border-ff-border rounded-xl p-3.5 cursor-pointer hover:border-ff-primary/70 transition shadow-sm">
+            <div class="flex items-center justify-between">
+              <div class="flex items-center space-x-3">
+                <div class="w-11 h-11 rounded-xl bg-slate-800 border border-slate-700 flex items-center justify-center text-lg">
+                  🌐
+                </div>
+                <div>
+                  <h3 class="text-sm font-semibold text-ff-text">Chrome</h3>
+                  <span class="text-[11px] text-ff-muted font-medium">30m spent / 1h 00m limit</span>
+                </div>
+              </div>
+              <span class="text-ff-muted text-base font-bold">›</span>
+            </div>
+            <div class="mt-2.5 flex items-center space-x-2 pt-2 border-t border-ff-border/40">
+              <span class="inline-flex items-center space-x-1 px-2.5 py-0.5 rounded-full bg-ff-productive/15 text-ff-productive text-[10px] font-semibold">
+                <span class="w-1.5 h-1.5 rounded-full bg-ff-productive"></span>
+                <span>Blocking</span>
+              </span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="h-4"></div>
+    </div>
+
+    <!-- BOTTOM FLOATING PILL NAVIGATION BAR -->
+    <div class="w-full shrink-0 p-4 pt-1 bg-ff-bg">
+      <div class="w-full h-16 bg-ff-surface border border-ff-border rounded-full px-3 flex items-center justify-between shadow-xl">
+        
+        <!-- Tab 1: Home -->
+        <button class="flex flex-col items-center justify-center px-2 py-1 text-ff-text hover:text-ff-primary transition">
+          <svg class="w-5 h-5 fill-current" viewBox="0 0 24 24"><path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z"/></svg>
+          <span class="text-[10px] font-medium mt-0.5">Home</span>
+        </button>
+
+        <!-- Group 1: [Usage + Focus] -->
+        <div class="flex items-center space-x-1 bg-ff-bg/50 border border-ff-border/40 rounded-full px-2 py-1">
+          <button class="flex flex-col items-center justify-center px-2 py-0.5 text-ff-text hover:text-ff-primary transition">
+            <svg class="w-4 h-4 fill-none stroke-current stroke-2" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><polyline points="12 6 12 12 16 14"/></svg>
+            <span class="text-[9px] font-medium mt-0.5">Usage</span>
+          </button>
+          <button class="flex flex-col items-center justify-center px-2 py-0.5 text-ff-text hover:text-ff-primary transition">
+            <svg class="w-4 h-4 fill-none stroke-current stroke-2" viewBox="0 0 24 24"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+            <span class="text-[9px] font-medium mt-0.5">Focus</span>
+          </button>
+        </div>
+
+        <!-- Group 2: [Planner + Block (ACTIVE)] -->
+        <div class="flex items-center space-x-1 bg-ff-bg/50 border border-ff-border/40 rounded-full px-2 py-1">
+          <button class="flex flex-col items-center justify-center px-2 py-0.5 text-ff-text hover:text-ff-primary transition">
+            <svg class="w-4 h-4 fill-none stroke-current stroke-2" viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+            <span class="text-[9px] font-medium mt-0.5">Planner</span>
+          </button>
+          <!-- Tab 5: Block (ACTIVE) -->
+          <button class="flex flex-col items-center justify-center px-2 py-0.5 text-ff-primary">
+            <svg class="w-4 h-4 fill-none stroke-current stroke-2" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><line x1="4.93" y1="4.93" x2="19.07" y2="19.07"/></svg>
+            <span class="text-[9px] font-bold mt-0.5">Block</span>
+          </button>
+        </div>
+
+      </div>
+      <div class="w-28 h-1 bg-ff-muted/30 rounded-full mx-auto mt-2"></div>
+    </div>
+
+    <!-- 7. APP SETTINGS BOTTOM SHEET (Modal) -->
+    <div id="settings-sheet" class="absolute inset-0 bg-black/80 backdrop-blur-sm z-40 hidden flex flex-col justify-end">
+      <div class="w-full max-h-[85vh] bg-ff-surface border-t border-ff-border rounded-t-3xl p-5 overflow-y-auto no-scrollbar shadow-2xl">
+        
+        <!-- Drag Handle -->
+        <div class="w-10 h-1 bg-ff-muted/40 rounded-full mx-auto mb-3"></div>
+
+        <!-- 7.2 Sheet Header -->
+        <div class="flex items-center justify-between pb-3 border-b border-ff-border/60">
+          <div class="flex items-center space-x-2.5">
+            <div id="modal-app-icon" class="w-9 h-9 rounded-lg bg-pink-900/30 border border-pink-700/40 flex items-center justify-center text-base">
+              📷
+            </div>
+            <div>
+              <h3 id="modal-app-title" class="text-sm font-bold text-ff-text leading-tight">Instagram Limit</h3>
+              <span id="modal-streak-badge" class="inline-flex items-center text-[10px] text-ff-warning font-semibold">
+                🔥 12 days
+              </span>
+            </div>
+          </div>
+          <button onclick="closeSettingsSheet()" class="text-ff-muted hover:text-ff-text p-1 text-sm">✕</button>
+        </div>
+
+        <!-- 7.3 Dual Column Time Picker -->
+        <div class="my-3.5 bg-ff-bg/60 border border-ff-border rounded-2xl p-4">
+          
+          <!-- Center Time Display -->
+          <div class="text-center mb-3">
+            <span id="picker-display-val" class="font-mono text-3xl font-bold text-ff-accent tracking-tight">0 hr 45 min</span>
+          </div>
+
+          <!-- Dual Column Selector (Hours & Minutes) -->
+          <div class="grid grid-cols-2 gap-4">
+            
+            <!-- Hours Column -->
+            <div class="text-center">
+              <span class="text-[9px] font-bold text-ff-muted uppercase tracking-wider block mb-1">Hours</span>
+              <div class="flex items-center justify-center space-x-2">
+                <button onclick="adjustPickerHours(-1)" class="w-8 h-8 rounded-lg bg-ff-surface border border-ff-border text-ff-text font-bold">−</button>
+                <span id="picker-hours-num" class="text-xl font-mono font-bold text-ff-text w-8">0</span>
+                <button onclick="adjustPickerHours(1)" class="w-8 h-8 rounded-lg bg-ff-surface border border-ff-border text-ff-text font-bold">+</button>
+              </div>
+            </div>
+
+            <!-- Minutes Column -->
+            <div class="text-center">
+              <span class="text-[9px] font-bold text-ff-muted uppercase tracking-wider block mb-1">Minutes</span>
+              <div class="flex items-center justify-center space-x-2">
+                <button onclick="adjustPickerMinutes(-5)" class="w-8 h-8 rounded-lg bg-ff-surface border border-ff-border text-ff-text font-bold">−</button>
+                <span id="picker-minutes-num" class="text-xl font-mono font-bold text-ff-text w-10">45</span>
+                <button onclick="adjustPickerMinutes(5)" class="w-8 h-8 rounded-lg bg-ff-surface border border-ff-border text-ff-text font-bold">+</button>
+              </div>
+            </div>
+
+          </div>
+        </div>
+
+        <!-- 7.4 Suggestion Bar -->
+        <div class="mb-3.5 bg-ff-productive/10 border-l-4 border-ff-productive rounded-r-xl p-2.5 flex items-center space-x-2 text-xs">
+          <span>💡</span>
+          <span class="text-[11px] text-ff-muted">Suggested limit is <strong class="text-ff-productive font-semibold">45m</strong> based on your average usage</span>
+        </div>
+
+        <!-- 7.5 Extra Time Sessions Section -->
+        <div class="bg-ff-accent/10 border border-ff-accent/30 rounded-2xl p-3.5 mb-4 space-y-3">
+          <div class="flex items-center justify-between">
+            <span class="text-xs font-bold text-ff-text">Extra Time Sessions</span>
+            <span class="text-[9px] font-bold px-2 py-0.5 rounded-full bg-ff-accent/20 text-ff-accent border border-ff-accent/30">Max 60 mins total</span>
+          </div>
+
+          <!-- Row 1: Number of sessions stepper -->
+          <div class="flex items-center justify-between text-xs">
+            <span class="text-ff-muted">Number of sessions</span>
+            <div class="flex items-center space-x-2">
+              <button onclick="adjustExtraSessions(-1)" class="w-7 h-7 rounded-lg bg-ff-surface border border-ff-border text-ff-text font-bold text-xs flex items-center justify-center">−</button>
+              <span id="val-extra-sessions" class="font-mono font-bold text-ff-text text-sm w-4 text-center">2</span>
+              <button onclick="adjustExtraSessions(1)" class="w-7 h-7 rounded-lg bg-ff-surface border border-ff-border text-ff-text font-bold text-xs flex items-center justify-center">+</button>
+            </div>
+          </div>
+
+          <!-- Row 2: Duration per session (Chips 5m, 10m, 15m) -->
+          <div class="flex items-center justify-between text-xs pt-1">
+            <span class="text-ff-muted">Duration per session</span>
+            <div class="flex items-center space-x-1.5">
+              <button onclick="setExtraDuration(5)" id="chip-5m" class="px-2.5 py-1 rounded-lg border text-[11px] font-semibold bg-ff-surface border-ff-border text-ff-muted">5m</button>
+              <button onclick="setExtraDuration(10)" id="chip-10m" class="px-2.5 py-1 rounded-lg border text-[11px] font-semibold bg-ff-accent/20 border-ff-accent text-ff-accent">10m</button>
+              <button onclick="setExtraDuration(15)" id="chip-15m" class="px-2.5 py-1 rounded-lg border text-[11px] font-semibold bg-ff-surface border-ff-border text-ff-muted">15m</button>
+            </div>
+          </div>
+
+          <!-- Row 3: Total Extra Time Calculated -->
+          <div class="flex items-center justify-between text-xs pt-2 border-t border-ff-border/40">
+            <span class="text-ff-muted">Total extra time:</span>
+            <span id="val-total-extra" class="font-bold text-ff-accent">20 mins</span>
+          </div>
+        </div>
+
+        <!-- 7.6 Action Buttons -->
+        <div class="space-y-2">
+          <!-- Save Changes: Ghost White background per spec exception -->
+          <button onclick="saveAppSettings()"
+                  class="w-full py-3.5 bg-ff-text hover:bg-white text-ff-bg font-bold text-xs rounded-xl shadow-md transition">
+            Save Changes
+          </button>
+          
+          <!-- Turn Off Block -->
+          <button onclick="triggerTurnOffBlock()"
+                  class="w-full py-3 bg-ff-danger/15 hover:bg-ff-danger/25 text-ff-danger font-bold text-xs rounded-xl transition border border-ff-danger/30">
+            Turn Off Block
+          </button>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- 8.1 STREAK WARNING SHEET (3s Delay) -->
+    <div id="streak-warning-sheet" class="absolute inset-0 bg-black/85 backdrop-blur-sm z-50 hidden flex flex-col justify-end">
+      <div class="w-full bg-ff-surface border-t border-ff-border rounded-t-3xl p-5 text-center shadow-2xl space-y-4">
+        <div class="w-10 h-1 bg-ff-muted/40 rounded-full mx-auto"></div>
+
+        <div>
+          <h3 class="text-sm font-bold text-ff-text leading-snug">
+            You'll lose your streak if you turn off <span id="warning-app-name" class="text-ff-primary">Instagram</span> Limit
+          </h3>
+          <p class="text-xs text-ff-muted mt-1">Discipline safeguards require a pause duration before unblocking.</p>
+        </div>
+
+        <!-- Streak Loss Graphic -->
+        <div class="bg-ff-bg/60 border border-ff-border rounded-xl p-4 flex items-center justify-center space-x-4">
+          <div class="text-center">
+            <span class="text-2xl">🔥</span>
+            <span id="streak-from-val" class="block text-xs font-bold text-ff-warning mt-1">12 days</span>
+          </div>
+          <span class="text-xl text-ff-muted">→</span>
+          <div class="text-center">
+            <span class="text-2xl">🌧️</span>
+            <span class="block text-xs font-bold text-ff-muted mt-1">0 days</span>
+          </div>
+        </div>
+
+        <!-- 3-Second Countdown Button -->
+        <div class="space-y-2 pt-1">
+          <button id="btn-warning-countdown" disabled onclick="openTurnOffDuration()"
+                  class="w-full py-3 bg-ff-muted/20 text-ff-muted font-bold text-xs rounded-full cursor-not-allowed transition">
+            Wait (3s) to Turn off limit...
+          </button>
+          <button onclick="closeStreakWarning()" class="w-full py-2.5 bg-ff-surface border border-ff-border text-ff-text font-medium text-xs rounded-full hover:border-ff-primary">
+            Cancel
+          </button>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- 8.2 TURN OFF DURATION SHEET -->
+    <div id="duration-sheet" class="absolute inset-0 bg-black/80 backdrop-blur-sm z-50 hidden flex flex-col justify-end">
+      <div class="w-full bg-ff-surface border-t border-ff-border rounded-t-3xl p-5 shadow-2xl space-y-3.5">
+        <div class="w-10 h-1 bg-ff-muted/40 rounded-full mx-auto"></div>
+        <h3 class="text-sm font-bold text-ff-text">How long do you want to turn off limit?</h3>
+
+        <!-- Radio Options -->
+        <div class="space-y-2 text-xs">
+          <label class="flex items-center space-x-3 p-3 rounded-xl bg-ff-bg/50 border border-ff-border cursor-pointer">
+            <input type="radio" name="turnoff-dur" value="today" checked class="accent-[#CA9C68]">
+            <span class="text-ff-text font-medium">Rest of the day</span>
+          </label>
+          <label class="flex items-center space-x-3 p-3 rounded-xl bg-ff-bg/50 border border-ff-border cursor-pointer">
+            <input type="radio" name="turnoff-dur" value="tomorrow" class="accent-[#CA9C68]">
+            <span class="text-ff-text font-medium">Till tomorrow</span>
+          </label>
+          <label class="flex items-center space-x-3 p-3 rounded-xl bg-ff-bg/50 border border-ff-border cursor-pointer">
+            <input type="radio" name="turnoff-dur" value="7days" class="accent-[#CA9C68]">
+            <span class="text-ff-text font-medium">7 days</span>
+          </label>
+        </div>
+
+        <div class="p-2.5 rounded-lg bg-ff-bg text-[10px] text-ff-muted border border-ff-border">
+          App Reminder will be turned off till tomorrow 12:00 AM.
+        </div>
+
+        <!-- Action Buttons -->
+        <div class="space-y-2 pt-1">
+          <button onclick="confirmTurnOff()" class="w-full py-3 bg-ff-text text-ff-bg font-bold text-xs rounded-xl shadow">
+            Turn Off
+          </button>
+          <button onclick="confirmDeleteLimit()" class="w-full py-2.5 bg-ff-danger/15 text-ff-danger border border-ff-danger/30 font-bold text-xs rounded-xl hover:bg-ff-danger/25">
+            Delete Limit
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- 9. ADD APP SHEET -->
+    <div id="add-app-sheet" class="absolute inset-0 bg-black/80 backdrop-blur-sm z-50 hidden flex flex-col justify-end">
+      <div class="w-full max-h-[80vh] bg-ff-surface border-t border-ff-border rounded-t-3xl p-5 shadow-2xl flex flex-col justify-between">
+        <div>
+          <div class="w-10 h-1 bg-ff-muted/40 rounded-full mx-auto mb-3"></div>
+          <div class="flex items-center justify-between mb-3">
+            <h3 class="text-sm font-bold text-ff-text">Select an app to add limit</h3>
+            <button onclick="toggleAddAppSheet(false)" class="text-xs text-ff-muted">✕</button>
+          </div>
+          
+          <!-- Search box -->
+          <div class="bg-ff-bg border border-ff-border rounded-lg px-3 py-2 flex items-center space-x-2 mb-3">
+            <span class="text-xs text-ff-muted">🔍</span>
+            <input type="text" placeholder="Search installed apps..." class="w-full bg-transparent text-xs text-ff-text focus:outline-none">
+          </div>
+
+          <!-- Apps List -->
+          <div class="space-y-2 max-h-72 overflow-y-auto no-scrollbar">
+            <!-- App Item 1 -->
+            <div class="p-2.5 rounded-xl bg-ff-bg/60 border border-ff-border flex items-center justify-between">
+              <div class="flex items-center space-x-2.5">
+                <div class="w-8 h-8 rounded-lg bg-blue-900/30 flex items-center justify-center text-sm">💬</div>
+                <div>
+                  <span class="text-xs font-semibold text-ff-text block">Discord</span>
+                  <span class="text-[10px] text-ff-muted">54 mins avg daily</span>
+                </div>
+              </div>
+              <button onclick="addAppLimit('Discord', '💬')" class="px-3 py-1 rounded-lg bg-ff-primary/20 text-ff-primary font-bold text-xs hover:bg-ff-primary/30">
+                + Add
+              </button>
+            </div>
+
+            <!-- App Item 2 -->
+            <div class="p-2.5 rounded-xl bg-ff-bg/60 border border-ff-border flex items-center justify-between">
+              <div class="flex items-center space-x-2.5">
+                <div class="w-8 h-8 rounded-lg bg-green-900/30 flex items-center justify-center text-sm">🎮</div>
+                <div>
+                  <span class="text-xs font-semibold text-ff-text block">Chess.com</span>
+                  <span class="text-[10px] text-ff-muted">38 mins avg daily</span>
+                </div>
+              </div>
+              <button onclick="addAppLimit('Chess.com', '🎮')" class="px-3 py-1 rounded-lg bg-ff-primary/20 text-ff-primary font-bold text-xs hover:bg-ff-primary/30">
+                + Add
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <button onclick="toggleAddAppSheet(false)" class="w-full py-2.5 mt-3 text-xs text-ff-muted hover:text-ff-text">
+          Close
+        </button>
+      </div>
+    </div>
+
+    <!-- 10. TOAST NOTIFICATION CONTAINER -->
+    <div id="toast-notif" class="absolute bottom-24 left-1/2 -translate-x-1/2 bg-ff-surface border border-ff-border px-4 py-2 rounded-xl text-xs font-semibold text-ff-text shadow-2xl transition-all duration-300 opacity-0 pointer-events-none z-50">
+      Toast Message
+    </div>
+
+  </div>
+
+  <!-- JAVASCRIPT LOGIC -->
+  <script>
+    let activeAppName = "Instagram";
+    let pickerHours = 0;
+    let pickerMinutes = 45;
+    let activeStreak = 12;
+    let extraSessions = 2;
+    let extraDuration = 10;
+    let warningTimer;
+
+    function openSettingsSheet(name, hours, mins, streak, status) {
+      activeAppName = name;
+      pickerHours = hours;
+      pickerMinutes = mins;
+      activeStreak = streak;
+
+      document.getElementById('modal-app-title').innerText = name + ' Limit';
+      document.getElementById('modal-streak-badge').innerText = streak > 0 ? `🔥 ${streak} days` : '🌧️ 0 days';
+      updatePickerDisplay();
+      updateExtraTimeCalculation();
+      document.getElementById('settings-sheet').classList.remove('hidden');
+    }
+
+    function closeSettingsSheet() {
+      document.getElementById('settings-sheet').classList.add('hidden');
+    }
+
+    function adjustPickerHours(delta) {
+      pickerHours = Math.max(0, Math.min(6, pickerHours + delta));
+      updatePickerDisplay();
+    }
+
+    function adjustPickerMinutes(delta) {
+      pickerMinutes += delta;
+      if (pickerMinutes >= 60) {
+        pickerMinutes = 0;
+        pickerHours = Math.min(6, pickerHours + 1);
+      } else if (pickerMinutes < 0) {
+        if (pickerHours > 0) {
+          pickerMinutes = 55;
+          pickerHours--;
+        } else {
+          pickerMinutes = 0;
+        }
+      }
+      updatePickerDisplay();
+    }
+
+    function updatePickerDisplay() {
+      document.getElementById('picker-hours-num').innerText = pickerHours;
+      document.getElementById('picker-minutes-num').innerText = pickerMinutes;
+      document.getElementById('picker-display-val').innerText = `${pickerHours} hr ${pickerMinutes} min`;
+    }
+
+    function adjustExtraSessions(delta) {
+      extraSessions = Math.max(0, Math.min(6, extraSessions + delta));
+      document.getElementById('val-extra-sessions').innerText = extraSessions;
+      updateExtraTimeCalculation();
+    }
+
+    function setExtraDuration(dur) {
+      extraDuration = dur;
+      [5, 10, 15].forEach(d => {
+        const chip = document.getElementById('chip-' + d + 'm');
+        if (d === dur) {
+          chip.className = "px-2.5 py-1 rounded-lg border text-[11px] font-semibold bg-ff-accent/20 border-ff-accent text-ff-accent";
+        } else {
+          chip.className = "px-2.5 py-1 rounded-lg border text-[11px] font-semibold bg-ff-surface border-ff-border text-ff-muted";
+        }
+      });
+      updateExtraTimeCalculation();
+    }
+
+    function updateExtraTimeCalculation() {
+      const total = extraSessions * extraDuration;
+      const el = document.getElementById('val-total-extra');
+      el.innerText = total + " mins";
+      if (total > 60) {
+        el.className = "font-bold text-ff-danger";
+      } else {
+        el.className = "font-bold text-ff-accent";
+      }
+    }
+
+    function saveAppSettings() {
+      closeSettingsSheet();
+      showToast(`${activeAppName} limit saved (${pickerHours}h ${pickerMinutes}m)`);
+    }
+
+    function triggerTurnOffBlock() {
+      closeSettingsSheet();
+      openStreakWarning(activeAppName, activeStreak);
+    }
+
+    function openStreakWarning(appName, streak) {
+      document.getElementById('warning-app-name').innerText = appName;
+      document.getElementById('streak-from-val').innerText = streak + " days";
+      document.getElementById('streak-warning-sheet').classList.remove('hidden');
+
+      const btn = document.getElementById('btn-warning-countdown');
+      btn.disabled = true;
+      btn.className = "w-full py-3 bg-ff-muted/20 text-ff-muted font-bold text-xs rounded-full cursor-not-allowed transition";
+
+      let countdown = 3;
+      btn.innerText = `Wait (${countdown}s) to Turn off limit...`;
+
+      clearInterval(warningTimer);
+      warningTimer = setInterval(() => {
+        countdown--;
+        if (countdown <= 0) {
+          clearInterval(warningTimer);
+          btn.disabled = false;
+          btn.innerText = "Turn Off Limit";
+          btn.className = "w-full py-3 bg-ff-danger hover:bg-red-700 text-ff-text font-bold text-xs rounded-full cursor-pointer transition shadow-lg";
+        } else {
+          btn.innerText = `Wait (${countdown}s) to Turn off limit...`;
+        }
+      }, 1000);
+    }
+
+    function closeStreakWarning() {
+      clearInterval(warningTimer);
+      document.getElementById('streak-warning-sheet').classList.add('hidden');
+    }
+
+    function openTurnOffDuration() {
+      closeStreakWarning();
+      document.getElementById('duration-sheet').classList.remove('hidden');
+    }
+
+    function confirmTurnOff() {
+      document.getElementById('duration-sheet').classList.add('hidden');
+      showToast(`${activeAppName} paused till tomorrow`);
+    }
+
+    function confirmDeleteLimit() {
+      document.getElementById('duration-sheet').classList.add('hidden');
+      showToast(`${activeAppName} limit deleted`);
+    }
+
+    function toggleAddAppSheet(show) {
+      document.getElementById('add-app-sheet').classList.toggle('hidden', !show);
+    }
+
+    function addAppLimit(name, emoji) {
+      toggleAddAppSheet(false);
+      openSettingsSheet(name, 0, 30, 0, 'blocking');
+      showToast(`Added ${name} limit`);
+    }
+
+    function showToast(msg) {
+      const toast = document.getElementById('toast-notif');
+      toast.innerText = msg;
+      toast.classList.remove('opacity-0');
+      toast.classList.add('opacity-100');
+      setTimeout(() => {
+        toast.classList.remove('opacity-100');
+        toast.classList.add('opacity-0');
+      }, 2200);
+    }
+  </script>
+</body>
+</html>
