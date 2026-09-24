@@ -26,6 +26,8 @@
 - [x] Skills setup and configuration registered.
 - [x] Active Focus Session UI Mockup approved by user (served by `Code1` on port 8085).
 - [x] Home Screen UI Mockup approved by user (served by `Code2` on port 8086).
+- [x] Preset Creation & Channel Whitelist UI Mockup completed and verified (served by `Code2` on port 8087).
+- [x] App Limits (Blocks Tab) UI Mockup completed and served (served by `Code2` on port 8088).
 - [x] Phase 1-A Step 1 completed: Flutter ThemeTokens, Typography, Spacing, Radius, Dark ThemeData, dependencies, and unit tests (100% passing, 0 lints).
 
 ---
