@@ -23,7 +23,8 @@
 - [x] Design system override specification locked (`ff_design_override.md` - Rustic Medley palette).
 - [x] Flutter project structure initialized with multi-platform runners (`fluxfoxus/`).
 - [x] Skills setup and configuration registered.
-- [x] Active Focus Session UI Mockup approved by user.
+- [x] Active Focus Session UI Mockup approved by user (served by `Code1` on port 8085).
+- [x] Home Screen UI Mockup completed and served (`Code2` on port 8086).
 
 ---
 
@@ -37,12 +38,22 @@
   - Pause / Play circular action button (`#CA9C68`)
 - [x] Strict Rustic Medley color mapping (`#13191F` background, `#2B2F2E` cards, `#594C3D` borders, `#906D4B` accent, `#CA9C68` primary, `#F8FAFC` text).
 - [x] Interactive Stop Focusing modal with discipline delay countdown & streak warning.
-- [x] Local preview served on port 8085 (`ui_mockups/active_focus_session.html`) awaiting approval.
+- [x] Local preview served on port 8085 (`ui_mockups/active_focus_session.html`).
+
+### 3.1 Active Work: Home Screen UI (`Code2`)
+- [x] Home screen layout structure matching `ui_home.md` and `ui_navigation.md`.
+- [x] Header row with FF aperture logo and dual stacked weekly/focused avg pills.
+- [x] Momentum Card with 24h Bézier stacked area chart (4 categories) and 2×2 legend grid with dividers.
+- [x] Session Card with today's focus time, preset selector, and 4 detail rows (duration, breaks, break time, description).
+- [x] Primary action pill button: "Start Focusing" in `#CA9C68`.
+- [x] Floating pill bottom navigation bar with 5 grouped tabs.
+- [x] State switcher (Standard, Active Session Running, Upcoming 15m alert, Empty state).
+- [x] Local preview served on port 8086 (`ui_mockups/home_screen.html`).
 
 ---
 
 ## 4. Backlog
-- [ ] Remaining UI screens generation (Home, Presets, App Limits, Planner, Usage Stats, 2/5/10/20 Distraction Intervention, Home Widget).
+- [ ] Remaining UI screens generation (Presets, App Limits, Planner, Usage Stats, 2/5/10/20 Distraction Intervention, Home Widget).
 - [ ] Flutter implementation of ThemeTokens (`lib/core/theme/`).
 - [ ] Database schema & Hive box implementations (`lib/core/database/`).
 - [ ] Riverpod state management providers and navigation shell (`go_router`).

@@ -1,0 +1,452 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>FluxFoxus — Home Screen Preview</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@600;700&display=swap" rel="stylesheet">
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            'ff-bg': '#13191F',        // River Styx
+            'ff-surface': '#2B2F2E',   // Carbon Fibre
+            'ff-border': '#594C3D',    // Afternoon Tea
+            'ff-accent': '#906D4B',    // Tanned Wood (replaces Soft Cyan)
+            'ff-primary': '#CA9C68',   // Amber Autumn (replaces Electric Indigo)
+            'ff-text': '#F8FAFC',      // Ghost White
+            'ff-muted': '#94A3B8',     // Muted caption
+            'ff-productive': '#14B8A6', // Teal
+            'ff-semi': '#906D4B',       // Warm Brown / Tanned Wood
+            'ff-distracting': '#1A2333',// Charcoal Slate
+          },
+          fontFamily: {
+            sans: ['Inter', 'sans-serif'],
+            mono: ['JetBrains Mono', 'monospace'],
+          }
+        }
+      }
+    }
+  </script>
+  <style>
+    body {
+      background-color: #0b0f14;
+      font-family: 'Inter', sans-serif;
+      user-select: none;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    /* Custom scrollbar hiding for clean device view */
+    .no-scrollbar::-webkit-scrollbar {
+      display: none;
+    }
+    .no-scrollbar {
+      -ms-overflow-style: none;
+      scrollbar-width: none;
+    }
+
+    /* Aperture Logo SVG Animation */
+    .aperture-glow {
+      filter: drop-shadow(0 0 4px rgba(202, 156, 104, 0.4));
+    }
+  </style>
+</head>
+<body class="min-h-screen flex flex-col items-center justify-center p-4 text-ff-text">
+
+  <!-- TOP TOOLBAR CONTROLS (Preview Controller) -->
+  <div class="mb-5 flex flex-wrap items-center justify-center gap-2 bg-[#182028] border border-ff-border px-4 py-2.5 rounded-2xl shadow-xl max-w-xl text-xs">
+    <span class="text-ff-primary font-bold tracking-wide uppercase text-[11px] mr-2">State Controls:</span>
+    <button onclick="setHomeState('normal')" id="btn-state-normal" class="px-3 py-1.5 rounded-lg bg-ff-primary text-ff-bg font-bold transition">
+      Standard State
+    </button>
+    <button onclick="setHomeState('active_session')" id="btn-state-active" class="px-3 py-1.5 rounded-lg bg-ff-surface text-ff-text border border-ff-border font-medium hover:border-ff-accent transition">
+      Active Session Running
+    </button>
+    <button onclick="setHomeState('upcoming')" id="btn-state-upcoming" class="px-3 py-1.5 rounded-lg bg-ff-surface text-ff-text border border-ff-border font-medium hover:border-ff-accent transition">
+      Upcoming (15m Alert)
+    </button>
+    <button onclick="setHomeState('empty')" id="btn-state-empty" class="px-3 py-1.5 rounded-lg bg-ff-surface text-ff-text border border-ff-border font-medium hover:border-ff-accent transition">
+      No Preset (Empty)
+    </button>
+  </div>
+
+  <!-- PHONE CONTAINER SIMULATOR -->
+  <div class="relative w-[390px] h-[830px] bg-ff-bg rounded-[44px] border-[3px] border-ff-border shadow-2xl overflow-hidden flex flex-col justify-between p-5">
+    
+    <!-- TOP SECTION (Status Bar + Header + Banner) -->
+    <div class="w-full shrink-0">
+      
+      <!-- ANDROID STATUS BAR -->
+      <div class="w-full flex items-center justify-between text-[11px] text-ff-muted font-medium pt-1 px-1">
+        <span id="system-time">09:42</span>
+        <div class="flex items-center space-x-1.5">
+          <svg class="w-3.5 h-3.5 fill-current" viewBox="0 0 24 24"><path d="M12 4C7.31 4 3.07 5.9 0 8.98L12 21 24 8.98C20.93 5.9 16.69 4 12 4z"/></svg>
+          <svg class="w-3.5 h-3.5 fill-current" viewBox="0 0 24 24"><path d="M2 22h20V2z"/></svg>
+          <div class="w-4 h-2.5 border border-ff-muted rounded-[2px] p-[1px] flex items-center">
+            <div class="h-full w-3/4 bg-ff-muted rounded-[1px]"></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 3. HEADER ROW -->
+      <div class="w-full flex items-center justify-between mt-3.5">
+        <!-- Left: FF Aperture Emblem + Wordmark -->
+        <div class="flex items-center space-x-2.5">
+          <!-- Aperture SVG -->
+          <svg class="w-7 h-7 text-ff-primary aperture-glow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+            <circle cx="12" cy="12" r="9.5" stroke="currentColor"/>
+            <polygon points="12,5 17,14 7,14" stroke="currentColor" fill="none"/>
+            <circle cx="12" cy="12" r="3.5" fill="currentColor"/>
+          </svg>
+          <h1 class="text-lg font-bold text-ff-text tracking-tight">FluxFoxus</h1>
+        </div>
+
+        <!-- Right: Stacked Averages Pills -->
+        <div class="flex flex-col space-y-1 items-end">
+          <!-- Pill 1: Focused Avg -->
+          <div class="flex items-center space-x-1.5 bg-ff-surface border border-ff-border px-2.5 py-0.5 rounded-full text-[11px]">
+            <span class="text-ff-text">Focused:</span>
+            <span id="header-focused-val" class="font-semibold text-ff-accent">2h 53m</span>
+          </div>
+          <!-- Pill 2: Weekly Avg -->
+          <div class="flex items-center space-x-1.5 bg-ff-surface border border-ff-border px-2.5 py-0.5 rounded-full text-[11px]">
+            <span class="text-ff-text">Weekly:</span>
+            <span id="header-weekly-val" class="font-semibold text-ff-accent">3h 20m</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- 8.2 UPCOMING SESSION BANNER (Togglable) -->
+      <div id="upcoming-banner" class="hidden mt-3 bg-ff-primary/15 border-l-4 border-ff-primary rounded-r-xl p-2.5 flex items-center justify-between">
+        <div class="flex items-center space-x-2 text-xs">
+          <span class="text-sm">⏰</span>
+          <span class="text-ff-text font-medium"><strong class="text-ff-primary">Math Olympiad</strong> starts in 12 min</span>
+        </div>
+        <span class="text-[10px] text-ff-muted font-bold uppercase tracking-wider">Planner →</span>
+      </div>
+
+    </div>
+
+    <!-- MAIN SCROLLABLE CONTENT BODY -->
+    <div class="flex-1 overflow-y-auto no-scrollbar space-y-3.5 my-3">
+      
+      <!-- SECTION DIVIDER 1 -->
+      <div class="h-px bg-ff-border w-full"></div>
+
+      <!-- 4. MOMENTUM CARD -->
+      <div class="bg-ff-surface border border-ff-border rounded-xl p-4 shadow-md">
+        <!-- Card Header -->
+        <div class="flex items-center justify-between mb-2.5">
+          <h2 class="text-sm font-semibold text-ff-text tracking-tight">Momentum</h2>
+          <span class="text-[11px] text-ff-muted font-medium">Last 24h</span>
+        </div>
+
+        <!-- Smooth Bézier Stacked Area Chart (SVG) -->
+        <div class="relative w-full h-32 my-1">
+          <svg class="w-full h-full overflow-visible" viewBox="0 0 320 120" preserveAspectRatio="none">
+            <defs>
+              <linearGradient id="gradProductive" x1="0" y1="0" x2="0" y2="1">
+                <stop offset="0%" stop-color="#14B8A6" stop-opacity="0.75"/>
+                <stop offset="100%" stop-color="#14B8A6" stop-opacity="0.1"/>
+              </linearGradient>
+              <linearGradient id="gradSemi" x1="0" y1="0" x2="0" y2="1">
+                <stop offset="0%" stop-color="#906D4B" stop-opacity="0.75"/>
+                <stop offset="100%" stop-color="#906D4B" stop-opacity="0.1"/>
+              </linearGradient>
+              <linearGradient id="gradDistracting" x1="0" y1="0" x2="0" y2="1">
+                <stop offset="0%" stop-color="#1A2333" stop-opacity="0.8"/>
+                <stop offset="100%" stop-color="#1A2333" stop-opacity="0.2"/>
+              </linearGradient>
+              <linearGradient id="gradOthers" x1="0" y1="0" x2="0" y2="1">
+                <stop offset="0%" stop-color="#94A3B8" stop-opacity="0.5"/>
+                <stop offset="100%" stop-color="#94A3B8" stop-opacity="0.05"/>
+              </linearGradient>
+            </defs>
+
+            <!-- Layer 1: Productive (Bottom) -->
+            <path d="M 0,120 L 0,85 C 40,75 80,105 120,65 C 160,30 200,80 240,45 C 280,35 300,50 320,60 L 320,120 Z" fill="url(#gradProductive)"/>
+            <path d="M 0,85 C 40,75 80,105 120,65 C 160,30 200,80 240,45 C 280,35 300,50 320,60" fill="none" stroke="#14B8A6" stroke-width="1.8"/>
+
+            <!-- Layer 2: Semi-Productive -->
+            <path d="M 0,85 C 40,75 80,105 120,65 C 160,30 200,80 240,45 C 280,35 300,50 320,60 L 320,38 C 290,30 260,20 220,35 C 180,45 140,25 100,45 C 60,65 30,55 0,65 Z" fill="url(#gradSemi)"/>
+            <path d="M 0,65 C 30,55 60,65 100,45 C 140,25 180,45 220,35 C 260,20 290,30 320,38" fill="none" stroke="#906D4B" stroke-width="1.5"/>
+
+            <!-- Layer 3: Distracting -->
+            <path d="M 0,65 C 30,55 60,65 100,45 C 140,25 180,45 220,35 C 260,20 290,30 320,38 L 320,24 C 280,18 240,22 200,16 C 160,12 120,28 80,26 C 40,24 20,40 0,42 Z" fill="url(#gradDistracting)"/>
+
+            <!-- Layer 4: Others (Top) -->
+            <path d="M 0,42 C 20,40 40,24 80,26 C 120,28 160,12 200,16 C 240,22 280,18 320,24 L 320,15 C 280,8 240,12 200,8 C 160,5 120,18 80,16 C 40,14 20,28 0,30 Z" fill="url(#gradOthers)"/>
+          </svg>
+        </div>
+
+        <!-- X-Axis Labels -->
+        <div class="flex justify-between text-[10px] text-ff-muted font-medium pt-1 px-1">
+          <span>6am</span>
+          <span>12pm</span>
+          <span>6pm</span>
+          <span>12am</span>
+        </div>
+
+        <!-- 4.4 2×2 Legend Grid with dividers -->
+        <div class="mt-3 pt-2.5 border-t border-ff-border grid grid-cols-2 divide-x divide-ff-border">
+          
+          <!-- Col 1 -->
+          <div class="pr-3 space-y-2">
+            <!-- Productive -->
+            <div class="flex items-center justify-between text-xs">
+              <div class="flex items-center space-x-1.5">
+                <span class="w-2 h-2 rounded-full bg-ff-productive"></span>
+                <span class="text-[11px] text-ff-muted">Productive</span>
+              </div>
+              <span class="font-bold text-ff-text text-[11px]">2h 15m</span>
+            </div>
+            <!-- Distracting -->
+            <div class="flex items-center justify-between text-xs pt-1.5 border-t border-ff-border">
+              <div class="flex items-center space-x-1.5">
+                <span class="w-2 h-2 rounded-full bg-[#1A2333] border border-ff-muted"></span>
+                <span class="text-[11px] text-ff-muted">Distracting</span>
+              </div>
+              <span class="font-bold text-ff-text text-[11px]">45m</span>
+            </div>
+          </div>
+
+          <!-- Col 2 -->
+          <div class="pl-3 space-y-2">
+            <!-- Semi-Productive -->
+            <div class="flex items-center justify-between text-xs">
+              <div class="flex items-center space-x-1.5">
+                <span class="w-2 h-2 rounded-full bg-ff-semi"></span>
+                <span class="text-[11px] text-ff-muted">Semi-Prod</span>
+              </div>
+              <span class="font-bold text-ff-text text-[11px]">1h 05m</span>
+            </div>
+            <!-- Others -->
+            <div class="flex items-center justify-between text-xs pt-1.5 border-t border-ff-border">
+              <div class="flex items-center space-x-1.5">
+                <span class="w-2 h-2 rounded-full bg-ff-muted"></span>
+                <span class="text-[11px] text-ff-muted">Others</span>
+              </div>
+              <span class="font-bold text-ff-text text-[11px]">20m</span>
+            </div>
+          </div>
+
+        </div>
+
+      </div>
+
+      <!-- SECTION DIVIDER 2 -->
+      <div class="h-px bg-ff-border w-full"></div>
+
+      <!-- 5. SESSION CARD -->
+      <div id="session-card" class="bg-ff-surface border border-ff-border border-l-4 border-l-ff-primary rounded-xl p-4 shadow-md">
+        
+        <!-- Top Row: Today's Focus Time + Preset Selector -->
+        <div id="preset-selector-row" class="flex items-center justify-between pb-3 border-b border-ff-border">
+          <!-- Total Focus Time Today -->
+          <div>
+            <span class="text-[10px] text-ff-muted uppercase tracking-wider font-semibold block">Today's Focus</span>
+            <span id="session-today-time" class="text-2xl font-mono font-bold text-ff-text">1hr 43m</span>
+          </div>
+
+          <!-- Preset Pill & Chevron -->
+          <div class="flex items-center space-x-1.5 bg-ff-bg/60 border border-ff-border px-3 py-1.5 rounded-full cursor-pointer hover:border-ff-primary transition">
+            <span id="preset-emoji" class="text-sm">⚡</span>
+            <span id="preset-title" class="text-xs font-semibold text-ff-text">Math Olympiad</span>
+            <span class="text-[10px] text-ff-muted ml-0.5">▾</span>
+          </div>
+        </div>
+
+        <!-- 5.3 Detail Rows -->
+        <div id="session-details-list" class="pt-2 text-xs space-y-2">
+          
+          <!-- Row 1: Duration -->
+          <div class="flex items-center justify-between py-1 border-b border-ff-border/50">
+            <span class="text-ff-muted">Duration</span>
+            <span id="detail-duration" class="font-medium text-ff-text">08:30pm — 11:00pm</span>
+          </div>
+
+          <!-- Row 2: Breaks -->
+          <div class="flex items-center justify-between py-1 border-b border-ff-border/50">
+            <span class="text-ff-muted">Breaks</span>
+            <span id="detail-breaks" class="font-medium text-ff-text">4 Sessions</span>
+          </div>
+
+          <!-- Row 3: Break Time (each) -->
+          <div class="flex items-center justify-between py-1 border-b border-ff-border/50">
+            <span class="text-ff-muted">Break Time (each)</span>
+            <span id="detail-break-time" class="font-medium text-ff-text">10m</span>
+          </div>
+
+          <!-- Row 4: Description -->
+          <div id="detail-desc-container" class="pt-1">
+            <span class="text-[9px] uppercase tracking-wider font-bold text-ff-muted block mb-0.5">Description</span>
+            <p id="detail-desc" class="italic text-ff-text text-[11px] leading-relaxed">
+              Deep work on IOQM Number Theory modular arithmetic & polynomials
+            </p>
+          </div>
+
+        </div>
+
+        <!-- Empty State Container (Hidden by default) -->
+        <div id="empty-state-details" class="hidden py-4 text-center">
+          <p class="text-xs text-ff-muted mb-2">No focus preset configured yet.</p>
+          <a href="#" class="inline-flex items-center text-xs font-bold text-ff-primary hover:underline">
+            Create one →
+          </a>
+        </div>
+
+      </div>
+
+      <!-- SECTION DIVIDER 3 -->
+      <div class="h-px bg-ff-border w-full"></div>
+
+      <!-- 6. START FOCUSING BUTTON -->
+      <div>
+        <button id="btn-primary-cta" onclick="handlePrimaryCTA()"
+                class="w-full py-4 px-6 bg-ff-primary hover:bg-[#b88c5a] text-ff-bg font-bold text-sm tracking-wide rounded-full text-center transition-all duration-200 active:scale-98 shadow-lg flex items-center justify-center space-x-2">
+          <span id="cta-button-text">Start Focusing</span>
+        </button>
+      </div>
+
+    </div>
+
+    <!-- BOTTOM SECTION: FLOATING PILL NAVIGATION BAR -->
+    <div class="w-full shrink-0 pt-2">
+      <!-- 1.1 Persistent Floating Pill Nav Bar -->
+      <div class="w-full h-16 bg-ff-surface border border-ff-border rounded-full px-3 flex items-center justify-between shadow-xl">
+        
+        <!-- Tab 1: Home (Standalone Leftmost) -->
+        <button class="flex flex-col items-center justify-center px-2 py-1 text-ff-primary">
+          <svg class="w-5 h-5 fill-current" viewBox="0 0 24 24">
+            <path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z"/>
+          </svg>
+          <span class="text-[10px] font-bold mt-0.5">Home</span>
+        </button>
+
+        <!-- Group 1: [Usage + Focus] Pill Sub-container -->
+        <div class="flex items-center space-x-1 bg-ff-bg/50 border border-ff-border/40 rounded-full px-2 py-1">
+          <!-- Tab 2: Usage -->
+          <button class="flex flex-col items-center justify-center px-2 py-0.5 text-ff-text hover:text-ff-primary transition">
+            <svg class="w-4 h-4 fill-none stroke-current stroke-2" viewBox="0 0 24 24">
+              <circle cx="12" cy="12" r="9"/>
+              <polyline points="12 6 12 12 16 14"/>
+            </svg>
+            <span class="text-[9px] font-medium mt-0.5">Usage</span>
+          </button>
+          <!-- Tab 3: Focus -->
+          <button class="flex flex-col items-center justify-center px-2 py-0.5 text-ff-text hover:text-ff-primary transition">
+            <svg class="w-4 h-4 fill-none stroke-current stroke-2" viewBox="0 0 24 24">
+              <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/>
+              <circle cx="12" cy="12" r="3"/>
+            </svg>
+            <span class="text-[9px] font-medium mt-0.5">Focus</span>
+          </button>
+        </div>
+
+        <!-- Group 2: [Planner + Block] Pill Sub-container -->
+        <div class="flex items-center space-x-1 bg-ff-bg/50 border border-ff-border/40 rounded-full px-2 py-1">
+          <!-- Tab 4: Planner -->
+          <button class="flex flex-col items-center justify-center px-2 py-0.5 text-ff-text hover:text-ff-primary transition">
+            <svg class="w-4 h-4 fill-none stroke-current stroke-2" viewBox="0 0 24 24">
+              <rect x="3" y="4" width="18" height="18" rx="2" ry="2"/>
+              <line x1="16" y1="2" x2="16" y2="6"/>
+              <line x1="8" y1="2" x2="8" y2="6"/>
+              <line x1="3" y1="10" x2="21" y2="10"/>
+            </svg>
+            <span class="text-[9px] font-medium mt-0.5">Planner</span>
+          </button>
+          <!-- Tab 5: Block -->
+          <button class="flex flex-col items-center justify-center px-2 py-0.5 text-ff-text hover:text-ff-primary transition">
+            <svg class="w-4 h-4 fill-none stroke-current stroke-2" viewBox="0 0 24 24">
+              <circle cx="12" cy="12" r="9"/>
+              <line x1="4.93" y1="4.93" x2="19.07" y2="19.07"/>
+            </svg>
+            <span class="text-[9px] font-medium mt-0.5">Block</span>
+          </button>
+        </div>
+
+      </div>
+
+      <!-- Android Home Bar -->
+      <div class="w-28 h-1 bg-ff-muted/30 rounded-full mx-auto mt-2"></div>
+    </div>
+
+  </div>
+
+  <!-- JAVASCRIPT STATE CONTROLLER -->
+  <script>
+    let currentState = 'normal';
+
+    function setHomeState(state) {
+      currentState = state;
+      const btnNormal = document.getElementById('btn-state-normal');
+      const btnActive = document.getElementById('btn-state-active');
+      const btnUpcoming = document.getElementById('btn-state-upcoming');
+      const btnEmpty = document.getElementById('btn-state-empty');
+
+      const banner = document.getElementById('upcoming-banner');
+      const ctaBtn = document.getElementById('btn-primary-cta');
+      const ctaText = document.getElementById('cta-button-text');
+      const sessionTodayTime = document.getElementById('session-today-time');
+      const sessionDetailsList = document.getElementById('session-details-list');
+      const emptyStateDetails = document.getElementById('empty-state-details');
+      const presetSelectorRow = document.getElementById('preset-selector-row');
+      const headerFocusedVal = document.getElementById('header-focused-val');
+      const headerWeeklyVal = document.getElementById('header-weekly-val');
+
+      // Reset toolbar button classes
+      [btnNormal, btnActive, btnUpcoming, btnEmpty].forEach(btn => {
+        btn.className = "px-3 py-1.5 rounded-lg bg-ff-surface text-ff-text border border-ff-border font-medium hover:border-ff-accent transition";
+      });
+
+      // Default resets
+      banner.classList.add('hidden');
+      sessionDetailsList.classList.remove('hidden');
+      emptyStateDetails.classList.add('hidden');
+      ctaBtn.disabled = false;
+      ctaBtn.classList.remove('opacity-50', 'cursor-not-allowed', 'bg-ff-accent', 'text-ff-bg');
+      ctaBtn.classList.add('bg-ff-primary', 'text-ff-bg');
+      ctaText.innerText = "Start Focusing";
+      sessionTodayTime.innerText = "1hr 43m";
+      headerFocusedVal.innerText = "2h 53m";
+      headerWeeklyVal.innerText = "3h 20m";
+
+      if (state === 'normal') {
+        btnNormal.className = "px-3 py-1.5 rounded-lg bg-ff-primary text-ff-bg font-bold transition";
+      } else if (state === 'active_session') {
+        btnActive.className = "px-3 py-1.5 rounded-lg bg-ff-accent text-ff-bg font-bold transition";
+        // Active Session State per spec: "Resume Session" in Soft Cyan (Rustic override: #906D4B Tanned Wood)
+        ctaBtn.classList.remove('bg-ff-primary');
+        ctaBtn.classList.add('bg-ff-accent', 'text-ff-text');
+        ctaText.innerText = "Resume Session (00:32:15)";
+        sessionTodayTime.innerText = "2hr 15m";
+      } else if (state === 'upcoming') {
+        btnUpcoming.className = "px-3 py-1.5 rounded-lg bg-ff-primary text-ff-bg font-bold transition";
+        banner.classList.remove('hidden');
+      } else if (state === 'empty') {
+        btnEmpty.className = "px-3 py-1.5 rounded-lg bg-ff-primary text-ff-bg font-bold transition";
+        sessionDetailsList.classList.add('hidden');
+        emptyStateDetails.classList.remove('hidden');
+        ctaBtn.disabled = true;
+        ctaBtn.classList.add('opacity-50', 'cursor-not-allowed');
+        headerFocusedVal.innerText = "—";
+        headerWeeklyVal.innerText = "—";
+      }
+    }
+
+    function handlePrimaryCTA() {
+      if (currentState === 'active_session') {
+        alert("Navigating to Active Focus Session screen...");
+      } else if (currentState === 'empty') {
+        alert("Please select or create a preset first.");
+      } else {
+        alert("Starting Focus Session with Math Olympiad preset...");
+      }
+    }
+  </script>
+</body>
+</html>
