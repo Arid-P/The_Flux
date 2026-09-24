@@ -11,7 +11,8 @@
 | Phase / Task | Status | Notes |
 |---|---|---|
 | **Project Setup and Skill Initialization** | Completed | Flutter project initialized, dependencies configured, developer skills and base configs setup. |
-| **Generating the Active Focus Session UI via Stitch** | In Progress | Active Focus Session Screen design based on `ui_focus_session.md` & `ff_design_override.md` (Rustic Medley palette, split-line mechanical flip-clock, bottom controls). |
+| **Active Focus Session UI Design & Preview** | Completed | Static HTML/Tailwind mockup (`ui_mockups/active_focus_session.html`) adhering strictly to Rustic Medley palette reviewed and approved by user. |
+| **Phase 1-A Step 1: Design Tokens & Theme** | In Progress | Implementing Flutter `ThemeTokens`, `AppColors`, typography scales, and dark-only `ThemeData` in `fluxfoxus/lib/core/theme/`. |
 | **Remaining UI and Backend Implementation** | Backlog | Complete UI screens, Riverpod state management, SQLite + Hive persistence, Background services, and MethodChannel IPC bridge. |
 
 ---
@@ -22,6 +23,7 @@
 - [x] Design system override specification locked (`ff_design_override.md` - Rustic Medley palette).
 - [x] Flutter project structure initialized with multi-platform runners (`fluxfoxus/`).
 - [x] Skills setup and configuration registered.
+- [x] Active Focus Session UI Mockup approved by user.
 
 ---
 
