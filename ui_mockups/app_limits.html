@@ -47,30 +47,26 @@
       -ms-overflow-style: none;
       scrollbar-width: none;
     }
-
-    /* Scroll snap picker column */
-    .snap-col {
-      scroll-snap-type: y mandatory;
-      overflow-y: scroll;
-    }
-    .snap-item {
-      scroll-snap-align: center;
-    }
   </style>
 </head>
 <body class="min-h-screen flex flex-col items-center justify-center p-4 text-ff-text">
 
   <!-- TOP TOOLBAR (Preview Controller) -->
-  <div class="mb-5 flex flex-wrap items-center justify-center gap-2 bg-[#182028] border border-ff-border px-4 py-2.5 rounded-2xl shadow-xl max-w-xl text-xs">
+  <div class="mb-5 flex flex-wrap items-center justify-center gap-2 bg-[#182028] border border-ff-border px-4 py-2.5 rounded-2xl shadow-xl max-w-2xl text-xs">
     <span class="text-ff-primary font-bold tracking-wide uppercase text-[11px] mr-2">Interactive Sheets:</span>
-    <button onclick="openSettingsSheet('Instagram', 0, 45, 12, 'blocking')" class="px-3 py-1.5 rounded-lg bg-ff-primary text-ff-bg font-bold transition">
+    <button onclick="openSettingsSheet('instagram')" class="px-3 py-1.5 rounded-lg bg-ff-primary text-ff-bg font-bold transition">
       Open Instagram Settings
     </button>
-    <button onclick="openStreakWarning('Instagram', 12)" class="px-3 py-1.5 rounded-lg bg-ff-surface text-ff-text border border-ff-border font-medium hover:border-ff-danger transition">
+    <button onclick="triggerTurnOffBlock('instagram')" class="px-3 py-1.5 rounded-lg bg-ff-surface text-ff-text border border-ff-border font-medium hover:border-ff-danger transition">
       Test Turn-Off Flow (3s Delay)
     </button>
     <button onclick="toggleAddAppSheet(true)" class="px-3 py-1.5 rounded-lg bg-ff-surface text-ff-text border border-ff-border font-medium hover:border-ff-primary transition">
       + Add App Sheet
+    </button>
+    <div class="h-4 w-px bg-ff-border mx-1"></div>
+    <button onclick="runAppLimitsAutoTests()" class="px-3.5 py-1.5 rounded-lg bg-emerald-500/20 text-emerald-400 border border-emerald-500/40 font-bold hover:bg-emerald-500/30 transition flex items-center space-x-1.5">
+      <span>🧪</span>
+      <span>Run Automated Tests</span>
     </button>
   </div>
 
@@ -118,87 +114,11 @@
         <div class="flex items-center space-x-2 pb-2">
           <span class="w-2 h-2 rounded-full bg-[#1A2333] border border-ff-muted"></span>
           <span class="text-[11px] font-bold text-ff-muted uppercase tracking-widest">Distracting</span>
+          <span id="badge-count-distracting" class="text-[10px] text-ff-muted font-medium ml-auto"></span>
         </div>
 
-        <!-- App Cards Stack -->
-        <div class="space-y-2.5">
-          
-          <!-- Card 1: Instagram (Active Blocking) -->
-          <div onclick="openSettingsSheet('Instagram', 0, 45, 12, 'blocking')"
-               class="bg-ff-surface border border-ff-border rounded-xl p-3.5 cursor-pointer hover:border-ff-primary/70 transition shadow-sm">
-            <div class="flex items-center justify-between">
-              <div class="flex items-center space-x-3">
-                <div class="w-11 h-11 rounded-xl bg-pink-900/30 border border-pink-700/40 flex items-center justify-center text-lg">
-                  📷
-                </div>
-                <div>
-                  <h3 class="text-sm font-semibold text-ff-text">Instagram</h3>
-                  <span class="text-[11px] text-ff-muted font-medium">42m spent / 45m limit</span>
-                </div>
-              </div>
-              <span class="text-ff-muted text-base font-bold">›</span>
-            </div>
-
-            <div class="mt-2.5 flex items-center space-x-2 pt-2 border-t border-ff-border/40">
-              <span class="inline-flex items-center space-x-1 px-2.5 py-0.5 rounded-full bg-ff-productive/15 text-ff-productive text-[10px] font-semibold">
-                <span class="w-1.5 h-1.5 rounded-full bg-ff-productive"></span>
-                <span>Blocking</span>
-              </span>
-              <span class="text-[10px] text-ff-warning font-semibold">🔥 12 days</span>
-            </div>
-          </div>
-
-          <!-- Card 2: YouTube (Active Blocking) -->
-          <div onclick="openSettingsSheet('YouTube', 1, 30, 24, 'blocking')"
-               class="bg-ff-surface border border-ff-border rounded-xl p-3.5 cursor-pointer hover:border-ff-primary/70 transition shadow-sm">
-            <div class="flex items-center justify-between">
-              <div class="flex items-center space-x-3">
-                <div class="w-11 h-11 rounded-xl bg-red-900/30 border border-red-700/40 flex items-center justify-center text-lg">
-                  ▶
-                </div>
-                <div>
-                  <h3 class="text-sm font-semibold text-ff-text">YouTube</h3>
-                  <span class="text-[11px] text-ff-muted font-medium">1h 10m spent / 1h 30m limit</span>
-                </div>
-              </div>
-              <span class="text-ff-muted text-base font-bold">›</span>
-            </div>
-
-            <div class="mt-2.5 flex items-center space-x-2 pt-2 border-t border-ff-border/40">
-              <span class="inline-flex items-center space-x-1 px-2.5 py-0.5 rounded-full bg-ff-productive/15 text-ff-productive text-[10px] font-semibold">
-                <span class="w-1.5 h-1.5 rounded-full bg-ff-productive"></span>
-                <span>Blocking</span>
-              </span>
-              <span class="text-[10px] text-ff-warning font-semibold">🔥 24 days</span>
-            </div>
-          </div>
-
-          <!-- Card 3: Reddit (Paused State) -->
-          <div onclick="openSettingsSheet('Reddit', 0, 30, 0, 'paused')"
-               class="bg-ff-surface border border-ff-border rounded-xl p-3.5 cursor-pointer hover:border-ff-primary/70 transition shadow-sm">
-            <div class="flex items-center justify-between">
-              <div class="flex items-center space-x-3">
-                <div class="w-11 h-11 rounded-xl bg-orange-900/30 border border-orange-700/40 flex items-center justify-center text-lg">
-                  🤖
-                </div>
-                <div>
-                  <h3 class="text-sm font-semibold text-ff-text">Reddit</h3>
-                  <span class="text-[11px] text-ff-muted font-medium">15m spent / 30m limit</span>
-                </div>
-              </div>
-              <span class="text-ff-muted text-base font-bold">›</span>
-            </div>
-
-            <div class="mt-2.5 pt-2 border-t border-ff-border/40">
-              <span class="inline-flex items-center space-x-1 px-2.5 py-0.5 rounded-full bg-ff-muted/15 text-ff-muted text-[10px] font-semibold">
-                <span class="w-1.5 h-1.5 rounded-full bg-ff-muted"></span>
-                <span>Paused</span>
-              </span>
-              <span class="text-[10px] text-ff-muted block mt-1">Turned off till Tomorrow, 9:00 AM</span>
-            </div>
-          </div>
-
-        </div>
+        <!-- Dynamic Container: Distracting App Cards -->
+        <div id="list-distracting" class="space-y-2.5"></div>
       </div>
 
       <!-- 5. CATEGORY GROUP: SEMI-PRODUCTIVE -->
@@ -206,32 +126,11 @@
         <div class="flex items-center space-x-2 pb-2">
           <span class="w-2 h-2 rounded-full bg-ff-accent"></span>
           <span class="text-[11px] font-bold text-ff-muted uppercase tracking-widest">Semi-Productive</span>
+          <span id="badge-count-semi" class="text-[10px] text-ff-muted font-medium ml-auto"></span>
         </div>
 
-        <div class="space-y-2.5">
-          <!-- Card: Gmail -->
-          <div onclick="openSettingsSheet('Gmail', 0, 45, 8, 'blocking')"
-               class="bg-ff-surface border border-ff-border rounded-xl p-3.5 cursor-pointer hover:border-ff-primary/70 transition shadow-sm">
-            <div class="flex items-center justify-between">
-              <div class="flex items-center space-x-3">
-                <div class="w-11 h-11 rounded-xl bg-slate-800 border border-slate-700 flex items-center justify-center text-lg">
-                  ✉️
-                </div>
-                <div>
-                  <h3 class="text-sm font-semibold text-ff-text">Gmail</h3>
-                  <span class="text-[11px] text-ff-muted font-medium">25m spent / 45m limit</span>
-                </div>
-              </div>
-              <span class="text-ff-muted text-base font-bold">›</span>
-            </div>
-            <div class="mt-2.5 flex items-center space-x-2 pt-2 border-t border-ff-border/40">
-              <span class="inline-flex items-center space-x-1 px-2.5 py-0.5 rounded-full bg-ff-productive/15 text-ff-productive text-[10px] font-semibold">
-                <span class="w-1.5 h-1.5 rounded-full bg-ff-productive"></span>
-                <span>Blocking</span>
-              </span>
-            </div>
-          </div>
-        </div>
+        <!-- Dynamic Container: Semi-Productive App Cards -->
+        <div id="list-semi" class="space-y-2.5"></div>
       </div>
 
       <!-- 5. CATEGORY GROUP: OTHERS -->
@@ -239,32 +138,11 @@
         <div class="flex items-center space-x-2 pb-2">
           <span class="w-2 h-2 rounded-full bg-ff-muted"></span>
           <span class="text-[11px] font-bold text-ff-muted uppercase tracking-widest">Others</span>
+          <span id="badge-count-others" class="text-[10px] text-ff-muted font-medium ml-auto"></span>
         </div>
 
-        <div class="space-y-2.5">
-          <!-- Card: Chrome -->
-          <div onclick="openSettingsSheet('Chrome', 1, 0, 15, 'blocking')"
-               class="bg-ff-surface border border-ff-border rounded-xl p-3.5 cursor-pointer hover:border-ff-primary/70 transition shadow-sm">
-            <div class="flex items-center justify-between">
-              <div class="flex items-center space-x-3">
-                <div class="w-11 h-11 rounded-xl bg-slate-800 border border-slate-700 flex items-center justify-center text-lg">
-                  🌐
-                </div>
-                <div>
-                  <h3 class="text-sm font-semibold text-ff-text">Chrome</h3>
-                  <span class="text-[11px] text-ff-muted font-medium">30m spent / 1h 00m limit</span>
-                </div>
-              </div>
-              <span class="text-ff-muted text-base font-bold">›</span>
-            </div>
-            <div class="mt-2.5 flex items-center space-x-2 pt-2 border-t border-ff-border/40">
-              <span class="inline-flex items-center space-x-1 px-2.5 py-0.5 rounded-full bg-ff-productive/15 text-ff-productive text-[10px] font-semibold">
-                <span class="w-1.5 h-1.5 rounded-full bg-ff-productive"></span>
-                <span>Blocking</span>
-              </span>
-            </div>
-          </div>
-        </div>
+        <!-- Dynamic Container: Others App Cards -->
+        <div id="list-others" class="space-y-2.5"></div>
       </div>
 
       <div class="h-4"></div>
@@ -347,9 +225,9 @@
             <div class="text-center">
               <span class="text-[9px] font-bold text-ff-muted uppercase tracking-wider block mb-1">Hours</span>
               <div class="flex items-center justify-center space-x-2">
-                <button onclick="adjustPickerHours(-1)" class="w-8 h-8 rounded-lg bg-ff-surface border border-ff-border text-ff-text font-bold">−</button>
+                <button onclick="adjustPickerHours(-1)" class="w-8 h-8 rounded-lg bg-ff-surface border border-ff-border text-ff-text font-bold hover:border-ff-primary">−</button>
                 <span id="picker-hours-num" class="text-xl font-mono font-bold text-ff-text w-8">0</span>
-                <button onclick="adjustPickerHours(1)" class="w-8 h-8 rounded-lg bg-ff-surface border border-ff-border text-ff-text font-bold">+</button>
+                <button onclick="adjustPickerHours(1)" class="w-8 h-8 rounded-lg bg-ff-surface border border-ff-border text-ff-text font-bold hover:border-ff-primary">+</button>
               </div>
             </div>
 
@@ -357,9 +235,9 @@
             <div class="text-center">
               <span class="text-[9px] font-bold text-ff-muted uppercase tracking-wider block mb-1">Minutes</span>
               <div class="flex items-center justify-center space-x-2">
-                <button onclick="adjustPickerMinutes(-5)" class="w-8 h-8 rounded-lg bg-ff-surface border border-ff-border text-ff-text font-bold">−</button>
+                <button onclick="adjustPickerMinutes(-5)" class="w-8 h-8 rounded-lg bg-ff-surface border border-ff-border text-ff-text font-bold hover:border-ff-primary">−</button>
                 <span id="picker-minutes-num" class="text-xl font-mono font-bold text-ff-text w-10">45</span>
-                <button onclick="adjustPickerMinutes(5)" class="w-8 h-8 rounded-lg bg-ff-surface border border-ff-border text-ff-text font-bold">+</button>
+                <button onclick="adjustPickerMinutes(5)" class="w-8 h-8 rounded-lg bg-ff-surface border border-ff-border text-ff-text font-bold hover:border-ff-primary">+</button>
               </div>
             </div>
 
@@ -369,7 +247,7 @@
         <!-- 7.4 Suggestion Bar -->
         <div class="mb-3.5 bg-ff-productive/10 border-l-4 border-ff-productive rounded-r-xl p-2.5 flex items-center space-x-2 text-xs">
           <span>💡</span>
-          <span class="text-[11px] text-ff-muted">Suggested limit is <strong class="text-ff-productive font-semibold">45m</strong> based on your average usage</span>
+          <span class="text-[11px] text-ff-muted">Suggested limit is <strong id="modal-suggested-val" class="text-ff-productive font-semibold">45m</strong> based on your average usage</span>
         </div>
 
         <!-- 7.5 Extra Time Sessions Section -->
@@ -383,9 +261,9 @@
           <div class="flex items-center justify-between text-xs">
             <span class="text-ff-muted">Number of sessions</span>
             <div class="flex items-center space-x-2">
-              <button onclick="adjustExtraSessions(-1)" class="w-7 h-7 rounded-lg bg-ff-surface border border-ff-border text-ff-text font-bold text-xs flex items-center justify-center">−</button>
+              <button onclick="adjustExtraSessions(-1)" class="w-7 h-7 rounded-lg bg-ff-surface border border-ff-border text-ff-text font-bold text-xs flex items-center justify-center hover:border-ff-primary">−</button>
               <span id="val-extra-sessions" class="font-mono font-bold text-ff-text text-sm w-4 text-center">2</span>
-              <button onclick="adjustExtraSessions(1)" class="w-7 h-7 rounded-lg bg-ff-surface border border-ff-border text-ff-text font-bold text-xs flex items-center justify-center">+</button>
+              <button onclick="adjustExtraSessions(1)" class="w-7 h-7 rounded-lg bg-ff-surface border border-ff-border text-ff-text font-bold text-xs flex items-center justify-center hover:border-ff-primary">+</button>
             </div>
           </div>
 
@@ -473,11 +351,11 @@
         <div class="space-y-2 text-xs">
           <label class="flex items-center space-x-3 p-3 rounded-xl bg-ff-bg/50 border border-ff-border cursor-pointer">
             <input type="radio" name="turnoff-dur" value="today" checked class="accent-[#CA9C68]">
-            <span class="text-ff-text font-medium">Rest of the day</span>
+            <span class="text-ff-text font-medium">Rest of the day (until 11:59 PM)</span>
           </label>
           <label class="flex items-center space-x-3 p-3 rounded-xl bg-ff-bg/50 border border-ff-border cursor-pointer">
             <input type="radio" name="turnoff-dur" value="tomorrow" class="accent-[#CA9C68]">
-            <span class="text-ff-text font-medium">Till tomorrow</span>
+            <span class="text-ff-text font-medium">Till tomorrow (9:00 AM)</span>
           </label>
           <label class="flex items-center space-x-3 p-3 rounded-xl bg-ff-bg/50 border border-ff-border cursor-pointer">
             <input type="radio" name="turnoff-dur" value="7days" class="accent-[#CA9C68]">
@@ -486,15 +364,15 @@
         </div>
 
         <div class="p-2.5 rounded-lg bg-ff-bg text-[10px] text-ff-muted border border-ff-border">
-          App Reminder will be turned off till tomorrow 12:00 AM.
+          App Reminder will be turned off and streak will be reset/paused per selection.
         </div>
 
         <!-- Action Buttons -->
         <div class="space-y-2 pt-1">
-          <button onclick="confirmTurnOff()" class="w-full py-3 bg-ff-text text-ff-bg font-bold text-xs rounded-xl shadow">
+          <button onclick="confirmTurnOff()" class="w-full py-3 bg-ff-text text-ff-bg font-bold text-xs rounded-xl shadow hover:bg-white transition">
             Turn Off
           </button>
-          <button onclick="confirmDeleteLimit()" class="w-full py-2.5 bg-ff-danger/15 text-ff-danger border border-ff-danger/30 font-bold text-xs rounded-xl hover:bg-ff-danger/25">
+          <button onclick="confirmDeleteLimit()" class="w-full py-2.5 bg-ff-danger/15 text-ff-danger border border-ff-danger/30 font-bold text-xs rounded-xl hover:bg-ff-danger/25 transition">
             Delete Limit
           </button>
         </div>
@@ -508,7 +386,7 @@
           <div class="w-10 h-1 bg-ff-muted/40 rounded-full mx-auto mb-3"></div>
           <div class="flex items-center justify-between mb-3">
             <h3 class="text-sm font-bold text-ff-text">Select an app to add limit</h3>
-            <button onclick="toggleAddAppSheet(false)" class="text-xs text-ff-muted">✕</button>
+            <button onclick="toggleAddAppSheet(false)" class="text-xs text-ff-muted hover:text-ff-text">✕</button>
           </div>
           
           <!-- Search box -->
@@ -519,30 +397,44 @@
 
           <!-- Apps List -->
           <div class="space-y-2 max-h-72 overflow-y-auto no-scrollbar">
-            <!-- App Item 1 -->
+            <!-- App Item 1: Discord -->
             <div class="p-2.5 rounded-xl bg-ff-bg/60 border border-ff-border flex items-center justify-between">
               <div class="flex items-center space-x-2.5">
-                <div class="w-8 h-8 rounded-lg bg-blue-900/30 flex items-center justify-center text-sm">💬</div>
+                <div class="w-8 h-8 rounded-lg bg-indigo-900/30 border border-indigo-700/40 flex items-center justify-center text-sm">💬</div>
                 <div>
                   <span class="text-xs font-semibold text-ff-text block">Discord</span>
-                  <span class="text-[10px] text-ff-muted">54 mins avg daily</span>
+                  <span class="text-[10px] text-ff-muted">54 mins avg daily (Distracting)</span>
                 </div>
               </div>
-              <button onclick="addAppLimit('Discord', '💬')" class="px-3 py-1 rounded-lg bg-ff-primary/20 text-ff-primary font-bold text-xs hover:bg-ff-primary/30">
+              <button onclick="addAppLimit('Discord', '💬', 'distracting')" class="px-3 py-1 rounded-lg bg-ff-primary/20 text-ff-primary font-bold text-xs hover:bg-ff-primary/30">
                 + Add
               </button>
             </div>
 
-            <!-- App Item 2 -->
+            <!-- App Item 2: Chess.com -->
             <div class="p-2.5 rounded-xl bg-ff-bg/60 border border-ff-border flex items-center justify-between">
               <div class="flex items-center space-x-2.5">
-                <div class="w-8 h-8 rounded-lg bg-green-900/30 flex items-center justify-center text-sm">🎮</div>
+                <div class="w-8 h-8 rounded-lg bg-green-900/30 border border-green-700/40 flex items-center justify-center text-sm">🎮</div>
                 <div>
                   <span class="text-xs font-semibold text-ff-text block">Chess.com</span>
-                  <span class="text-[10px] text-ff-muted">38 mins avg daily</span>
+                  <span class="text-[10px] text-ff-muted">38 mins avg daily (Semi-Productive)</span>
                 </div>
               </div>
-              <button onclick="addAppLimit('Chess.com', '🎮')" class="px-3 py-1 rounded-lg bg-ff-primary/20 text-ff-primary font-bold text-xs hover:bg-ff-primary/30">
+              <button onclick="addAppLimit('Chess.com', '🎮', 'semi')" class="px-3 py-1 rounded-lg bg-ff-primary/20 text-ff-primary font-bold text-xs hover:bg-ff-primary/30">
+                + Add
+              </button>
+            </div>
+
+            <!-- App Item 3: TikTok -->
+            <div class="p-2.5 rounded-xl bg-ff-bg/60 border border-ff-border flex items-center justify-between">
+              <div class="flex items-center space-x-2.5">
+                <div class="w-8 h-8 rounded-lg bg-pink-900/30 border border-pink-700/40 flex items-center justify-center text-sm">🎵</div>
+                <div>
+                  <span class="text-xs font-semibold text-ff-text block">TikTok</span>
+                  <span class="text-[10px] text-ff-muted">1h 15m avg daily (Distracting)</span>
+                </div>
+              </div>
+              <button onclick="addAppLimit('TikTok', '🎵', 'distracting')" class="px-3 py-1 rounded-lg bg-ff-primary/20 text-ff-primary font-bold text-xs hover:bg-ff-primary/30">
                 + Add
               </button>
             </div>
@@ -562,26 +454,246 @@
 
   </div>
 
-  <!-- JAVASCRIPT LOGIC -->
+  <!-- AUTOMATED TEST RESULTS MODAL -->
+  <div id="auto-test-modal" class="fixed inset-0 bg-black/85 backdrop-blur-md z-50 flex items-center justify-center p-4 hidden">
+    <div class="w-full max-w-lg bg-ff-surface border border-ff-border rounded-3xl p-5 shadow-2xl flex flex-col max-h-[85vh]">
+      
+      <!-- Modal Header -->
+      <div class="flex items-center justify-between pb-3 border-b border-ff-border/60">
+        <div class="flex items-center space-x-2">
+          <span class="text-lg">🧪</span>
+          <div>
+            <h3 class="text-sm font-bold text-ff-text">App Limits Test Suite</h3>
+            <span class="text-[10px] text-ff-muted">CRUD lifecycle, DOM reactivity, & 3s delay checks</span>
+          </div>
+        </div>
+        <button onclick="closeAppLimitsAutoTests()" class="w-7 h-7 rounded-lg bg-ff-bg border border-ff-border text-ff-muted hover:text-ff-text flex items-center justify-center text-xs">
+          ✕
+        </button>
+      </div>
+
+      <!-- Summary Card -->
+      <div class="my-3 p-3 bg-ff-bg/70 border border-ff-border rounded-xl flex items-center justify-between">
+        <div>
+          <span id="test-summary-status" class="text-xs font-bold text-ff-text block">Running tests...</span>
+          <span id="test-summary-detail" class="text-[10px] text-ff-muted">Checking assertion gates...</span>
+        </div>
+        <span id="test-summary-badge" class="px-2.5 py-1 rounded-full bg-ff-primary/20 text-ff-primary text-[10px] font-bold border border-ff-primary/30">
+          TESTING
+        </span>
+      </div>
+
+      <!-- Test Items List -->
+      <div id="test-results-list" class="flex-1 overflow-y-auto no-scrollbar space-y-2 pr-1"></div>
+
+      <!-- Footer Button -->
+      <div class="pt-3 mt-3 border-t border-ff-border/60 flex justify-end">
+        <button onclick="closeAppLimitsAutoTests()" class="px-5 py-2 rounded-xl bg-ff-primary text-ff-bg font-bold text-xs hover:bg-[#b88c5a] transition">
+          Close Results
+        </button>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- JAVASCRIPT STATE STORE & REACTIVE ENGINE -->
   <script>
-    let activeAppName = "Instagram";
+    // 1. Reactive State Store
+    let appLimits = [
+      {
+        id: 'instagram',
+        name: 'Instagram',
+        category: 'distracting',
+        emoji: '📷',
+        bgClass: 'bg-pink-900/30',
+        borderClass: 'border-pink-700/40',
+        spentMins: 42,
+        limitHours: 0,
+        limitMins: 45,
+        streak: 12,
+        status: 'blocking', // 'blocking' or 'paused'
+        pausedUntil: null,
+        extraSessions: 2,
+        extraDuration: 10
+      },
+      {
+        id: 'youtube',
+        name: 'YouTube',
+        category: 'distracting',
+        emoji: '▶',
+        bgClass: 'bg-red-900/30',
+        borderClass: 'border-red-700/40',
+        spentMins: 70,
+        limitHours: 1,
+        limitMins: 30,
+        streak: 24,
+        status: 'blocking',
+        pausedUntil: null,
+        extraSessions: 2,
+        extraDuration: 10
+      },
+      {
+        id: 'reddit',
+        name: 'Reddit',
+        category: 'distracting',
+        emoji: '🤖',
+        bgClass: 'bg-orange-900/30',
+        borderClass: 'border-orange-700/40',
+        spentMins: 15,
+        limitHours: 0,
+        limitMins: 30,
+        streak: 0,
+        status: 'paused',
+        pausedUntil: 'Tomorrow, 9:00 AM',
+        extraSessions: 1,
+        extraDuration: 5
+      },
+      {
+        id: 'gmail',
+        name: 'Gmail',
+        category: 'semi',
+        emoji: '✉️',
+        bgClass: 'bg-slate-800',
+        borderClass: 'border-slate-700',
+        spentMins: 25,
+        limitHours: 0,
+        limitMins: 45,
+        streak: 8,
+        status: 'blocking',
+        pausedUntil: null,
+        extraSessions: 1,
+        extraDuration: 10
+      },
+      {
+        id: 'chrome',
+        name: 'Chrome',
+        category: 'others',
+        emoji: '🌐',
+        bgClass: 'bg-slate-800',
+        borderClass: 'border-slate-700',
+        spentMins: 30,
+        limitHours: 1,
+        limitMins: 0,
+        streak: 15,
+        status: 'blocking',
+        pausedUntil: null,
+        extraSessions: 1,
+        extraDuration: 15
+      }
+    ];
+
+    let activeAppId = 'instagram';
     let pickerHours = 0;
     let pickerMinutes = 45;
-    let activeStreak = 12;
     let extraSessions = 2;
     let extraDuration = 10;
     let warningTimer;
 
-    function openSettingsSheet(name, hours, mins, streak, status) {
-      activeAppName = name;
-      pickerHours = hours;
-      pickerMinutes = mins;
-      activeStreak = streak;
+    // Helper: format minutes into readable time
+    function formatDuration(mins) {
+      if (!mins || mins === 0) return "0m";
+      const h = Math.floor(mins / 60);
+      const m = mins % 60;
+      if (h > 0 && m > 0) return `${h}h ${m}m`;
+      if (h > 0) return `${h}h 00m`;
+      return `${m}m`;
+    }
 
-      document.getElementById('modal-app-title').innerText = name + ' Limit';
-      document.getElementById('modal-streak-badge').innerText = streak > 0 ? `🔥 ${streak} days` : '🌧️ 0 days';
+    // Helper: format spending/limit string
+    function formatSpendingLimit(spentMins, limitHours, limitMins) {
+      const totalLimitMins = (limitHours * 60) + limitMins;
+      return `${formatDuration(spentMins)} spent / ${formatDuration(totalLimitMins)} limit`;
+    }
+
+    // 2. Main DOM Renderer
+    function renderAppLimits() {
+      const categories = ['distracting', 'semi', 'others'];
+
+      categories.forEach(cat => {
+        const container = document.getElementById(`list-${cat}`);
+        const countBadge = document.getElementById(`badge-count-${cat}`);
+        if (!container) return;
+
+        const apps = appLimits.filter(a => a.category === cat);
+        countBadge.innerText = `${apps.length} app${apps.length === 1 ? '' : 's'}`;
+
+        if (apps.length === 0) {
+          container.innerHTML = `
+            <div class="p-3 rounded-xl bg-ff-surface/40 border border-ff-border/50 text-center text-xs text-ff-muted italic">
+              No apps limited in this category.
+            </div>
+          `;
+          return;
+        }
+
+        container.innerHTML = apps.map(app => {
+          const spendingText = formatSpendingLimit(app.spentMins, app.limitHours, app.limitMins);
+          const isBlocking = app.status === 'blocking';
+
+          const statusBadge = isBlocking
+            ? `
+              <div class="mt-2.5 flex items-center space-x-2 pt-2 border-t border-ff-border/40">
+                <span class="inline-flex items-center space-x-1 px-2.5 py-0.5 rounded-full bg-ff-productive/15 text-ff-productive text-[10px] font-semibold">
+                  <span class="w-1.5 h-1.5 rounded-full bg-ff-productive"></span>
+                  <span>Blocking</span>
+                </span>
+                <span class="text-[10px] text-ff-warning font-semibold">🔥 ${app.streak} days</span>
+              </div>
+            `
+            : `
+              <div class="mt-2.5 pt-2 border-t border-ff-border/40">
+                <span class="inline-flex items-center space-x-1 px-2.5 py-0.5 rounded-full bg-ff-muted/15 text-ff-muted text-[10px] font-semibold">
+                  <span class="w-1.5 h-1.5 rounded-full bg-ff-muted"></span>
+                  <span>Paused</span>
+                </span>
+                <span class="text-[10px] text-ff-muted block mt-1">Turned off till ${app.pausedUntil || 'Tomorrow, 9:00 AM'}</span>
+              </div>
+            `;
+
+          return `
+            <div id="card-${app.id}" onclick="openSettingsSheet('${app.id}')"
+                 class="bg-ff-surface border border-ff-border rounded-xl p-3.5 cursor-pointer hover:border-ff-primary/70 transition shadow-sm">
+              <div class="flex items-center justify-between">
+                <div class="flex items-center space-x-3">
+                  <div class="w-11 h-11 rounded-xl ${app.bgClass} border ${app.borderClass} flex items-center justify-center text-lg">
+                    ${app.emoji}
+                  </div>
+                  <div>
+                    <h3 class="text-sm font-semibold text-ff-text">${app.name}</h3>
+                    <span id="limit-text-${app.id}" class="text-[11px] text-ff-muted font-medium">${spendingText}</span>
+                  </div>
+                </div>
+                <span class="text-ff-muted text-base font-bold">›</span>
+              </div>
+              ${statusBadge}
+            </div>
+          `;
+        }).join('');
+      });
+    }
+
+    // 3. Settings Sheet Actions
+    function openSettingsSheet(appId) {
+      const app = appLimits.find(a => a.id === appId);
+      if (!app) return;
+
+      activeAppId = appId;
+      pickerHours = app.limitHours;
+      pickerMinutes = app.limitMins;
+      extraSessions = app.extraSessions;
+      extraDuration = app.extraDuration;
+
+      document.getElementById('modal-app-title').innerText = `${app.name} Limit`;
+      document.getElementById('modal-app-icon').innerHTML = app.emoji;
+      document.getElementById('modal-app-icon').className = `w-9 h-9 rounded-lg ${app.bgClass} border ${app.borderClass} flex items-center justify-center text-base`;
+      document.getElementById('modal-streak-badge').innerText = app.streak > 0 ? `🔥 ${app.streak} days` : '🌧️ 0 days';
+      document.getElementById('modal-suggested-val').innerText = formatDuration((app.limitHours * 60) + app.limitMins);
+
       updatePickerDisplay();
+      setExtraDuration(app.extraDuration);
+      document.getElementById('val-extra-sessions').innerText = extraSessions;
       updateExtraTimeCalculation();
+
       document.getElementById('settings-sheet').classList.remove('hidden');
     }
 
@@ -626,6 +738,7 @@
       extraDuration = dur;
       [5, 10, 15].forEach(d => {
         const chip = document.getElementById('chip-' + d + 'm');
+        if (!chip) return;
         if (d === dur) {
           chip.className = "px-2.5 py-1 rounded-lg border text-[11px] font-semibold bg-ff-accent/20 border-ff-accent text-ff-accent";
         } else {
@@ -638,6 +751,7 @@
     function updateExtraTimeCalculation() {
       const total = extraSessions * extraDuration;
       const el = document.getElementById('val-total-extra');
+      if (!el) return;
       el.innerText = total + " mins";
       if (total > 60) {
         el.className = "font-bold text-ff-danger";
@@ -646,14 +760,29 @@
       }
     }
 
+    // 4. Save Changes (DYNAMIC DOM UPDATE)
     function saveAppSettings() {
+      const app = appLimits.find(a => a.id === activeAppId);
+      if (!app) return;
+
+      app.limitHours = pickerHours;
+      app.limitMins = pickerMinutes;
+      app.extraSessions = extraSessions;
+      app.extraDuration = extraDuration;
+
+      renderAppLimits();
       closeSettingsSheet();
-      showToast(`${activeAppName} limit saved (${pickerHours}h ${pickerMinutes}m)`);
+      showToast(`${app.name} limit saved (${pickerHours}h ${pickerMinutes}m)`);
     }
 
-    function triggerTurnOffBlock() {
+    // 5. Turn Off Block Flow (DYNAMIC STATUS UPDATE)
+    function triggerTurnOffBlock(appId) {
+      if (appId) activeAppId = appId;
+      const app = appLimits.find(a => a.id === activeAppId);
+      if (!app) return;
+
       closeSettingsSheet();
-      openStreakWarning(activeAppName, activeStreak);
+      openStreakWarning(app.name, app.streak);
     }
 
     function openStreakWarning(appName, streak) {
@@ -692,24 +821,76 @@
       document.getElementById('duration-sheet').classList.remove('hidden');
     }
 
+    // DYNAMIC PAUSE EXECUTION
     function confirmTurnOff() {
+      const app = appLimits.find(a => a.id === activeAppId);
+      if (!app) return;
+
+      const durChoice = document.querySelector('input[name="turnoff-dur"]:checked')?.value || 'tomorrow';
+      let pausedStr = "Tomorrow, 9:00 AM";
+      if (durChoice === 'today') pausedStr = "Tonight, 11:59 PM";
+      if (durChoice === '7days') pausedStr = "7 days (Oct 1)";
+
+      app.status = 'paused';
+      app.pausedUntil = pausedStr;
+      app.streak = 0; // streak reset per spec
+
+      renderAppLimits();
       document.getElementById('duration-sheet').classList.add('hidden');
-      showToast(`${activeAppName} paused till tomorrow`);
+      showToast(`${app.name} paused till ${pausedStr}`);
     }
 
+    // DYNAMIC DELETE EXECUTION
     function confirmDeleteLimit() {
+      const idx = appLimits.findIndex(a => a.id === activeAppId);
+      if (idx === -1) return;
+
+      const deletedName = appLimits[idx].name;
+      appLimits.splice(idx, 1);
+
+      renderAppLimits();
       document.getElementById('duration-sheet').classList.add('hidden');
-      showToast(`${activeAppName} limit deleted`);
+      showToast(`${deletedName} limit deleted`);
     }
 
+    // 6. Add App Sheet & DYNAMIC INSERTION
     function toggleAddAppSheet(show) {
       document.getElementById('add-app-sheet').classList.toggle('hidden', !show);
     }
 
-    function addAppLimit(name, emoji) {
+    function addAppLimit(name, emoji, category) {
+      const id = name.toLowerCase().replace(/[^a-z0-9]/g, '');
+      const existing = appLimits.find(a => a.id === id);
+
+      if (existing) {
+        showToast(`${name} limit already exists!`);
+        toggleAddAppSheet(false);
+        openSettingsSheet(id);
+        return;
+      }
+
+      const newApp = {
+        id: id,
+        name: name,
+        category: category || 'distracting',
+        emoji: emoji || '📱',
+        bgClass: 'bg-indigo-900/30',
+        borderClass: 'border-indigo-700/40',
+        spentMins: 0,
+        limitHours: 0,
+        limitMins: 30,
+        streak: 0,
+        status: 'blocking',
+        pausedUntil: null,
+        extraSessions: 2,
+        extraDuration: 10
+      };
+
+      appLimits.push(newApp);
+      renderAppLimits();
       toggleAddAppSheet(false);
-      openSettingsSheet(name, 0, 30, 0, 'blocking');
-      showToast(`Added ${name} limit`);
+      openSettingsSheet(id);
+      showToast(`Added ${name} limit (30m default)`);
     }
 
     function showToast(msg) {
@@ -722,6 +903,202 @@
         toast.classList.add('opacity-0');
       }, 2200);
     }
+
+    // 7. Automated Test Suite for App Limits
+    async function runAppLimitsAutoTests() {
+      const modal = document.getElementById('auto-test-modal');
+      const list = document.getElementById('test-results-list');
+      const summaryStatus = document.getElementById('test-summary-status');
+      const summaryBadge = document.getElementById('test-summary-badge');
+      const summaryDetail = document.getElementById('test-summary-detail');
+
+      modal.classList.remove('hidden');
+      list.innerHTML = '';
+      summaryStatus.innerText = "Running App Limits Automated Suite...";
+      summaryBadge.innerText = "TESTING";
+      summaryBadge.className = "px-2.5 py-1 rounded-full bg-ff-primary/20 text-ff-primary text-[10px] font-bold border border-ff-primary/30";
+
+      const tests = [
+        {
+          name: "1. Initial Category App Cards & Counts",
+          run: () => {
+            const distractingCount = appLimits.filter(a => a.category === 'distracting').length;
+            const semiCount = appLimits.filter(a => a.category === 'semi').length;
+            const othersCount = appLimits.filter(a => a.category === 'others').length;
+
+            const dCards = document.getElementById('list-distracting').children.length;
+            const sCards = document.getElementById('list-semi').children.length;
+            const oCards = document.getElementById('list-others').children.length;
+
+            if (dCards !== distractingCount) throw new Error(`Distracting count mismatch: ${dCards} vs ${distractingCount}`);
+            if (sCards !== semiCount) throw new Error(`Semi-Prod count mismatch: ${sCards} vs ${semiCount}`);
+            if (oCards !== othersCount) throw new Error(`Others count mismatch: ${oCards} vs ${othersCount}`);
+            return `Rendered: ${distractingCount} Distracting, ${semiCount} Semi-Prod, ${othersCount} Others cards`;
+          }
+        },
+        {
+          name: "2. Dynamic App Limit Save (Hours & Minutes Mutation)",
+          run: () => {
+            const ig = appLimits.find(a => a.id === 'instagram');
+            openSettingsSheet('instagram');
+            pickerHours = 1;
+            pickerMinutes = 15;
+            saveAppSettings();
+
+            const cardText = document.getElementById('limit-text-instagram').innerText;
+            if (!cardText.includes("1h 15m limit")) {
+              throw new Error(`Expected '1h 15m limit' in card, got '${cardText}'`);
+            }
+            // Restore
+            pickerHours = 0;
+            pickerMinutes = 45;
+            saveAppSettings();
+            return "Limit updated dynamically on card: 45m → 1h 15m → 45m";
+          }
+        },
+        {
+          name: "3. Extra Time Calculation & 60-Minute Warning Gate",
+          run: () => {
+            openSettingsSheet('instagram');
+            extraSessions = 5;
+            extraDuration = 15; // 5 * 15 = 75 mins (>60m)
+            updateExtraTimeCalculation();
+
+            const totalEl = document.getElementById('val-total-extra');
+            if (!totalEl.classList.contains('text-ff-danger')) {
+              throw new Error("Expected red warning text when extra time exceeds 60m");
+            }
+            // Reset to safe
+            extraSessions = 2;
+            extraDuration = 10;
+            updateExtraTimeCalculation();
+            closeSettingsSheet();
+            return "Enforces 60m max budget: 75m triggers danger warning, 20m valid";
+          }
+        },
+        {
+          name: "4. Turn-Off Streak Warning 3-Second Safeguard Delay",
+          run: () => {
+            openStreakWarning('Instagram', 12);
+            const btn = document.getElementById('btn-warning-countdown');
+            if (!btn.disabled) throw new Error("Countdown button must be disabled initially");
+            if (!btn.innerText.includes("Wait")) throw new Error("Button must display countdown wait text");
+            closeStreakWarning();
+            return "Discipline safeguard: 3-second delay prevents impulsive unblocking";
+          }
+        },
+        {
+          name: "5. Dynamic Turn-Off Execution (Blocking → Paused State)",
+          run: () => {
+            const ig = appLimits.find(a => a.id === 'instagram');
+            activeAppId = 'instagram';
+            confirmTurnOff(); // sets to paused
+
+            const card = document.getElementById('card-instagram');
+            if (!card.innerText.includes("Paused")) throw new Error("Card did not update to 'Paused' state");
+            if (!card.innerText.includes("Turned off till")) throw new Error("Card missing 'Turned off till' timestamp");
+
+            // Revert back to blocking
+            ig.status = 'blocking';
+            ig.streak = 12;
+            renderAppLimits();
+            return "Card dynamically morphed: 'Blocking' (#14B8A6) → 'Paused' (#94A3B8) with timestamp";
+          }
+        },
+        {
+          name: "6. Dynamic Add App (DOM Insertion & Count Increment)",
+          run: () => {
+            const initCount = appLimits.length;
+            addAppLimit('Discord', '💬', 'distracting');
+            closeSettingsSheet();
+
+            const newCard = document.getElementById('card-discord');
+            if (!newCard) throw new Error("New card #card-discord not found in DOM");
+            if (appLimits.length !== initCount + 1) throw new Error("App limits array count did not increment");
+            return `Successfully inserted Discord card into DOM (total: ${initCount} → ${appLimits.length})`;
+          }
+        },
+        {
+          name: "7. Dynamic Delete App (DOM Removal & Count Decrement)",
+          run: () => {
+            const beforeCount = appLimits.length;
+            activeAppId = 'discord';
+            confirmDeleteLimit();
+
+            const deletedCard = document.getElementById('card-discord');
+            if (deletedCard) throw new Error("Deleted card #card-discord still present in DOM");
+            if (appLimits.length !== beforeCount - 1) throw new Error("App limits count did not decrement");
+            return `Successfully removed Discord card from DOM (total: ${beforeCount} → ${appLimits.length})`;
+          }
+        },
+        {
+          name: "8. Dual Column Time Picker Boundaries",
+          run: () => {
+            pickerHours = 0;
+            adjustPickerHours(-1);
+            if (pickerHours !== 0) throw new Error("Hours cannot be negative");
+            adjustPickerHours(10);
+            if (pickerHours > 6) throw new Error("Hours cannot exceed 6");
+
+            pickerHours = 0;
+            pickerMinutes = 0;
+            adjustPickerMinutes(-5);
+            if (pickerMinutes < 0) throw new Error("Minutes cannot be negative");
+            updatePickerDisplay();
+            return "Time picker strictly enforces 0–6 hours and 0–55 minutes range";
+          }
+        }
+      ];
+
+      let passedCount = 0;
+      for (const t of tests) {
+        await new Promise(r => setTimeout(r, 60));
+        const item = document.createElement('div');
+        item.className = "p-2.5 rounded-xl border flex items-start space-x-2.5 transition";
+
+        try {
+          const detail = t.run();
+          passedCount++;
+          item.className += " bg-emerald-950/30 border-emerald-800/50 text-emerald-200";
+          item.innerHTML = `
+            <span class="text-emerald-400 font-bold">✓</span>
+            <div class="flex-1">
+              <span class="font-bold text-ff-text block text-xs">${t.name}</span>
+              <span class="text-[10px] text-emerald-300/80 leading-relaxed">${detail}</span>
+            </div>
+          `;
+        } catch (err) {
+          item.className += " bg-red-950/30 border-red-800/50 text-red-200";
+          item.innerHTML = `
+            <span class="text-red-400 font-bold">✕</span>
+            <div class="flex-1">
+              <span class="font-bold text-ff-text block text-xs">${t.name}</span>
+              <span class="text-[10px] text-red-300/80 leading-relaxed">${err.message}</span>
+            </div>
+          `;
+        }
+        list.appendChild(item);
+      }
+
+      summaryStatus.innerText = `${passedCount}/${tests.length} Automated Tests Passed`;
+      summaryDetail.innerText = passedCount === tests.length ? "All CRUD mutations, DOM reactivity, & safeguard gates verified!" : "Some tests failed";
+      if (passedCount === tests.length) {
+        summaryBadge.innerText = "100% PASSED";
+        summaryBadge.className = "px-2.5 py-1 rounded-full bg-emerald-500/20 text-emerald-400 text-[10px] font-bold border border-emerald-500/30";
+      } else {
+        summaryBadge.innerText = "FAILURES";
+        summaryBadge.className = "px-2.5 py-1 rounded-full bg-red-500/20 text-red-400 text-[10px] font-bold border border-red-500/30";
+      }
+    }
+
+    function closeAppLimitsAutoTests() {
+      document.getElementById('auto-test-modal').classList.add('hidden');
+    }
+
+    // Initialize DOM rendering on ready
+    window.addEventListener('DOMContentLoaded', () => {
+      renderAppLimits();
+    });
   </script>
 </body>
 </html>

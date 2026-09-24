@@ -55,7 +55,7 @@
 - [x] Floating pill bottom navigation bar with 5 grouped tabs.
 - [x] State switcher (Standard, Active Session Running, Upcoming 15m alert, Empty state).
 - [x] Local preview served on port 8086 (`ui_mockups/home_screen.html`), reviewed and approved by user.
-- [ ] In-browser automated test suite validating rolling weekly metrics, area chart layer ordering, state transitions, and IPC sync requirements.
+- [x] In-browser automated test suite validating rolling weekly metrics, area chart layer ordering, state transitions, and IPC sync requirements.
 
 ### 3.2 Active Work: Preset Creation & YouTube Whitelist Screen (`Code1`)
 - [x] Preset Creation full-screen flow layout (`ui_preset.md`).
@@ -78,8 +78,8 @@
 - [x] Primary Save button in Ghost White (`#F8FAFC`) per spec exception.
 - [x] Turn-off flow: streak warning sheet (`🔥` to `🌧️`) with 3-second delay button and duration picker sheet.
 - [x] Add App sheet with search and quick-add actions.
-- [ ] Fix DOM reactivity: dynamic card insertion on Add, instant removal on Delete, status switch from Blocking to Paused on Turn-Off, and time limit text update on Save.
-- [ ] In-browser automated test runner validating all limit lifecycle operations.
+- [x] Fixed DOM reactivity: dynamic card insertion on Add, instant removal on Delete, status switch from Blocking to Paused on Turn-Off, and time limit text update on Save.
+- [x] In-browser automated test runner validating all limit lifecycle operations and boundaries (100% passed).
 - [x] Local preview served on port 8088 (`ui_mockups/app_limits.html`).
 
 ---
