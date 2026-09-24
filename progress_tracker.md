@@ -25,7 +25,7 @@
 - [x] Flutter project structure initialized with multi-platform runners (`fluxfoxus/`).
 - [x] Skills setup and configuration registered.
 - [x] Active Focus Session UI Mockup approved by user (served by `Code1` on port 8085).
-- [x] Home Screen UI Mockup completed and served (`Code2` on port 8086).
+- [x] Home Screen UI Mockup approved by user (served by `Code2` on port 8086).
 - [x] Phase 1-A Step 1 completed: Flutter ThemeTokens, Typography, Spacing, Radius, Dark ThemeData, dependencies, and unit tests (100% passing, 0 lints).
 
 ---
@@ -50,13 +50,23 @@
 - [x] Primary action pill button: "Start Focusing" in `#CA9C68`.
 - [x] Floating pill bottom navigation bar with 5 grouped tabs.
 - [x] State switcher (Standard, Active Session Running, Upcoming 15m alert, Empty state).
-- [x] Local preview served on port 8086 (`ui_mockups/home_screen.html`).
+- [x] Local preview served on port 8086 (`ui_mockups/home_screen.html`), reviewed and approved by user.
+
+### 3.2 Active Work: Preset Creation & YouTube Whitelist Screen (`Code2`)
+- [x] Preset Creation full-screen flow layout (`ui_preset.md`).
+- [x] Preset Name input with tappable Emoji selector button.
+- [x] Break Configuration 2-card grid with steppers (breaks 0–6, duration 1–15m).
+- [x] App Restrictions with 4 collapsible category cards and app toggle switches.
+- [x] YouTube 3-way radio mode selection (Block / Allow / Study Mode).
+- [x] Description card with auto-styled textarea.
+- [x] Sticky bottom "Save Preset" pill button (`#CA9C68`).
+- [x] Interactive Emoji Picker sheet & Study Mode Channel Whitelist sheet with friction confirmation sentence flow.
+- [x] Local preview served on port 8087 (`ui_mockups/preset_creation.html`).
 
 ---
 
 ## 4. Backlog
-- [ ] Remaining UI screens generation (Presets, App Limits, Planner, Usage Stats, 2/5/10/20 Distraction Intervention, Home Widget).
-- [ ] Flutter implementation of ThemeTokens (`lib/core/theme/`).
+- [ ] Remaining UI screens generation (App Limits, Planner, Usage Stats, 2/5/10/20 Distraction Intervention, Home Widget).
 - [ ] Database schema & Hive box implementations (`lib/core/database/`).
 - [ ] Riverpod state management providers and navigation shell (`go_router`).
 - [ ] Foreground timer service and background workers (`flutter_foreground_task`, `workmanager`).

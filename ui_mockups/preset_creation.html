@@ -1,0 +1,642 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>FluxFoxus — Preset Creation & Channel Whitelist Preview</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@600;700&display=swap" rel="stylesheet">
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            'ff-bg': '#13191F',        // River Styx
+            'ff-surface': '#2B2F2E',   // Carbon Fibre
+            'ff-border': '#594C3D',    // Afternoon Tea
+            'ff-accent': '#906D4B',    // Tanned Wood (replaces Soft Cyan)
+            'ff-primary': '#CA9C68',   // Amber Autumn (replaces Electric Indigo)
+            'ff-text': '#F8FAFC',      // Ghost White
+            'ff-muted': '#94A3B8',     // Muted caption
+            'ff-productive': '#14B8A6', // Teal
+            'ff-semi': '#906D4B',       // Warm Brown
+            'ff-distracting': '#1A2333',// Charcoal Slate
+          },
+          fontFamily: {
+            sans: ['Inter', 'sans-serif'],
+            mono: ['JetBrains Mono', 'monospace'],
+          }
+        }
+      }
+    }
+  </script>
+  <style>
+    body {
+      background-color: #0b0f14;
+      font-family: 'Inter', sans-serif;
+      user-select: none;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    .no-scrollbar::-webkit-scrollbar {
+      display: none;
+    }
+    .no-scrollbar {
+      -ms-overflow-style: none;
+      scrollbar-width: none;
+    }
+
+    /* Toggle switch transitions */
+    .toggle-checkbox:checked {
+      right: 2px;
+      border-color: #CA9C68;
+    }
+    .toggle-checkbox:checked + .toggle-label {
+      background-color: #CA9C68;
+    }
+  </style>
+</head>
+<body class="min-h-screen flex flex-col items-center justify-center p-4 text-ff-text">
+
+  <!-- TOP TOOLBAR (Preview Controller) -->
+  <div class="mb-5 flex flex-wrap items-center justify-center gap-2 bg-[#182028] border border-ff-border px-4 py-2.5 rounded-2xl shadow-xl max-w-xl text-xs">
+    <span class="text-ff-primary font-bold tracking-wide uppercase text-[11px] mr-2">Interactive Sheets:</span>
+    <button onclick="toggleEmojiSheet(true)" class="px-3 py-1.5 rounded-lg bg-ff-surface text-ff-text border border-ff-border font-medium hover:border-ff-primary transition">
+      Open Emoji Picker
+    </button>
+    <button onclick="toggleWhitelistScreen(true)" class="px-3 py-1.5 rounded-lg bg-ff-surface text-ff-text border border-ff-border font-medium hover:border-ff-primary transition">
+      Open Channel Whitelist
+    </button>
+    <button onclick="openAddChannelSheet()" class="px-3 py-1.5 rounded-lg bg-ff-primary text-ff-bg font-bold transition">
+      Test Friction Typing Flow
+    </button>
+  </div>
+
+  <!-- PHONE CONTAINER SIMULATOR -->
+  <div class="relative w-[390px] h-[830px] bg-ff-bg rounded-[44px] border-[3px] border-ff-border shadow-2xl overflow-hidden flex flex-col justify-between">
+    
+    <!-- TOP BAR (Status Bar + Header) -->
+    <div class="w-full shrink-0 pt-5 px-5 pb-3 border-b border-ff-border/60 bg-ff-bg z-10">
+      <!-- ANDROID STATUS BAR -->
+      <div class="w-full flex items-center justify-between text-[11px] text-ff-muted font-medium pb-2 px-1">
+        <span>09:42</span>
+        <div class="flex items-center space-x-1.5">
+          <svg class="w-3.5 h-3.5 fill-current" viewBox="0 0 24 24"><path d="M12 4C7.31 4 3.07 5.9 0 8.98L12 21 24 8.98C20.93 5.9 16.69 4 12 4z"/></svg>
+          <svg class="w-3.5 h-3.5 fill-current" viewBox="0 0 24 24"><path d="M2 22h20V2z"/></svg>
+          <div class="w-4 h-2.5 border border-ff-muted rounded-[2px] p-[1px] flex items-center">
+            <div class="h-full w-3/4 bg-ff-muted rounded-[1px]"></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 2.1 HEADER ROW -->
+      <div class="w-full flex items-center justify-between pt-1">
+        <button onclick="alert('Preset discard / close')" class="w-8 h-8 rounded-lg bg-ff-surface border border-ff-border flex items-center justify-center text-ff-muted hover:text-ff-text transition">
+          <svg class="w-4 h-4 fill-none stroke-current stroke-2" viewBox="0 0 24 24"><path d="M18 6L6 18M6 6l12 12"/></svg>
+        </button>
+        <h1 class="text-base font-bold text-ff-text tracking-tight">New Preset</h1>
+        <div class="w-8"></div> <!-- spacer for centered title -->
+      </div>
+    </div>
+
+    <!-- MAIN SCROLLABLE FORM CONTENT -->
+    <div class="flex-1 overflow-y-auto no-scrollbar px-5 py-4 space-y-5">
+      
+      <!-- 3. SECTION: PRESET NAME -->
+      <div>
+        <label class="text-[11px] font-bold text-ff-muted tracking-widest uppercase block mb-1.5">Preset Name</label>
+        <div class="bg-ff-surface border border-ff-border rounded-xl p-3 flex items-center space-x-3 shadow-sm">
+          <!-- Emoji Selector Button -->
+          <button onclick="toggleEmojiSheet(true)" id="selected-emoji-btn"
+                  class="w-11 h-11 rounded-lg bg-ff-primary/15 border border-ff-primary/40 flex items-center justify-center text-xl hover:scale-105 transition shadow-sm shrink-0">
+            <span id="current-emoji">⚡</span>
+          </button>
+          
+          <div class="flex-1">
+            <span class="text-[10px] text-ff-muted uppercase font-semibold block">Name</span>
+            <input id="input-preset-name" type="text" value="Math Olympiad" placeholder="Enter preset name"
+                   class="w-full bg-transparent text-sm font-semibold text-ff-text placeholder-ff-muted/50 focus:outline-none"/>
+          </div>
+        </div>
+      </div>
+
+      <!-- 4. SECTION: BREAK CONFIGURATION -->
+      <div>
+        <label class="text-[11px] font-bold text-ff-muted tracking-widest uppercase block mb-1.5">Break Configuration</label>
+        <div class="grid grid-cols-2 gap-3">
+          
+          <!-- Card 1: Number of Breaks -->
+          <div class="bg-ff-surface border border-ff-border rounded-xl p-3 shadow-sm flex flex-col justify-between">
+            <span class="text-[9px] font-bold text-ff-muted tracking-wider uppercase mb-2">Number of Breaks</span>
+            <div class="flex items-center justify-between">
+              <button onclick="adjustBreaks(-1)" id="btn-dec-breaks"
+                      class="w-8 h-8 rounded-lg bg-ff-primary/20 text-ff-primary font-bold text-base flex items-center justify-center hover:bg-ff-primary/30 transition">
+                −
+              </button>
+              <div class="text-center">
+                <span id="val-breaks" class="text-xl font-mono font-bold text-ff-text block leading-none">4</span>
+                <span class="text-[9px] text-ff-muted font-medium">breaks</span>
+              </div>
+              <button onclick="adjustBreaks(1)" id="btn-inc-breaks"
+                      class="w-8 h-8 rounded-lg bg-ff-primary/20 text-ff-primary font-bold text-base flex items-center justify-center hover:bg-ff-primary/30 transition">
+                +
+              </button>
+            </div>
+          </div>
+
+          <!-- Card 2: Duration Each -->
+          <div class="bg-ff-surface border border-ff-border rounded-xl p-3 shadow-sm flex flex-col justify-between">
+            <span class="text-[9px] font-bold text-ff-muted tracking-wider uppercase mb-2">Duration Each</span>
+            <div class="flex items-center justify-between">
+              <button onclick="adjustDuration(-1)" id="btn-dec-duration"
+                      class="w-8 h-8 rounded-lg bg-ff-primary/20 text-ff-primary font-bold text-base flex items-center justify-center hover:bg-ff-primary/30 transition">
+                −
+              </button>
+              <div class="text-center">
+                <span id="val-duration" class="text-xl font-mono font-bold text-ff-text block leading-none">10</span>
+                <span class="text-[9px] text-ff-muted font-medium">mins</span>
+              </div>
+              <button onclick="adjustDuration(1)" id="btn-inc-duration"
+                      class="w-8 h-8 rounded-lg bg-ff-primary/20 text-ff-primary font-bold text-base flex items-center justify-center hover:bg-ff-primary/30 transition">
+                +
+              </button>
+            </div>
+          </div>
+
+        </div>
+      </div>
+
+      <!-- 5. SECTION: APP RESTRICTIONS -->
+      <div>
+        <label class="text-[11px] font-bold text-ff-muted tracking-widest uppercase block mb-1.5">App Restrictions</label>
+        <div class="space-y-2.5">
+
+          <!-- 5.1 & 5.2 DISTRACTING APPS (Expanded by default) -->
+          <div class="border border-ff-border rounded-xl overflow-hidden bg-ff-surface shadow-sm">
+            <!-- Header -->
+            <button onclick="toggleCategory('distracting')" class="w-full p-3.5 flex items-center justify-between hover:bg-ff-bg/20 transition">
+              <div class="flex items-center space-x-2">
+                <span class="w-2 h-2 rounded-full bg-[#1A2333] border border-ff-muted"></span>
+                <span class="text-xs font-bold text-ff-text">Distracting</span>
+              </div>
+              <div class="flex items-center space-x-2 text-[11px] text-ff-muted">
+                <span id="count-distracting">3 apps blocked</span>
+                <span id="icon-cat-distracting" class="text-xs">▲</span>
+              </div>
+            </button>
+
+            <!-- Expanded App List -->
+            <div id="list-cat-distracting" class="border-t border-ff-border divide-y divide-ff-border/40 bg-ff-surface">
+              
+              <!-- 5.4 YouTube Special Row (3-way radio) -->
+              <div class="p-3 bg-ff-bg/30">
+                <div class="flex items-center justify-between mb-2">
+                  <div class="flex items-center space-x-2.5">
+                    <div class="w-7 h-7 rounded-lg bg-red-900/40 border border-red-700/50 flex items-center justify-center text-xs">
+                      ▶
+                    </div>
+                    <span class="text-xs font-semibold text-ff-text">YouTube</span>
+                  </div>
+                  <button onclick="toggleWhitelistScreen(true)" class="text-[11px] font-bold text-ff-primary hover:underline">
+                    Configure →
+                  </button>
+                </div>
+
+                <!-- 3-way Radio Option Controls -->
+                <div class="space-y-1.5 pl-9 text-[11px]">
+                  <label class="flex items-center space-x-2 cursor-pointer">
+                    <input type="radio" name="yt-mode" value="block" onchange="setYTMode('block')" class="accent-[#CA9C68]">
+                    <span class="text-ff-muted">Block completely</span>
+                  </label>
+                  <label class="flex items-center space-x-2 cursor-pointer">
+                    <input type="radio" name="yt-mode" value="allow" onchange="setYTMode('allow')" class="accent-[#CA9C68]">
+                    <span class="text-ff-muted">Allow completely</span>
+                  </label>
+                  <label class="flex items-center space-x-2 cursor-pointer">
+                    <input type="radio" name="yt-mode" value="study" checked onchange="setYTMode('study')" class="accent-[#CA9C68]">
+                    <span class="text-ff-text font-semibold">Study Mode (<span id="yt-whitelisted-count">4</span> channels)</span>
+                  </label>
+                </div>
+              </div>
+
+              <!-- Instagram Row -->
+              <div class="p-3 flex items-center justify-between">
+                <div class="flex items-center space-x-2.5">
+                  <div class="w-7 h-7 rounded-lg bg-pink-900/30 border border-pink-700/50 flex items-center justify-center text-xs">
+                    📷
+                  </div>
+                  <span class="text-xs font-medium text-ff-text">Instagram</span>
+                </div>
+                <input type="checkbox" checked class="w-4 h-4 accent-[#CA9C68]">
+              </div>
+
+              <!-- X / Twitter Row -->
+              <div class="p-3 flex items-center justify-between">
+                <div class="flex items-center space-x-2.5">
+                  <div class="w-7 h-7 rounded-lg bg-slate-800 border border-slate-700 flex items-center justify-center text-xs">
+                    𝕏
+                  </div>
+                  <span class="text-xs font-medium text-ff-text">X (Twitter)</span>
+                </div>
+                <input type="checkbox" checked class="w-4 h-4 accent-[#CA9C68]">
+              </div>
+
+              <!-- Reddit Row -->
+              <div class="p-3 flex items-center justify-between">
+                <div class="flex items-center space-x-2.5">
+                  <div class="w-7 h-7 rounded-lg bg-orange-900/30 border border-orange-700/50 flex items-center justify-center text-xs">
+                    🤖
+                  </div>
+                  <span class="text-xs font-medium text-ff-text">Reddit</span>
+                </div>
+                <input type="checkbox" checked class="w-4 h-4 accent-[#CA9C68]">
+              </div>
+
+            </div>
+          </div>
+
+          <!-- PRODUCTIVE APPS (Collapsed) -->
+          <div class="border border-ff-border rounded-xl overflow-hidden bg-ff-surface shadow-sm">
+            <button onclick="toggleCategory('productive')" class="w-full p-3.5 flex items-center justify-between hover:bg-ff-bg/20 transition">
+              <div class="flex items-center space-x-2">
+                <span class="w-2 h-2 rounded-full bg-ff-productive"></span>
+                <span class="text-xs font-bold text-ff-text">Productive</span>
+              </div>
+              <div class="flex items-center space-x-2 text-[11px] text-ff-muted">
+                <span>0 apps blocked</span>
+                <span id="icon-cat-productive" class="text-xs">▼</span>
+              </div>
+            </button>
+            <div id="list-cat-productive" class="hidden border-t border-ff-border divide-y divide-ff-border/40 p-3 text-xs text-ff-muted">
+              <div class="flex items-center justify-between py-1.5">
+                <span>Notewise (Notes & Maths)</span>
+                <input type="checkbox" class="w-4 h-4 accent-[#CA9C68]">
+              </div>
+              <div class="flex items-center justify-between py-1.5">
+                <span>PW App (Neev Diamond)</span>
+                <input type="checkbox" class="w-4 h-4 accent-[#CA9C68]">
+              </div>
+            </div>
+          </div>
+
+          <!-- SEMI-PRODUCTIVE APPS (Collapsed) -->
+          <div class="border border-ff-border rounded-xl overflow-hidden bg-ff-surface shadow-sm">
+            <button onclick="toggleCategory('semi')" class="w-full p-3.5 flex items-center justify-between hover:bg-ff-bg/20 transition">
+              <div class="flex items-center space-x-2">
+                <span class="w-2 h-2 rounded-full bg-ff-semi"></span>
+                <span class="text-xs font-bold text-ff-text">Semi-Productive</span>
+              </div>
+              <div class="flex items-center space-x-2 text-[11px] text-ff-muted">
+                <span>0 apps blocked</span>
+                <span id="icon-cat-semi" class="text-xs">▼</span>
+              </div>
+            </button>
+            <div id="list-cat-semi" class="hidden border-t border-ff-border divide-y divide-ff-border/40 p-3 text-xs text-ff-muted">
+              <div class="flex items-center justify-between py-1.5">
+                <span>Google Maps</span>
+                <input type="checkbox" class="w-4 h-4 accent-[#CA9C68]">
+              </div>
+              <div class="flex items-center justify-between py-1.5">
+                <span>Gmail</span>
+                <input type="checkbox" class="w-4 h-4 accent-[#CA9C68]">
+              </div>
+            </div>
+          </div>
+
+          <!-- OTHERS (Collapsed) -->
+          <div class="border border-ff-border rounded-xl overflow-hidden bg-ff-surface shadow-sm">
+            <button onclick="toggleCategory('others')" class="w-full p-3.5 flex items-center justify-between hover:bg-ff-bg/20 transition">
+              <div class="flex items-center space-x-2">
+                <span class="w-2 h-2 rounded-full bg-ff-muted"></span>
+                <span class="text-xs font-bold text-ff-text">Others</span>
+              </div>
+              <div class="flex items-center space-x-2 text-[11px] text-ff-muted">
+                <span>0 apps blocked</span>
+                <span id="icon-cat-others" class="text-xs">▼</span>
+              </div>
+            </button>
+            <div id="list-cat-others" class="hidden border-t border-ff-border divide-y divide-ff-border/40 p-3 text-xs text-ff-muted">
+              <div class="flex items-center justify-between py-1.5">
+                <span>Settings</span>
+                <input type="checkbox" class="w-4 h-4 accent-[#CA9C68]">
+              </div>
+            </div>
+          </div>
+
+        </div>
+      </div>
+
+      <!-- 6. SECTION: YOUTUBE CONFIGURATION CARD -->
+      <div>
+        <label class="text-[11px] font-bold text-ff-muted tracking-widest uppercase block mb-1.5">YouTube Configuration</label>
+        <div class="bg-ff-surface/90 border border-ff-accent/30 rounded-xl p-3.5 flex items-center justify-between shadow-sm">
+          <div>
+            <div class="flex items-center space-x-2">
+              <span class="text-xs font-bold text-ff-text">YouTube Study Mode</span>
+              <span class="text-[9px] font-bold px-2 py-0.5 rounded-full bg-ff-accent/20 text-ff-accent border border-ff-accent/30">Enabled</span>
+            </div>
+            <span class="text-[10px] text-ff-muted block mt-0.5"><span id="yt-channels-badge">4</span> channels whitelisted</span>
+          </div>
+          <button onclick="toggleWhitelistScreen(true)" class="text-xs font-bold text-ff-primary hover:underline">
+            Configure →
+          </button>
+        </div>
+      </div>
+
+      <!-- 7. SECTION: DESCRIPTION -->
+      <div>
+        <label class="text-[11px] font-bold text-ff-muted tracking-widest uppercase block mb-1.5">Description</label>
+        <div class="bg-ff-surface border border-ff-border rounded-xl p-3 shadow-sm">
+          <textarea id="preset-desc" rows="3" placeholder="What do you plan on focusing? Add notes..."
+                    class="w-full bg-transparent text-xs text-ff-text placeholder-ff-muted/50 focus:outline-none resize-none leading-relaxed">Deep work on IOQM Number Theory modular arithmetic & polynomials</textarea>
+        </div>
+      </div>
+
+      <div class="h-2"></div>
+    </div>
+
+    <!-- 8. BOTTOM STICKY SAVE BUTTON -->
+    <div class="w-full p-4 border-t border-ff-border bg-ff-bg shrink-0">
+      <button onclick="savePreset()"
+              class="w-full py-3.5 px-5 bg-ff-primary hover:bg-[#b88c5a] text-ff-bg font-bold text-sm rounded-full text-center transition-all duration-200 active:scale-98 shadow-lg flex items-center justify-center">
+        Save Preset
+      </button>
+    </div>
+
+    <!-- 9. EMOJI PICKER BOTTOM SHEET (Modal) -->
+    <div id="emoji-sheet" class="absolute inset-0 bg-black/70 backdrop-blur-sm z-40 hidden flex flex-col justify-end">
+      <div class="w-full bg-ff-surface border-t border-ff-border rounded-t-3xl p-5 shadow-2xl animate-fade-in">
+        <!-- Handle -->
+        <div class="w-10 h-1 bg-ff-muted/40 rounded-full mx-auto mb-4"></div>
+        <div class="flex items-center justify-between mb-4">
+          <h3 class="text-sm font-bold text-ff-text">Select Icon</h3>
+          <button onclick="toggleEmojiSheet(false)" class="text-xs text-ff-muted hover:text-ff-text">Cancel</button>
+        </div>
+        <!-- 8-Column Emoji Grid -->
+        <div class="grid grid-cols-8 gap-2 py-2">
+          <button onclick="selectEmoji('⏳')" class="w-8 h-8 rounded-lg bg-ff-bg border border-ff-border/50 text-base flex items-center justify-center hover:border-ff-primary">⏳</button>
+          <button onclick="selectEmoji('⚡')" class="w-8 h-8 rounded-lg bg-ff-bg border border-ff-border/50 text-base flex items-center justify-center hover:border-ff-primary">⚡</button>
+          <button onclick="selectEmoji('🎯')" class="w-8 h-8 rounded-lg bg-ff-bg border border-ff-border/50 text-base flex items-center justify-center hover:border-ff-primary">🎯</button>
+          <button onclick="selectEmoji('📚')" class="w-8 h-8 rounded-lg bg-ff-bg border border-ff-border/50 text-base flex items-center justify-center hover:border-ff-primary">📚</button>
+          <button onclick="selectEmoji('📐')" class="w-8 h-8 rounded-lg bg-ff-bg border border-ff-border/50 text-base flex items-center justify-center hover:border-ff-primary">📐</button>
+          <button onclick="selectEmoji('💻')" class="w-8 h-8 rounded-lg bg-ff-bg border border-ff-border/50 text-base flex items-center justify-center hover:border-ff-primary">💻</button>
+          <button onclick="selectEmoji('🧠')" class="w-8 h-8 rounded-lg bg-ff-bg border border-ff-border/50 text-base flex items-center justify-center hover:border-ff-primary">🧠</button>
+          <button onclick="selectEmoji('🔥')" class="w-8 h-8 rounded-lg bg-ff-bg border border-ff-border/50 text-base flex items-center justify-center hover:border-ff-primary">🔥</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- 11. CHANNEL WHITELIST SCREEN (Full-Screen Push Overlay) -->
+    <div id="whitelist-screen" class="absolute inset-0 bg-ff-bg z-50 hidden flex flex-col justify-between">
+      
+      <!-- Whitelist Header -->
+      <div class="p-5 border-b border-ff-border shrink-0">
+        <div class="flex items-center justify-between">
+          <button onclick="toggleWhitelistScreen(false)" class="w-8 h-8 rounded-lg bg-ff-surface border border-ff-border flex items-center justify-center text-ff-text">
+            ←
+          </button>
+          <div class="text-center">
+            <h2 class="text-sm font-bold text-ff-text">Study Channels</h2>
+            <span class="text-[10px] text-ff-muted font-medium"><span id="header-channels-count">4</span> channels</span>
+          </div>
+          <button onclick="openAddChannelSheet()" class="w-8 h-8 rounded-lg bg-ff-primary text-ff-bg font-bold flex items-center justify-center hover:bg-[#b88c5a]">
+            +
+          </button>
+        </div>
+      </div>
+
+      <!-- Search Bar & List -->
+      <div class="flex-1 overflow-y-auto no-scrollbar p-5 space-y-4">
+        <!-- Search -->
+        <div class="bg-ff-surface border border-ff-border rounded-lg px-3 py-2 flex items-center space-x-2">
+          <span class="text-ff-muted text-xs">🔍</span>
+          <input type="text" placeholder="Search study channels..." class="w-full bg-transparent text-xs text-ff-text focus:outline-none placeholder-ff-muted/60">
+        </div>
+
+        <!-- Channels Container -->
+        <div id="channels-list" class="bg-ff-surface border border-ff-border rounded-xl divide-y divide-ff-border shadow-sm">
+          
+          <!-- Channel 1 -->
+          <div class="p-3.5 flex items-center justify-between">
+            <div class="flex items-center space-x-3">
+              <div class="w-9 h-9 rounded-full bg-ff-bg border border-ff-border flex items-center justify-center font-bold text-xs text-ff-primary">
+                3B
+              </div>
+              <span class="text-xs font-semibold text-ff-text">3Blue1Brown</span>
+            </div>
+            <button onclick="removeChannel(this)" class="text-ff-muted hover:text-red-400 text-sm px-1">✕</button>
+          </div>
+
+          <!-- Channel 2 -->
+          <div class="p-3.5 flex items-center justify-between">
+            <div class="flex items-center space-x-3">
+              <div class="w-9 h-9 rounded-full bg-ff-bg border border-ff-border flex items-center justify-center font-bold text-xs text-ff-primary">
+                NP
+              </div>
+              <span class="text-xs font-semibold text-ff-text">Numberphile</span>
+            </div>
+            <button onclick="removeChannel(this)" class="text-ff-muted hover:text-red-400 text-sm px-1">✕</button>
+          </div>
+
+          <!-- Channel 3 -->
+          <div class="p-3.5 flex items-center justify-between">
+            <div class="flex items-center space-x-3">
+              <div class="w-9 h-9 rounded-full bg-ff-bg border border-ff-border flex items-center justify-center font-bold text-xs text-ff-primary">
+                KA
+              </div>
+              <span class="text-xs font-semibold text-ff-text">Khan Academy</span>
+            </div>
+            <button onclick="removeChannel(this)" class="text-ff-muted hover:text-red-400 text-sm px-1">✕</button>
+          </div>
+
+          <!-- Channel 4 -->
+          <div class="p-3.5 flex items-center justify-between">
+            <div class="flex items-center space-x-3">
+              <div class="w-9 h-9 rounded-full bg-ff-bg border border-ff-border flex items-center justify-center font-bold text-xs text-ff-primary">
+                VT
+              </div>
+              <span class="text-xs font-semibold text-ff-text">Veritasium</span>
+            </div>
+            <button onclick="removeChannel(this)" class="text-ff-muted hover:text-red-400 text-sm px-1">✕</button>
+          </div>
+
+        </div>
+      </div>
+
+      <!-- Whitelist Bottom Bar -->
+      <div class="p-4 border-t border-ff-border bg-ff-bg">
+        <button onclick="toggleWhitelistScreen(false)" class="w-full py-3 bg-ff-surface border border-ff-border text-xs font-bold text-ff-text rounded-full hover:border-ff-primary">
+          Done
+        </button>
+      </div>
+
+    </div>
+
+    <!-- 11.5 ADD CHANNEL SHEET WITH FRICTION SENTENCE (Modal) -->
+    <div id="add-channel-sheet" class="absolute inset-0 bg-black/80 backdrop-blur-sm z-50 hidden flex flex-col justify-end">
+      <div class="w-full bg-ff-surface border-t border-ff-border rounded-t-3xl p-5 shadow-2xl">
+        <div class="w-10 h-1 bg-ff-muted/40 rounded-full mx-auto mb-3"></div>
+        <h3 class="text-sm font-bold text-ff-text mb-3">Add Study Channel</h3>
+        
+        <!-- Channel Name Input -->
+        <div class="mb-3">
+          <label class="text-[10px] text-ff-muted uppercase font-bold block mb-1">Channel Name or URL</label>
+          <input id="input-new-channel-name" type="text" placeholder="e.g. Physics Galaxy"
+                 class="w-full bg-ff-bg border border-ff-border rounded-lg px-3 py-2 text-xs text-ff-text focus:outline-none focus:border-ff-primary">
+        </div>
+
+        <!-- Discipline Friction Sentence Card -->
+        <div class="bg-ff-bg border border-ff-accent/50 rounded-xl p-3 mb-3">
+          <span class="text-[9px] uppercase font-bold tracking-wider text-ff-accent block mb-1">Type this sentence to confirm:</span>
+          <p id="target-sentence" class="text-xs text-ff-text font-medium italic select-all bg-ff-surface/50 p-2 rounded border border-ff-border/50">
+            I am adding this channel strictly for academic focus and olympiad preparation.
+          </p>
+        </div>
+
+        <!-- Sentence Typing Input -->
+        <div class="mb-4">
+          <input id="input-confirmation-sentence" type="text" oninput="checkFrictionSentence()" placeholder="Type the sentence exactly as above..."
+                 class="w-full bg-ff-bg border border-ff-border rounded-lg px-3 py-2 text-xs text-ff-text focus:outline-none focus:border-ff-accent font-mono">
+          <span id="sentence-match-status" class="text-[10px] text-ff-muted block mt-1">Requires exact character match</span>
+        </div>
+
+        <!-- Buttons -->
+        <div class="space-y-2">
+          <button id="btn-submit-channel" disabled onclick="submitNewChannel()"
+                  class="w-full py-3 bg-ff-primary/30 text-ff-muted font-bold text-xs rounded-full cursor-not-allowed transition">
+            Add Channel
+          </button>
+          <button onclick="closeAddChannelSheet()" class="w-full py-2 text-xs text-ff-muted hover:text-ff-text">
+            Cancel
+          </button>
+        </div>
+
+      </div>
+    </div>
+
+  </div>
+
+  <!-- JAVASCRIPT LOGIC -->
+  <script>
+    let breaksCount = 4;
+    let breakDuration = 10;
+    let channelCount = 4;
+    const requiredSentence = "I am adding this channel strictly for academic focus and olympiad preparation.";
+
+    function adjustBreaks(delta) {
+      breaksCount = Math.max(0, Math.min(6, breaksCount + delta));
+      document.getElementById('val-breaks').innerText = breaksCount;
+      document.getElementById('btn-dec-breaks').disabled = breaksCount === 0;
+      document.getElementById('btn-inc-breaks').disabled = breaksCount === 6;
+    }
+
+    function adjustDuration(delta) {
+      breakDuration = Math.max(1, Math.min(15, breakDuration + delta));
+      document.getElementById('val-duration').innerText = breakDuration;
+      document.getElementById('btn-dec-duration').disabled = breakDuration === 1;
+      document.getElementById('btn-inc-duration').disabled = breakDuration === 15;
+    }
+
+    function toggleCategory(cat) {
+      const list = document.getElementById('list-cat-' + cat);
+      const icon = document.getElementById('icon-cat-' + cat);
+      if (list.classList.contains('hidden')) {
+        list.classList.remove('hidden');
+        icon.innerText = '▲';
+      } else {
+        list.classList.add('hidden');
+        icon.innerText = '▼';
+      }
+    }
+
+    function setYTMode(mode) {
+      console.log("YouTube mode set to: " + mode);
+    }
+
+    function toggleEmojiSheet(show) {
+      document.getElementById('emoji-sheet').classList.toggle('hidden', !show);
+    }
+
+    function selectEmoji(emoji) {
+      document.getElementById('current-emoji').innerText = emoji;
+      toggleEmojiSheet(false);
+    }
+
+    function toggleWhitelistScreen(show) {
+      document.getElementById('whitelist-screen').classList.toggle('hidden', !show);
+    }
+
+    function openAddChannelSheet() {
+      document.getElementById('add-channel-sheet').classList.remove('hidden');
+      document.getElementById('input-confirmation-sentence').value = '';
+      document.getElementById('input-new-channel-name').value = '';
+      checkFrictionSentence();
+    }
+
+    function closeAddChannelSheet() {
+      document.getElementById('add-channel-sheet').classList.add('hidden');
+    }
+
+    function checkFrictionSentence() {
+      const input = document.getElementById('input-confirmation-sentence').value.trim();
+      const btn = document.getElementById('btn-submit-channel');
+      const status = document.getElementById('sentence-match-status');
+      
+      if (input === requiredSentence) {
+        btn.disabled = false;
+        btn.className = "w-full py-3 bg-ff-primary hover:bg-[#b88c5a] text-ff-bg font-bold text-xs rounded-full cursor-pointer transition shadow-md";
+        status.innerText = "✓ Sentence matched! Ready to add.";
+        status.className = "text-[10px] text-ff-productive font-semibold block mt-1";
+      } else {
+        btn.disabled = true;
+        btn.className = "w-full py-3 bg-ff-primary/30 text-ff-muted font-bold text-xs rounded-full cursor-not-allowed transition";
+        status.innerText = "Requires exact character match (" + input.length + "/" + requiredSentence.length + " chars)";
+        status.className = "text-[10px] text-ff-muted block mt-1";
+      }
+    }
+
+    function submitNewChannel() {
+      const name = document.getElementById('input-new-channel-name').value.trim() || "Physics Galaxy";
+      const list = document.getElementById('channels-list');
+      
+      const newRow = document.createElement('div');
+      newRow.className = "p-3.5 flex items-center justify-between";
+      newRow.innerHTML = `
+        <div class="flex items-center space-x-3">
+          <div class="w-9 h-9 rounded-full bg-ff-bg border border-ff-border flex items-center justify-center font-bold text-xs text-ff-primary">
+            ${name.substring(0, 2).toUpperCase()}
+          </div>
+          <span class="text-xs font-semibold text-ff-text">${name}</span>
+        </div>
+        <button onclick="removeChannel(this)" class="text-ff-muted hover:text-red-400 text-sm px-1">✕</button>
+      `;
+      list.appendChild(newRow);
+
+      channelCount++;
+      updateChannelCounts();
+      closeAddChannelSheet();
+      toggleWhitelistScreen(true);
+    }
+
+    function removeChannel(btn) {
+      btn.parentElement.remove();
+      channelCount--;
+      updateChannelCounts();
+    }
+
+    function updateChannelCounts() {
+      document.getElementById('header-channels-count').innerText = channelCount;
+      document.getElementById('yt-whitelisted-count').innerText = channelCount;
+      document.getElementById('yt-channels-badge').innerText = channelCount;
+    }
+
+    function savePreset() {
+      const name = document.getElementById('input-preset-name').value;
+      const emoji = document.getElementById('current-emoji').innerText;
+      alert(`Preset Saved!\n${emoji} ${name}\nBreaks: ${breaksCount} × ${breakDuration}m\nYouTube Study Channels: ${channelCount}`);
+    }
+  </script>
+</body>
+</html>
