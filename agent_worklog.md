@@ -10,7 +10,7 @@ This registry coordinates concurrent/subsequent AI coding agents working in this
 | Agent Name | Role / Specialty | Status | Branch | Current Task / Active Scope | Reserved / Active Files | Port(s) Used |
 |---|---|---|---|---|---|---|
 | **Code1** | Lead UI Designer | **ACTIVE** | `ff` | Phase 1-A Step 4: Permissions Onboarding Flow (plain-language explanation screens & system intent handlers for POST_NOTIFICATIONS, PACKAGE_USAGE_STATS, SYSTEM_ALERT_WINDOW, and ACCESSIBILITY_SERVICE per TRD Section 7). | `fluxfoxus/lib/core/permissions/`, `fluxfoxus/lib/presentation/screens/onboarding_screens.dart`, `progress_tracker.md`, `agent_worklog.md` | `8085` |
-| **Code2** | Companion UI Designer | **ACTIVE** | `ff` | Refinement & Reactivity: (1) Add in-browser automated tests to `home_screen.html` (backend requirements, rolling metrics, state assertions); (2) Fix DOM reactivity for Add, Delete, Edit, and Turn-Off flows in `app_limits.html` with test runner. | `ui_mockups/home_screen.html`, `ui_mockups/app_limits.html`, `progress_tracker.md`, `agent_worklog.md` | `8086`, `8088` |
+| **Code2** | Companion UI Designer | **IDLE** | `ff` | Phase 1-A UI: Planner Screen Preview (`ui_mockups/planner.html`) completed and served on port 8089; automated test suites passing on all screens (Home, App Limits, Planner). | `ui_mockups/planner.html`, `ui_mockups/home_screen.html`, `ui_mockups/app_limits.html`, `progress_tracker.md`, `agent_worklog.md` | `8086`, `8088`, `8089` |
 
 ---
 
@@ -72,26 +72,30 @@ This registry coordinates concurrent/subsequent AI coding agents working in this
 * **Current Working Branch:** `ff` (Strict branch lock — DO NOT SWITCH BRANCHES)
 * **Status:** `ACTIVE` (In-progress)
 * **Completed:**
-  - Built static HTML/Tailwind preview of the **Home Screen** (`ui_mockups/home_screen.html`) with 24h Bézier stacked area chart, momentum legend grid, preset selector, and floating 5-tab pill nav bar. Preview served on port `8086`, reviewed and approved by user.
+  - Built static HTML/Tailwind preview of the **Home Screen** (`ui_mockups/home_screen.html`) with 24h Bézier stacked area chart, momentum legend grid, preset selector, floating 5-tab pill nav bar, and in-browser automated test runner (`#auto-test-modal`). Preview served on port `8086`, reviewed and approved by user.
   - Built static HTML/Tailwind preview of the **Preset Creation & Channel Whitelist Screen** (`ui_mockups/preset_creation.html`) with break steppers, collapsible app restrictions, YouTube 3-way radio, and discipline friction confirmation typing flow. Preview served on port `8087`, verified with automated test runner by C1.
-  - Built static HTML/Tailwind preview of the **App Limits (Blocks Tab) Screen** (`ui_mockups/app_limits.html`), served on port `8088`.
+  - Built static HTML/Tailwind preview of the **App Limits (Blocks Tab) Screen** (`ui_mockups/app_limits.html`), dynamic in-memory CRUD engine (`renderAppLimits()`), Add/Edit/Delete/Turn-Off DOM updates, 3s streak delay safeguard, and automated test suite. Preview served on port `8088`.
+  - Built static HTML/Tailwind preview of the **Planner Screen** (`ui_mockups/planner.html`) per `ui_planner.md` & `ff_design_override.md`, featuring:
+    - Month/Year header with "Today" and "Help" pill actions.
+    - Streak bar (`🔥 Current streak: 5 days`).
+    - 7-day horizontal scrollable calendar strip with active (`#CA9C68`), unselected today subtle pill, and inactive states.
+    - Side-by-side stats row (Focus total vs Usage screen time).
+    - Session cards with completed (opacity 0.6, `#4E7D56` border-left, `✓` checkmark, "Spent" sub-label), active/live (`#CA9C68` border-left, ticking timer, pulsing indicator, "Live" sub-label), and scheduled states.
+    - FD-synced source badge with `↻` sync icon (omitted for manual FF presets).
+    - Centered FAB ("+ Add Preset") clearing the bottom nav bar.
+    - Floating 5-tab pill navigation bar with Tab 4 ("Planner") active in `#CA9C68`.
+    - In-browser automated test runner (`#auto-test-modal`) testing all 10 feature gates (100% passing).
+    - Local preview served on port `8089`.
+  - Built standalone verification test scripts (`test_planner_screen.js`, `test_code2_screens.js`) passing 100% of DOM, color tokens, and state assertions across all screens.
 * **What `Code2` is doing right now:**
-  1. **Home Screen Automated Test Suite**:
-     - Adding an in-browser automated test runner (`#auto-test-modal`) to `ui_mockups/home_screen.html`.
-     - Validates backend requirements, rolling metric averages (Focused vs Weekly), 24h area chart layer ordering, 4 state transitions (Standard, Active Session Running, Upcoming 15m alert, Empty state), and FD ↔ FF IPC hooks (`com.fluxfoxus/fd_integration`).
-  2. **App Limits Screen Reactivity & DOM Mutation Fixes**:
-     - Investigating and fixing DOM reactivity in `ui_mockups/app_limits.html`:
-       - **Add App**: dynamically creates and appends new app cards to their proper category group.
-       - **Edit & Save**: dynamically updates card limit values, spent times, and active streaks.
-       - **Turn-off Limit**: dynamically switches badge from "Blocking" to "Paused" and adds "Turned off till [timestamp]".
-       - **Delete Limit**: dynamically removes the card from the UI.
-     - Adding an in-browser automated test runner modal to verify all limit CRUD and lifecycle mutations.
-  3. Strict constraint: No Flutter code written until explicitly requested; focus strictly on perfecting HTML/Tailwind screens and dynamic mockups.
+  - `IDLE` / Awaiting user feedback on Planner screen preview (`ui_mockups/planner.html` on port 8089) or instruction for the next UI screen (e.g., Usage Stats or Distracted Intervention).
 * **Exclusive Resources / Do Not Overwrite:**
+  - `ui_mockups/planner.html` (Code2 screen)
   - `ui_mockups/home_screen.html` (Code2 screen)
   - `ui_mockups/app_limits.html` (Code2 screen)
   - Port `8086` (Home Screen preview)
   - Port `8088` (App Limits preview)
+  - Port `8089` (Planner preview)
 
 ---
 

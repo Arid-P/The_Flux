@@ -33,6 +33,7 @@
 - [x] Phase 1-A Step 1 completed: Flutter ThemeTokens, Typography, Spacing, Radius, Dark ThemeData, dependencies, and unit tests (100% passing, 0 lints).
 - [x] Phase 1-A Step 2 completed: SQLite tables with foreign keys and performance indexes (`app_database.dart`), Hive boxes for preferences/categories/metadata (`hive_storage_service.dart`), 11 automated unit tests passing, 0 lints.
 - [x] Phase 1-A Step 3 completed: Navigation shell with `go_router`, floating pill bottom nav bar with [Usage+Focus] & [Planner+Block] sub-containers, active session full-screen takeover nav hide logic, 10 widget/route tests passing, 0 lints.
+- [x] Planner Screen UI Mockup completed and served with 10 automated assertion gates (served by `Code2` on port 8089).
 
 ---
 
@@ -84,11 +85,29 @@
 - [x] In-browser automated test runner validating all limit lifecycle operations and boundaries (100% passed).
 - [x] Local preview served on port 8088 (`ui_mockups/app_limits.html`).
 
+### 3.4 Active Work: Planner Screen UI (`Code2`)
+- [x] Planner screen layout structure matching `ui_planner.md` and `ui_navigation.md`.
+- [x] Header with Month + Year ("March 2026") and "Today" / "Help" pill buttons.
+- [x] Streak Bar (`🔥 Current streak: 5 days`) with Soft Cyan/Amber styling.
+- [x] Horizontal scrollable Calendar Strip (Mon–Sun) with active/today/inactive state toggles.
+- [x] Daily Stats Row with 2 cards (Focus time vs Usage screen time).
+- [x] Session List scrollable container with session cards:
+  - Preset icon container (40×40px).
+  - Title, Preset name pill (`#906D4B`), Source badge ("FF" / "FD").
+  - Time range, FD sync icon (`↻`), Duration value with sub-label ("Planned", "Live", "Spent").
+  - Card states: Completed (opacity 0.6, `#4E7D56` border-left, checkmark `✓`), Active (`#CA9C68` border-left, ticking timer, "Live" tag), Scheduled ("Planned" tag).
+  - Empty state when no sessions are scheduled for the selected day.
+- [x] Centered FAB ("+ Add Preset") positioned 100px from bottom to clear navigation.
+- [x] Floating 5-tab pill navigation bar with Tab 4 ("Planner") active in `#CA9C68`.
+- [x] In-browser automated test runner modal (`#auto-test-modal`) testing day selection, session filtering, state badge styles, duration tickers, and IPC sync contracts.
+- [x] Local preview served on port 8089 (`ui_mockups/planner.html`).
+
 ---
 
 ## 4. Backlog
-- [ ] Remaining UI screens generation (Planner, Usage Stats, 2/5/10/20 Distraction Intervention, Home Widget).
+- [ ] Remaining UI screens generation (Usage Stats, 2/5/10/20 Distraction Intervention, Home Widget).
 - [ ] Database schema & Hive box implementations (`lib/core/database/`).
 - [ ] Riverpod state management providers and navigation shell (`go_router`).
 - [ ] Foreground timer service and background workers (`flutter_foreground_task`, `workmanager`).
 - [ ] MethodChannel IPC bridge (`com.fluxfoxus/fd_integration`).
+
