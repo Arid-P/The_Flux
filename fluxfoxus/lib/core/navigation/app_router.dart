@@ -116,6 +116,11 @@ GoRouter createAppRouter({String initialLocation = AppRoutes.home}) {
       // Permissions Onboarding Flows
       GoRoute(
         parentNavigatorKey: rootNavigatorKey,
+        path: AppRoutes.permissionsOnboarding,
+        builder: (context, state) => const PermissionsOnboardingFlowScreen(),
+      ),
+      GoRoute(
+        parentNavigatorKey: rootNavigatorKey,
         path: AppRoutes.usageStatsPermission,
         builder: (context, state) => const UsageStatsPermissionScreen(),
       ),

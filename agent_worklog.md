@@ -9,7 +9,7 @@ This registry coordinates concurrent/subsequent AI coding agents working in this
 
 | Agent Name | Role / Specialty | Status | Branch | Current Task / Active Scope | Reserved / Active Files | Port(s) Used |
 |---|---|---|---|---|---|---|
-| **Code1** | Lead UI Designer | **ACTIVE** | `ff` | Phase 1-A Step 4: Permissions Onboarding Flow (plain-language explanation screens & system intent handlers for POST_NOTIFICATIONS, PACKAGE_USAGE_STATS, SYSTEM_ALERT_WINDOW, and ACCESSIBILITY_SERVICE per TRD Section 7). | `fluxfoxus/lib/core/permissions/`, `fluxfoxus/lib/presentation/screens/onboarding_screens.dart`, `progress_tracker.md`, `agent_worklog.md` | `8085` |
+| **Code1** | Lead UI Designer | **ACTIVE** | `ff` | Phase 1-B Step 5: Preset System (Presets CRUD in SQLite, interactive creation screen with steppers, emoji selector, category app restrictions, YouTube 3-way radio, and automated field tests per `ui_preset.md`). | `fluxfoxus/lib/features/presets/`, `fluxfoxus/lib/presentation/screens/preset_create_screen.dart`, `progress_tracker.md`, `agent_worklog.md` | `8085` |
 | **Code2** | Companion UI Designer | **IDLE** | `ff` | Phase 1-A UI: Planner Screen Preview (`ui_mockups/planner.html`) completed and served on port 8089; automated test suites passing on all screens (Home, App Limits, Planner). | `ui_mockups/planner.html`, `ui_mockups/home_screen.html`, `ui_mockups/app_limits.html`, `progress_tracker.md`, `agent_worklog.md` | `8086`, `8088`, `8089` |
 
 ---
@@ -48,20 +48,26 @@ This registry coordinates concurrent/subsequent AI coding agents working in this
     - Complete screen widgets with proper semantic structure and Rustic Medley theme integration.
     - 10 automated unit & widget tests in `navigation_test.dart` + root smoke test in `widget_test.dart` (26 tests total passing across all suites).
     - Static analysis: `flutter analyze` 100% clean with 0 issues.
+  - Implemented Phase 1-A Step 4: Permissions Onboarding Flow:
+    - `AppPermission` enum and comprehensive metadata (`PermissionDetails`) per TRD Section 7.
+    - `PermissionService` abstraction and `DefaultPermissionService` with mock override capabilities for hermetic unit testing.
+    - `PermissionsNotifier` and `permissionsStatusProvider` in Riverpod 3.x.
+    - `PermissionsOnboardingFlowScreen`: 4-step first-launch wizard (`POST_NOTIFICATIONS`, `PACKAGE_USAGE_STATS`, `SYSTEM_ALERT_WINDOW`, `ACCESSIBILITY_SERVICE`) with progress indicator, privacy assurance, skip/back/continue actions.
+    - Standalone redirect screens (`UsageStatsPermissionScreen`, `AccessibilityPermissionScreen`) with direct action triggers.
+    - 13 automated unit & widget tests in `permission_service_test.dart` and `onboarding_screens_test.dart` (39 tests total passing across all suites).
+    - Static analysis: `flutter analyze` 100% clean with 0 issues.
 * **What `Code1` is doing right now:**
-  - Implementing Phase 1-A Step 4: Permissions Onboarding Flow:
-    - Service and state management for checking and requesting critical permissions per TRD Section 7:
-      1. `POST_NOTIFICATIONS` (runtime permission)
-      2. `PACKAGE_USAGE_STATS` (system settings redirect)
-      3. `SYSTEM_ALERT_WINDOW` (system settings redirect)
-      4. `ACCESSIBILITY_SERVICE` (accessibility settings redirect)
-    - Interactive plain-language onboarding flow with status tracking.
-    - Unit and widget tests for permission service and onboarding screens.
+  - Implementing Phase 1-B Step 5: Preset System:
+    - Creating Preset data models (`Preset`, `PresetAppRestriction`, `YouTubeMode`) with SQLite serialization/deserialization.
+    - Implementing `PresetsRepository` (CRUD operations on `presets` and `preset_app_restrictions` tables).
+    - Implementing Riverpod providers (`presetsListProvider`, `currentPresetProvider`, `presetControllerProvider`).
+    - Building full Preset Creation screen per `ui_preset.md` (Name input, Emoji selector bottom sheet, Break steppers 0-6 breaks & 1-15m duration, App restrictions with 4 categories, YouTube 3-way radio).
+    - Writing comprehensive automated tests for every field, stepper, and repository operation.
 * **Next Steps for `Code1`:**
-  - Proceed with Phase 1-B Step 5: Preset System (Presets CRUD in SQLite, creation screen with steppers, emoji selector, category app restrictions, YouTube 3-way radio).
+  - Proceed with Phase 1-B Step 6: Focus Timer + Foreground Service.
 * **Exclusive Resources / Do Not Overwrite:**
-  - `fluxfoxus/lib/core/permissions/`
-  - `fluxfoxus/lib/presentation/screens/onboarding_screens.dart`
+  - `fluxfoxus/lib/features/presets/`
+  - `fluxfoxus/lib/presentation/screens/preset_create_screen.dart`
   - `progress_tracker.md` (Update collaboratively)
   - `agent_worklog.md` (Update collaboratively)
   - Port `8085` (Preview server remains up)

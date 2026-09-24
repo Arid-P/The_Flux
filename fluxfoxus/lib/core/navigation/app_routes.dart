@@ -22,6 +22,7 @@ class AppRoutes {
   static String presetChannelsPath(String presetId) => '/planner/preset/$presetId/channels';
 
   // Onboarding & Permissions routes
+  static const String permissionsOnboarding = '/onboarding/permissions';
   static const String usageStatsPermission = '/onboarding/usage_stats_permission';
   static const String accessibilityPermission = '/onboarding/accessibility_permission';
 }
