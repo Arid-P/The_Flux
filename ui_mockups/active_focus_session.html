@@ -1,0 +1,446 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>FluxFoxus — Active Focus Session Preview</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@700&display=swap" rel="stylesheet">
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            'ff-bg': '#13191F',        // River Styx
+            'ff-surface': '#2B2F2E',   // Carbon Fibre
+            'ff-border': '#594C3D',    // Afternoon Tea
+            'ff-accent': '#906D4B',    // Tanned Wood (replaces Soft Cyan)
+            'ff-primary': '#CA9C68',   // Amber Autumn (replaces Electric Indigo)
+            'ff-text': '#F8FAFC',      // Ghost White
+            'ff-muted': '#94A3B8',     // Muted caption
+          },
+          fontFamily: {
+            sans: ['Inter', 'sans-serif'],
+            mono: ['JetBrains Mono', 'monospace'],
+          }
+        }
+      }
+    }
+  </script>
+  <style>
+    body {
+      background-color: #0b0f14;
+      font-family: 'Inter', sans-serif;
+      user-select: none;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    /* Mechanical split line on flip card */
+    .flip-card-seam {
+      position: absolute;
+      left: 0;
+      right: 0;
+      top: 50%;
+      height: 2px;
+      background-color: #CA9C68;
+      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.7);
+      z-index: 20;
+    }
+
+    /* Card hinge notches */
+    .hinge-notch-left, .hinge-notch-right {
+      position: absolute;
+      top: 50%;
+      width: 7px;
+      height: 14px;
+      transform: translateY(-50%);
+      background-color: #13191F;
+      z-index: 25;
+      border: 1px solid #594C3D;
+    }
+    .hinge-notch-left {
+      left: -1px;
+      border-left: none;
+      border-radius: 0 5px 5px 0;
+    }
+    .hinge-notch-right {
+      right: -1px;
+      border-right: none;
+      border-radius: 5px 0 0 5px;
+    }
+
+    /* Flip animation keyframes */
+    @keyframes flipDown {
+      0% {
+        transform: rotateX(0deg);
+      }
+      50% {
+        transform: rotateX(-90deg);
+        background-color: #242827;
+      }
+      100% {
+        transform: rotateX(0deg);
+      }
+    }
+
+    .animate-flip {
+      animation: flipDown 0.35s ease-in-out;
+    }
+
+    /* Shading overlay for upper and lower flip halves */
+    .half-card-top {
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 50%;
+      background: linear-gradient(180deg, rgba(255,255,255,0.02) 0%, rgba(0,0,0,0.18) 100%);
+      border-top-left-radius: 16px;
+      border-top-right-radius: 16px;
+      pointer-events: none;
+    }
+
+    .half-card-bottom {
+      position: absolute;
+      top: 50%;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: linear-gradient(180deg, rgba(0,0,0,0.18) 0%, rgba(255,255,255,0.02) 100%);
+      border-bottom-left-radius: 16px;
+      border-bottom-right-radius: 16px;
+      pointer-events: none;
+    }
+  </style>
+</head>
+<body class="min-h-screen flex flex-col items-center justify-center p-4 text-ff-text">
+
+  <!-- TOP TOOLBAR CONTROLS (Preview Controller) -->
+  <div class="mb-6 flex flex-wrap items-center justify-center gap-2 bg-[#182028] border border-ff-border px-4 py-2.5 rounded-2xl shadow-xl max-w-xl text-xs">
+    <span class="text-ff-primary font-bold tracking-wide uppercase text-[11px] mr-2">Preview Controls:</span>
+    <button onclick="setMode('focus')" id="btn-mode-focus" class="px-3 py-1.5 rounded-lg bg-ff-primary text-ff-bg font-bold transition">
+      Focus Mode
+    </button>
+    <button onclick="setMode('break')" id="btn-mode-break" class="px-3 py-1.5 rounded-lg bg-ff-surface text-ff-text border border-ff-border font-medium hover:border-ff-accent transition">
+      Break Window
+    </button>
+    <button onclick="toggleStopModal(true)" class="px-3 py-1.5 rounded-lg bg-ff-surface text-ff-text border border-ff-border font-medium hover:border-ff-primary transition">
+      Trigger Stop Modal
+    </button>
+    <button onclick="triggerFlipAnimation()" class="px-3 py-1.5 rounded-lg bg-ff-surface text-ff-accent border border-ff-border font-medium hover:bg-ff-surface/80 transition">
+      ↻ Test Flip
+    </button>
+  </div>
+
+  <!-- PHONE CONTAINER SIMULATOR -->
+  <div class="relative w-[380px] h-[800px] bg-ff-bg rounded-[44px] border-[3px] border-ff-border shadow-2xl overflow-hidden flex flex-col justify-between p-6">
+    
+    <!-- ANDROID STATUS BAR -->
+    <div class="w-full flex items-center justify-between text-[11px] text-ff-muted font-medium pt-1 px-1">
+      <span id="system-time">09:42</span>
+      <div class="flex items-center space-x-1.5">
+        <svg class="w-3.5 h-3.5 fill-current" viewBox="0 0 24 24"><path d="M12 4C7.31 4 3.07 5.9 0 8.98L12 21 24 8.98C20.93 5.9 16.69 4 12 4z"/></svg>
+        <svg class="w-3.5 h-3.5 fill-current" viewBox="0 0 24 24"><path d="M2 22h20V2z"/></svg>
+        <div class="w-4 h-2.5 border border-ff-muted rounded-[2px] p-[1px] flex items-center">
+          <div class="h-full w-3/4 bg-ff-muted rounded-[1px]"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 1.3 HEADER ROW -->
+    <div class="w-full flex items-center justify-between mt-4">
+      <!-- Left: Preset Name Pill -->
+      <div id="preset-pill" class="flex items-center space-x-2 bg-ff-primary px-3.5 py-1.5 rounded-full transition-colors duration-300">
+        <span class="text-xs">⚡</span>
+        <span id="preset-name" class="text-xs font-semibold text-ff-bg tracking-tight">Math Olympiad</span>
+      </div>
+
+      <!-- Right: Session Info / Break Mode Label -->
+      <div class="text-right">
+        <div id="session-status-badge" class="hidden text-sm font-extrabold text-ff-accent tracking-wider">
+          BREAK
+        </div>
+        <div id="session-time-range" class="text-xs text-ff-muted font-medium tracking-tight">
+          09:00 PM - 12:00 AM
+        </div>
+      </div>
+    </div>
+
+    <!-- 1.4 MAIN DISPLAY: MECHANICAL FLIP CLOCK -->
+    <div class="flex-1 flex flex-col items-center justify-center space-y-4 my-auto">
+      
+      <!-- TOP CARD: HOURS -->
+      <div id="card-hours" class="relative w-[280px] h-[190px] bg-ff-surface rounded-2xl border border-ff-border flex items-center justify-center shadow-lg transition-all duration-300">
+        <!-- Mechanical Split Seam -->
+        <div class="flip-card-seam"></div>
+        <div class="hinge-notch-left"></div>
+        <div class="hinge-notch-right"></div>
+        
+        <!-- Subtle Top/Bottom Realistic Shadowing -->
+        <div class="half-card-top"></div>
+        <div class="half-card-bottom"></div>
+
+        <!-- Digit Display -->
+        <span id="hours-display" class="font-mono text-7xl font-bold tracking-tight text-ff-text transition-colors duration-300 z-10 select-none">
+          02
+        </span>
+
+        <!-- Sub-Label: HOURS -->
+        <span class="absolute bottom-2.5 right-3.5 text-[10px] font-bold tracking-widest text-ff-muted uppercase select-none z-10">
+          HOURS
+        </span>
+      </div>
+
+      <!-- BOTTOM CARD: MINUTES -->
+      <div id="card-minutes" class="relative w-[280px] h-[190px] bg-ff-surface rounded-2xl border border-ff-border flex items-center justify-center shadow-lg transition-all duration-300">
+        <!-- Mechanical Split Seam -->
+        <div class="flip-card-seam"></div>
+        <div class="hinge-notch-left"></div>
+        <div class="hinge-notch-right"></div>
+
+        <!-- Subtle Top/Bottom Realistic Shadowing -->
+        <div class="half-card-top"></div>
+        <div class="half-card-bottom"></div>
+
+        <!-- Digit Display -->
+        <span id="minutes-display" class="font-mono text-7xl font-bold tracking-tight text-ff-text transition-colors duration-300 z-10 select-none">
+          45
+        </span>
+
+        <!-- Sub-Label: MINUTES -->
+        <span class="absolute bottom-2.5 right-3.5 text-[10px] font-bold tracking-widest text-ff-muted uppercase select-none z-10">
+          MINUTES
+        </span>
+      </div>
+
+      <!-- TIMER MODE INDICATOR SUB-BAR -->
+      <div class="flex items-center space-x-2 text-xs text-ff-muted/80 pt-1">
+        <span class="w-1.5 h-1.5 rounded-full bg-ff-primary animate-pulse"></span>
+        <span id="timer-mode-label" class="tracking-wide uppercase text-[10px] font-semibold">Countdown Active</span>
+      </div>
+
+    </div>
+
+    <!-- 1.5 BOTTOM CONTROLS BAR -->
+    <div class="w-full flex items-center justify-between gap-3 mb-3">
+      
+      <!-- Left (~50% width): Stop Focusing Button -->
+      <button onclick="toggleStopModal(true)" 
+              class="flex-1 py-3.5 px-4 bg-ff-primary hover:bg-[#b88c5a] text-ff-bg font-semibold rounded-full text-center transition-all duration-200 active:scale-95 shadow-md flex items-center justify-center">
+        <span class="text-xs uppercase tracking-wider font-bold">Stop Focusing</span>
+      </button>
+
+      <!-- Center: Break Pill -->
+      <button id="btn-break-control" onclick="toggleBreakState()"
+              class="px-5 py-3 rounded-full border border-ff-accent hover:bg-ff-accent/15 text-ff-text font-semibold text-xs tracking-wide transition-all duration-200 active:scale-95 flex items-center justify-center">
+        <span>Break</span>
+      </button>
+
+      <!-- Right: Pause / Play Circle -->
+      <button id="btn-pause-play" onclick="togglePausePlay()"
+              class="w-[52px] h-[52px] rounded-full bg-ff-primary hover:bg-[#b88c5a] text-ff-bg flex items-center justify-center transition-all duration-200 active:scale-95 shadow-md shrink-0">
+        <!-- Pause Icon Default -->
+        <svg id="icon-pause" class="w-5 h-5 fill-current" viewBox="0 0 24 24">
+          <path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z"/>
+        </svg>
+        <!-- Play Icon Hidden -->
+        <svg id="icon-play" class="w-5 h-5 fill-current hidden ml-0.5" viewBox="0 0 24 24">
+          <path d="M8 5v14l11-7z"/>
+        </svg>
+      </button>
+
+    </div>
+
+    <!-- HOME BAR INDICATOR (Android Pill) -->
+    <div class="w-28 h-1 bg-ff-muted/30 rounded-full mx-auto mt-1"></div>
+
+    <!-- 3. STOP FOCUSING MODAL OVERLAY (Initially Hidden) -->
+    <div id="stop-modal" class="absolute inset-0 bg-black/80 backdrop-blur-sm z-50 flex items-center justify-center p-6 hidden">
+      <div class="w-full bg-ff-surface border border-ff-border rounded-3xl p-6 shadow-2xl flex flex-col text-center space-y-4">
+        
+        <!-- Warning Icon & Title -->
+        <div class="w-12 h-12 rounded-full bg-ff-accent/20 border border-ff-accent flex items-center justify-center mx-auto text-ff-accent">
+          <svg class="w-6 h-6 fill-current" viewBox="0 0 24 24"><path d="M1 21h22L12 2 1 21zm12-3h-2v-2h2v2zm0-4h-2v-4h2v4z"/></svg>
+        </div>
+
+        <div>
+          <h3 class="text-base font-bold text-ff-text">Leaving Focus Session?</h3>
+          <p class="text-xs text-ff-muted mt-1 leading-relaxed">
+            Your <span class="text-ff-primary font-bold">47-day streak</span> will reset to 0 if you quit now.
+          </p>
+        </div>
+
+        <!-- Formula Wait Time Indicator -->
+        <div class="bg-ff-bg/60 border border-ff-border rounded-xl p-3 text-xs text-ff-muted">
+          <span class="block text-[10px] uppercase font-bold tracking-widest text-ff-accent mb-0.5">Discipline Delay</span>
+          Buttons unlock in <span id="modal-timer" class="font-mono font-bold text-ff-text text-sm">18s</span>
+        </div>
+
+        <!-- Action Buttons (Locked during formula wait time) -->
+        <div class="space-y-2.5 pt-2">
+          <!-- Quit Session Button -->
+          <button id="btn-quit-session" disabled 
+                  class="w-full py-3 rounded-full text-xs font-bold tracking-wide transition-all duration-300 bg-ff-bg/40 text-ff-muted border border-ff-border cursor-not-allowed">
+            Quit Session (<span id="btn-quit-timer">18s</span>)
+          </button>
+
+          <!-- Keep Going Button -->
+          <button id="btn-keep-going" onclick="toggleStopModal(false)"
+                  class="w-full py-3 rounded-full text-xs font-bold tracking-wide transition-all duration-300 bg-ff-primary text-ff-bg hover:bg-[#b88c5a]">
+            Keep Going
+          </button>
+        </div>
+
+      </div>
+    </div>
+
+  </div>
+
+  <!-- JAVASCRIPT STATE CONTROLLER -->
+  <script>
+    let currentMode = 'focus'; // 'focus' or 'break'
+    let isPaused = false;
+    let countdownInterval;
+    let modalCountdown = 18;
+    let modalTimerInterval;
+
+    function setMode(mode) {
+      currentMode = mode;
+      const hoursDisplay = document.getElementById('hours-display');
+      const minutesDisplay = document.getElementById('minutes-display');
+      const sessionBadge = document.getElementById('session-status-badge');
+      const timerLabel = document.getElementById('timer-mode-label');
+      const presetPill = document.getElementById('preset-pill');
+      const presetName = document.getElementById('preset-name');
+      const btnBreak = document.getElementById('btn-break-control');
+
+      const btnFocus = document.getElementById('btn-mode-focus');
+      const btnBreakMode = document.getElementById('btn-mode-break');
+
+      if (mode === 'break') {
+        // Break Mode Styling per spec: Cyan replaced with #906D4B (Tanned Wood)
+        hoursDisplay.classList.remove('text-ff-text');
+        hoursDisplay.classList.add('text-ff-accent');
+
+        minutesDisplay.classList.remove('text-ff-text');
+        minutesDisplay.classList.add('text-ff-accent');
+
+        sessionBadge.classList.remove('hidden');
+        timerLabel.innerText = "Break Time (05:00)";
+        timerLabel.classList.add('text-ff-accent');
+
+        hoursDisplay.innerText = "00";
+        minutesDisplay.innerText = "05";
+
+        btnBreak.innerHTML = "<span>End Break</span>";
+        btnBreak.classList.add('bg-ff-accent', 'text-ff-bg');
+        btnBreak.classList.remove('text-ff-text');
+
+        // Toolbar styling
+        btnBreakMode.classList.remove('bg-ff-surface', 'text-ff-text');
+        btnBreakMode.classList.add('bg-ff-accent', 'text-ff-bg');
+        btnFocus.classList.remove('bg-ff-primary', 'text-ff-bg');
+        btnFocus.classList.add('bg-ff-surface', 'text-ff-text');
+      } else {
+        // Focus Mode: Ghost White (#F8FAFC) digits, Amber Autumn (#CA9C68) primary
+        hoursDisplay.classList.remove('text-ff-accent');
+        hoursDisplay.classList.add('text-ff-text');
+
+        minutesDisplay.classList.remove('text-ff-accent');
+        minutesDisplay.classList.add('text-ff-text');
+
+        sessionBadge.classList.add('hidden');
+        timerLabel.innerText = "Countdown Active";
+        timerLabel.classList.remove('text-ff-accent');
+
+        hoursDisplay.innerText = "02";
+        minutesDisplay.innerText = "45";
+
+        btnBreak.innerHTML = "<span>Break</span>";
+        btnBreak.classList.remove('bg-ff-accent', 'text-ff-bg');
+        btnBreak.classList.add('text-ff-text');
+
+        // Toolbar styling
+        btnFocus.classList.add('bg-ff-primary', 'text-ff-bg');
+        btnFocus.classList.remove('bg-ff-surface', 'text-ff-text');
+        btnBreakMode.classList.add('bg-ff-surface', 'text-ff-text');
+        btnBreakMode.classList.remove('bg-ff-accent', 'text-ff-bg');
+      }
+    }
+
+    function toggleBreakState() {
+      if (currentMode === 'focus') {
+        setMode('break');
+      } else {
+        setMode('focus');
+      }
+    }
+
+    function togglePausePlay() {
+      isPaused = !isPaused;
+      const iconPause = document.getElementById('icon-pause');
+      const iconPlay = document.getElementById('icon-play');
+      const timerLabel = document.getElementById('timer-mode-label');
+
+      if (isPaused) {
+        iconPause.classList.add('hidden');
+        iconPlay.classList.remove('hidden');
+        timerLabel.innerText = "Session Paused";
+      } else {
+        iconPause.classList.remove('hidden');
+        iconPlay.classList.add('hidden');
+        timerLabel.innerText = currentMode === 'break' ? "Break Time (05:00)" : "Countdown Active";
+      }
+    }
+
+    function triggerFlipAnimation() {
+      const cardHours = document.getElementById('card-hours');
+      const cardMinutes = document.getElementById('card-minutes');
+
+      cardHours.classList.add('animate-flip');
+      cardMinutes.classList.add('animate-flip');
+
+      setTimeout(() => {
+        cardHours.classList.remove('animate-flip');
+        cardMinutes.classList.remove('animate-flip');
+      }, 350);
+    }
+
+    function toggleStopModal(show) {
+      const modal = document.getElementById('stop-modal');
+      const quitBtn = document.getElementById('btn-quit-session');
+      const timerSpan = document.getElementById('modal-timer');
+      const btnTimerSpan = document.getElementById('btn-quit-timer');
+
+      if (show) {
+        modal.classList.remove('hidden');
+        modalCountdown = 18;
+        quitBtn.disabled = true;
+        quitBtn.classList.remove('bg-red-900/60', 'text-red-200', 'border-red-700', 'cursor-pointer');
+        quitBtn.classList.add('bg-ff-bg/40', 'text-ff-muted', 'border-ff-border', 'cursor-not-allowed');
+
+        clearInterval(modalTimerInterval);
+        modalTimerInterval = setInterval(() => {
+          modalCountdown--;
+          if (modalCountdown <= 0) {
+            clearInterval(modalTimerInterval);
+            timerSpan.innerText = "Unlocked";
+            btnTimerSpan.innerText = "Ready";
+            quitBtn.disabled = false;
+            quitBtn.classList.remove('bg-ff-bg/40', 'text-ff-muted', 'border-ff-border', 'cursor-not-allowed');
+            quitBtn.classList.add('bg-[#752a26]', 'text-ff-text', 'border-[#a8322d]', 'cursor-pointer', 'hover:bg-[#8f322d]');
+          } else {
+            timerSpan.innerText = modalCountdown + 's';
+            btnTimerSpan.innerText = modalCountdown + 's';
+          }
+        }, 1000);
+      } else {
+        modal.classList.add('hidden');
+        clearInterval(modalTimerInterval);
+      }
+    }
+  </script>
+</body>
+</html>

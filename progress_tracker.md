@@ -26,15 +26,16 @@
 ---
 
 ## 3. Active Work: Focus Session UI (Stitch / Tailwind Preview)
-- [ ] Active Focus Session screen layout structure.
-- [ ] Split-line mechanical flip-clock (HH:MM cards with horizontal split seam).
-- [ ] Header status bar: preset name pill, time range / break status.
-- [ ] Bottom controls:
+- [x] Active Focus Session screen layout structure.
+- [x] Split-line mechanical flip-clock (HH:MM cards with horizontal split seam in `#CA9C68`).
+- [x] Header status bar: preset name pill (`#CA9C68`), time range / break status (`#906D4B`).
+- [x] Bottom controls:
   - Stop Focusing button (`#CA9C68` primary pill)
   - Break button (`#906D4B` secondary outline)
-  - Pause / Play action button
-- [ ] Strict Rustic Medley color mapping (`#13191F` background, `#2B2F2E` cards, `#594C3D` borders, `#906D4B` accent, `#CA9C68` primary, `#F8FAFC` text).
-- [ ] Local preview / artifact generation for review.
+  - Pause / Play circular action button (`#CA9C68`)
+- [x] Strict Rustic Medley color mapping (`#13191F` background, `#2B2F2E` cards, `#594C3D` borders, `#906D4B` accent, `#CA9C68` primary, `#F8FAFC` text).
+- [x] Interactive Stop Focusing modal with discipline delay countdown & streak warning.
+- [x] Local preview served on port 8085 (`ui_mockups/active_focus_session.html`) awaiting approval.
 
 ---
 
