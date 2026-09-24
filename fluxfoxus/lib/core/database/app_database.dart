@@ -7,23 +7,30 @@ class AppDatabase {
   static const String _databaseName = 'fluxfoxus.db';
   static const int _databaseVersion = 1;
 
-  Database? _db;
+  final Database? db;
+  final DatabaseFactory? factory;
+  Database? _openedDb;
+
+  AppDatabase({this.db, this.factory});
 
   /// Returns the active SQLite database instance. Initializes if needed.
   Future<Database> get database async {
-    if (_db != null && _db!.isOpen) {
-      return _db!;
+    if (db != null && db!.isOpen) {
+      return db!;
     }
-    _db = await initDatabase();
-    return _db!;
+    if (_openedDb != null && _openedDb!.isOpen) {
+      return _openedDb!;
+    }
+    _openedDb = await initDatabase(factory: factory);
+    return _openedDb!;
   }
 
   /// Initializes database from given custom path or default platform path.
   Future<Database> initDatabase({String? customPath, DatabaseFactory? factory}) async {
+    final dbFactory = factory ?? this.factory ?? databaseFactory;
     final String dbPath = customPath ?? join(await getDatabasesPath(), _databaseName);
-    final dbFactory = factory ?? databaseFactory;
 
-    return await dbFactory.openDatabase(
+    final db = await dbFactory.openDatabase(
       dbPath,
       options: OpenDatabaseOptions(
         version: _databaseVersion,
@@ -39,6 +46,8 @@ class AppDatabase {
         },
       ),
     );
+    _openedDb = db;
+    return db;
   }
 
   /// Creates all 6 core tables and performance indexes.
@@ -64,9 +73,9 @@ class AppDatabase {
 
   /// Closes database connection.
   Future<void> close() async {
-    if (_db != null && _db!.isOpen) {
-      await _db!.close();
-      _db = null;
+    if (_openedDb != null && _openedDb!.isOpen) {
+      await _openedDb!.close();
+      _openedDb = null;
     }
   }
 }

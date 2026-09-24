@@ -132,7 +132,7 @@ void main() {
       expect(find.text('New Preset'), findsOneWidget);
 
       // Can pop back to Planner
-      await tester.tap(find.byIcon(Icons.arrow_back));
+      await tester.tap(find.byKey(const Key('close_preset_button')));
       await tester.pumpAndSettle();
 
       expect(find.byType(PlannerScreen), findsOneWidget);
