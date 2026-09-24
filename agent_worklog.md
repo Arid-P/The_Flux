@@ -9,7 +9,7 @@ This registry coordinates concurrent/subsequent AI coding agents working in this
 
 | Agent Name | Role / Specialty | Status | Branch | Current Task / Active Scope | Reserved / Active Files | Port(s) Used |
 |---|---|---|---|---|---|---|
-| **Code1** | Lead UI Designer | **ACTIVE** | `ff` | Phase 1-A Foundation: Dependencies configuration & Flutter Design System / ThemeTokens implementation (`fluxfoxus/lib/core/theme/`) enforcing Rustic Medley palette. | `fluxfoxus/lib/core/theme/`, `fluxfoxus/pubspec.yaml`, `progress_tracker.md`, `agent_worklog.md` | `8085` |
+| **Code1** | Lead UI Designer | **ACTIVE** | `ff` | Completed Phase 1-A Step 1 (ThemeTokens, Design System, & Dependencies). Next: Step 2 (Database & Hive + DI). | `fluxfoxus/lib/core/`, `progress_tracker.md`, `agent_worklog.md` | `8085` |
 | **Code2** | Companion UI Designer | **ACTIVE** | `ff` | Generating and serving Home Screen UI preview (`ui_home.md` + `ui_navigation.md` + `ff_design_override.md`) with floating nav bar & momentum chart. | `ui_mockups/home_screen.html`, `progress_tracker.md`, `agent_worklog.md` | `8086` |
 
 ---
@@ -24,17 +24,22 @@ This registry coordinates concurrent/subsequent AI coding agents working in this
 * **Completed:**
   - Built static HTML/Tailwind preview of the **Active Focus Session Screen** (`ui_mockups/active_focus_session.html`) with split-line mechanical flip-clock, bottom controls, and Rustic Medley palette override.
   - Preview reviewed and approved by user.
-* **What `Code1` is doing right now:**
-  1. Updating and configuring remaining dependencies in `fluxfoxus/pubspec.yaml` and Android build parameters (`minSdkVersion 26`, `targetSdkVersion 34`).
-  2. Implementing the Flutter Design System in `fluxfoxus/lib/core/theme/`:
-     - `app_colors.dart` / `theme_tokens.dart` (Rustic Medley: `#13191F`, `#2B2F2E`, `#594C3D`, `#906D4B`, `#CA9C68`, `#F8FAFC`, `#94A3B8`).
-     - `app_typography.dart` (Inter typography scales from `type_display` to `type_micro`).
-     - `app_spacing.dart` & `app_radius.dart`.
-     - `app_theme.dart` (Dark-only `ThemeData`).
+  - Added and resolved all Flutter dependencies in `fluxfoxus/pubspec.yaml` (runtime + dev).
+  - Configured Android `minSdkVersion = 26` and `targetSdkVersion = 34` in `android/app/build.gradle.kts`.
+  - Implemented the complete Flutter Design System & ThemeTokens in `fluxfoxus/lib/core/theme/`:
+    - `theme_tokens.dart` (Rustic Medley: `#13191F`, `#2B2F2E`, `#594C3D`, `#906D4B`, `#CA9C68`, `#F8FAFC`, `#94A3B8`).
+    - `app_typography.dart` (Inter typography scales from `type_display` to `type_micro`).
+    - `app_spacing.dart` (4px base grid).
+    - `app_radius.dart` (Corner radiuses).
+    - `app_theme.dart` (Dark-only `ThemeData`, flat 2D zero-elevation).
+    - `theme.dart` (Barrel export).
+  - Configured `fluxfoxus/lib/main.dart` with `ProviderScope` and `AppTheme.darkTheme`.
+  - Added unit test suite `test/core/theme/theme_tokens_test.dart` (5 tests passing, `flutter analyze` 100% clean).
 * **Next Steps for `Code1`:**
-  - Proceed with Step 2 (Database & Hive initialization) and Step 3 (Navigation Shell with `go_router`).
+  - Proceed with Phase 1-A Step 2: Database (SQLite schema for presets, sessions, streaks, limits) + Hive preferences/cache boxes.
+  - Proceed with Phase 1-A Step 3: Navigation Shell with `go_router` and 5-tab floating bar.
 * **Exclusive Resources / Do Not Overwrite:**
-  - `fluxfoxus/lib/core/theme/`
+  - `fluxfoxus/lib/core/`
   - `fluxfoxus/pubspec.yaml`
   - `progress_tracker.md` (Update collaboratively)
   - `agent_worklog.md` (Update collaboratively)

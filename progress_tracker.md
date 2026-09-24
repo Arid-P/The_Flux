@@ -12,8 +12,9 @@
 |---|---|---|
 | **Project Setup and Skill Initialization** | Completed | Flutter project initialized, dependencies configured, developer skills and base configs setup. |
 | **Active Focus Session UI Design & Preview** | Completed | Static HTML/Tailwind mockup (`ui_mockups/active_focus_session.html`) adhering strictly to Rustic Medley palette reviewed and approved by user. |
-| **Phase 1-A Step 1: Design Tokens & Theme** | In Progress | Implementing Flutter `ThemeTokens`, `AppColors`, typography scales, and dark-only `ThemeData` in `fluxfoxus/lib/core/theme/`. |
-| **Remaining UI and Backend Implementation** | Backlog | Complete UI screens, Riverpod state management, SQLite + Hive persistence, Background services, and MethodChannel IPC bridge. |
+| **Phase 1-A Step 1: Design Tokens & Theme** | Completed | Flutter `ThemeTokens`, `AppTypography`, `AppSpacing`, `AppRadius`, `AppTheme.darkTheme` implemented; all dependencies resolved; Android minSdk 26/targetSdk 34 configured. |
+| **Phase 1-A Step 2: Database & Hive Persistence** | Next Up | SQLite tables (presets, sessions, streaks, limits) + Hive preferences/metadata boxes. |
+| **Remaining UI and Backend Implementation** | Backlog | Complete UI screens, Riverpod state management, Background services, and MethodChannel IPC bridge. |
 
 ---
 
@@ -25,6 +26,7 @@
 - [x] Skills setup and configuration registered.
 - [x] Active Focus Session UI Mockup approved by user (served by `Code1` on port 8085).
 - [x] Home Screen UI Mockup completed and served (`Code2` on port 8086).
+- [x] Phase 1-A Step 1 completed: Flutter ThemeTokens, Typography, Spacing, Radius, Dark ThemeData, dependencies, and unit tests (100% passing, 0 lints).
 
 ---
 
