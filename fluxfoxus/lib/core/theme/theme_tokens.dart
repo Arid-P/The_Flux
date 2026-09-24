@@ -60,4 +60,13 @@ class ThemeTokens {
 
   /// Others category (Neutral Slate Grey)
   static const Color categoryOthers = Color(0xFF94A3B8);
+
+  // ---------------------------------------------------------------------------
+  // Radius Constants
+  // ---------------------------------------------------------------------------
+  static const double radiusSm = 4.0;
+  static const double radiusMd = 8.0;
+  static const double radiusLg = 12.0;
+  static const double radiusXl = 16.0;
+  static const double radiusPill = 28.0;
 }

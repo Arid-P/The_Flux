@@ -14,7 +14,8 @@
 | **Active Focus Session UI Design & Preview** | Completed | Static HTML/Tailwind mockup (`ui_mockups/active_focus_session.html`) adhering strictly to Rustic Medley palette reviewed and approved by user. |
 | **Phase 1-A Step 1: Design Tokens & Theme** | Completed | Flutter `ThemeTokens`, `AppTypography`, `AppSpacing`, `AppRadius`, `AppTheme.darkTheme` implemented; all dependencies resolved; Android minSdk 26/targetSdk 34 configured. |
 | **Phase 1-A Step 2: Database & Hive Persistence** | Completed | SQLite tables (`presets`, `preset_app_restrictions`, `focus_sessions`, `app_limits`, `streak_records`, `study_channels`) with cascade foreign keys & indexes; Hive boxes (`preferences`, `app_categories`, `app_metadata`); 11 unit tests passing, 0 lints. |
-| **Phase 1-A Step 3: Navigation Shell** | In Progress | Implementing `go_router` declarative routes matching TRD Section 6 and floating 5-tab pill nav bar matching `ui_navigation.md`. |
+| **Phase 1-A Step 3: Navigation Shell** | Completed | `go_router` declarative routes per TRD Section 6; 5-tab floating pill bar per `ui_navigation.md` with [Usage+Focus] and [Planner+Block] group pills; full-screen takeover hide logic; 10 unit/widget tests passing, 0 lints. |
+| **Phase 1-A Step 4: Permissions Onboarding Flow** | In Progress | Plain-language explanation screens and intent redirect bridges for POST_NOTIFICATIONS, PACKAGE_USAGE_STATS, SYSTEM_ALERT_WINDOW, and ACCESSIBILITY_SERVICE. |
 | **Remaining UI and Backend Implementation** | Backlog | Complete UI screens, Riverpod state management, Background services, and MethodChannel IPC bridge. |
 
 ---
@@ -31,6 +32,7 @@
 - [x] App Limits (Blocks Tab) UI Mockup completed and served (served by `Code2` on port 8088).
 - [x] Phase 1-A Step 1 completed: Flutter ThemeTokens, Typography, Spacing, Radius, Dark ThemeData, dependencies, and unit tests (100% passing, 0 lints).
 - [x] Phase 1-A Step 2 completed: SQLite tables with foreign keys and performance indexes (`app_database.dart`), Hive boxes for preferences/categories/metadata (`hive_storage_service.dart`), 11 automated unit tests passing, 0 lints.
+- [x] Phase 1-A Step 3 completed: Navigation shell with `go_router`, floating pill bottom nav bar with [Usage+Focus] & [Planner+Block] sub-containers, active session full-screen takeover nav hide logic, 10 widget/route tests passing, 0 lints.
 
 ---
 

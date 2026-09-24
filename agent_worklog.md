@@ -9,7 +9,7 @@ This registry coordinates concurrent/subsequent AI coding agents working in this
 
 | Agent Name | Role / Specialty | Status | Branch | Current Task / Active Scope | Reserved / Active Files | Port(s) Used |
 |---|---|---|---|---|---|---|
-| **Code1** | Lead UI Designer | **ACTIVE** | `ff` | Phase 1-A Step 3: Navigation Shell (`go_router` routes per TRD Section 6, floating 5-tab pill navigation bar per `ui_navigation.md`, sub-container tab grouping, automated navigation tests). | `fluxfoxus/lib/core/navigation/`, `progress_tracker.md`, `agent_worklog.md` | `8085` |
+| **Code1** | Lead UI Designer | **ACTIVE** | `ff` | Phase 1-A Step 4: Permissions Onboarding Flow (plain-language explanation screens & system intent handlers for POST_NOTIFICATIONS, PACKAGE_USAGE_STATS, SYSTEM_ALERT_WINDOW, and ACCESSIBILITY_SERVICE per TRD Section 7). | `fluxfoxus/lib/core/permissions/`, `fluxfoxus/lib/presentation/screens/onboarding_screens.dart`, `progress_tracker.md`, `agent_worklog.md` | `8085` |
 | **Code2** | Companion UI Designer | **ACTIVE** | `ff` | Refinement & Reactivity: (1) Add in-browser automated tests to `home_screen.html` (backend requirements, rolling metrics, state assertions); (2) Fix DOM reactivity for Add, Delete, Edit, and Turn-Off flows in `app_limits.html` with test runner. | `ui_mockups/home_screen.html`, `ui_mockups/app_limits.html`, `progress_tracker.md`, `agent_worklog.md` | `8086`, `8088` |
 
 ---
@@ -39,19 +39,29 @@ This registry coordinates concurrent/subsequent AI coding agents working in this
     - SQLite schema & tables (`presets`, `preset_app_restrictions`, `focus_sessions`, `app_limits`, `streak_records`, `study_channels`) with foreign key cascade delete and performance indexes (`app_database.dart`, `database_tables.dart`).
     - Hive storage service (`hive_storage_service.dart`) with boxes for `preferences`, `app_categories`, and `app_metadata`.
     - Automated unit tests (`app_database_test.dart`, `hive_storage_service_test.dart`) — 11 tests passing, 0 lints.
+  - Implemented Phase 1-A Step 3: Navigation Shell:
+    - `go_router` declarative routes per TRD Section 6 (`/`, `/usage`, `/focus`, `/focus/session`, `/planner`, `/planner/preset/create`, `/planner/preset/:id/edit`, `/planner/preset/:id/channels`, `/blocks`, and permission onboarding routes).
+    - Floating 5-tab pill navigation bar matching `ui_navigation.md` and Rustic Medley tokens (`#2B2F2E` surface, `#594C3D` border, `#CA9C68` active primary, `#94A3B8` inactive muted, 28px pill radius, 16px margins).
+    - Visual sub-container pill grouping for [Usage + Focus] and [Planner + Block], Home standalone.
+    - Full-screen takeover behavior: bottom navigation bar is automatically hidden on `/focus/session` and restored upon returning to Home.
+    - Custom camera aperture icon (`ApertureIcon`) for FF brand tab.
+    - Complete screen widgets with proper semantic structure and Rustic Medley theme integration.
+    - 10 automated unit & widget tests in `navigation_test.dart` + root smoke test in `widget_test.dart` (26 tests total passing across all suites).
+    - Static analysis: `flutter analyze` 100% clean with 0 issues.
 * **What `Code1` is doing right now:**
-  - Implementing Phase 1-A Step 3: Navigation Shell:
-    - `go_router` declarative routes per TRD Section 6 (`/`, `/usage`, `/focus`, `/focus/session`, `/planner`, `/planner/preset/create`, `/planner/preset/:id/edit`, `/planner/preset/:id/channels`, `/blocks`).
-    - Floating pill bottom navigation bar per `ui_navigation.md`:
-      - 5 tabs: Home, Usage, Focus, Planner, Block
-      - Sub-container pill groups: [Usage + Focus] and [Planner + Block], Home standalone
-      - Full-screen takeover: nav bar hidden on `/focus/session`
-      - Rustic Medley tokens: surface `#2B2F2E`, border `#594C3D`, active `#CA9C68`, inactive `#94A3B8`/`#F8FAFC`.
-    - Automated tests for router configurations and navigation bar widget interactions.
+  - Implementing Phase 1-A Step 4: Permissions Onboarding Flow:
+    - Service and state management for checking and requesting critical permissions per TRD Section 7:
+      1. `POST_NOTIFICATIONS` (runtime permission)
+      2. `PACKAGE_USAGE_STATS` (system settings redirect)
+      3. `SYSTEM_ALERT_WINDOW` (system settings redirect)
+      4. `ACCESSIBILITY_SERVICE` (accessibility settings redirect)
+    - Interactive plain-language onboarding flow with status tracking.
+    - Unit and widget tests for permission service and onboarding screens.
 * **Next Steps for `Code1`:**
-  - Proceed with Phase 1-A Step 4: Permissions Onboarding Flow.
+  - Proceed with Phase 1-B Step 5: Preset System (Presets CRUD in SQLite, creation screen with steppers, emoji selector, category app restrictions, YouTube 3-way radio).
 * **Exclusive Resources / Do Not Overwrite:**
-  - `fluxfoxus/lib/core/navigation/`
+  - `fluxfoxus/lib/core/permissions/`
+  - `fluxfoxus/lib/presentation/screens/onboarding_screens.dart`
   - `progress_tracker.md` (Update collaboratively)
   - `agent_worklog.md` (Update collaboratively)
   - Port `8085` (Preview server remains up)
@@ -85,7 +95,7 @@ This registry coordinates concurrent/subsequent AI coding agents working in this
 
 ---
 
-## 3. Protocol for Other Agents (e.g. `Code2`, `Backend1`, etc.)
+## 3. Protocol for EVERY Agents (e.g. `Code1`, `Backend1`, `Code2` etc.)
 
 1. **Check this Registry:** Read `agent_worklog.md` before claiming or executing any task.
 2. **Register Your Agent:** Add a row to the table in Section 1 with your assigned name, role, status (`ACTIVE`), and target scope.
