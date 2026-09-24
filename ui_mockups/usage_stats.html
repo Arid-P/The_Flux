@@ -78,7 +78,7 @@
       <div class="flex items-center space-x-1.5">
         <button onclick="switchTab('today')" class="px-2.5 py-0.5 rounded-lg bg-ff-primary/20 text-ff-primary border border-ff-primary/40 font-mono text-[10px]">Today</button>
         <button onclick="switchTab('daily')" class="px-2.5 py-0.5 rounded-lg bg-ff-bg hover:border-ff-border border border-transparent text-ff-text font-mono text-[10px]">Daily (Week)</button>
-        <button onclick="switchTab('weekly')" class="px-2.5 py-0.5 rounded-lg bg-ff-bg hover:border-ff-border border border-transparent text-ff-text font-mono text-[10px]">Weekly (5 Wks)</button>
+        <button onclick="switchTab('weekly')" class="px-2.5 py-0.5 rounded-lg bg-ff-bg hover:border-ff-border border border-transparent text-ff-text font-mono text-[10px]">Weekly (7 Wks)</button>
       </div>
     </div>
   </div>
@@ -192,22 +192,22 @@
           <div class="relative w-full h-[180px] flex items-center justify-center">
             <svg class="w-full h-full" viewBox="0 0 320 180" preserveAspectRatio="none">
               <defs>
-                <!-- Area Gradients -->
+                <!-- Area Gradients (Vivid / High Contrast) -->
                 <linearGradient id="grad-productive" x1="0" y1="0" x2="0" y2="1">
-                  <stop offset="0%" stop-color="#4E7D56" stop-opacity="0.85"/>
-                  <stop offset="100%" stop-color="#4E7D56" stop-opacity="0.3"/>
+                  <stop offset="0%" stop-color="#58A366" stop-opacity="0.95"/>
+                  <stop offset="100%" stop-color="#4E7D56" stop-opacity="0.55"/>
                 </linearGradient>
                 <linearGradient id="grad-semi" x1="0" y1="0" x2="0" y2="1">
-                  <stop offset="0%" stop-color="#906D4B" stop-opacity="0.85"/>
-                  <stop offset="100%" stop-color="#906D4B" stop-opacity="0.3"/>
+                  <stop offset="0%" stop-color="#B88856" stop-opacity="0.95"/>
+                  <stop offset="100%" stop-color="#906D4B" stop-opacity="0.50"/>
                 </linearGradient>
                 <linearGradient id="grad-distracting" x1="0" y1="0" x2="0" y2="1">
-                  <stop offset="0%" stop-color="#38332B" stop-opacity="0.85"/>
-                  <stop offset="100%" stop-color="#38332B" stop-opacity="0.4"/>
+                  <stop offset="0%" stop-color="#C27838" stop-opacity="0.95"/>
+                  <stop offset="100%" stop-color="#C27838" stop-opacity="0.50"/>
                 </linearGradient>
                 <linearGradient id="grad-others" x1="0" y1="0" x2="0" y2="1">
-                  <stop offset="0%" stop-color="#64748B" stop-opacity="0.8"/>
-                  <stop offset="100%" stop-color="#64748B" stop-opacity="0.25"/>
+                  <stop offset="0%" stop-color="#7E8F9F" stop-opacity="0.90"/>
+                  <stop offset="100%" stop-color="#64748B" stop-opacity="0.45"/>
                 </linearGradient>
               </defs>
 
@@ -217,16 +217,20 @@
               <line x1="0" y1="128" x2="320" y2="128" stroke="#594C3D" stroke-opacity="0.25" stroke-dasharray="3 3"/>
 
               <!-- Layer 4: Others (Topmost Area) -->
-              <path class="chart-path" d="M 0 170 Q 50 145, 100 115 T 200 65 T 320 40 L 320 170 L 0 170 Z" fill="url(#grad-others)"/>
+              <path class="chart-path" d="M 0 170 Q 50 145, 100 115 T 200 65 T 320 40 L 320 170 L 0 170 Z" fill="url(#grad-others)" stroke="#7E8F9F" stroke-width="1.5" stroke-linejoin="round"/>
+              <path d="M 0 170 Q 50 145, 100 115 T 200 65 T 320 40" fill="none" stroke="#7E8F9F" stroke-width="2" stroke-linecap="round"/>
 
               <!-- Layer 3: Distracting Area -->
-              <path class="chart-path" d="M 0 170 Q 50 152, 100 125 T 200 85 T 320 62 L 320 170 L 0 170 Z" fill="url(#grad-distracting)"/>
+              <path class="chart-path" d="M 0 170 Q 50 152, 100 125 T 200 85 T 320 62 L 320 170 L 0 170 Z" fill="url(#grad-distracting)" stroke="#C27838" stroke-width="1.5" stroke-linejoin="round"/>
+              <path d="M 0 170 Q 50 152, 100 125 T 200 85 T 320 62" fill="none" stroke="#C27838" stroke-width="2" stroke-linecap="round"/>
 
               <!-- Layer 2: Semi-Productive Area -->
-              <path class="chart-path" d="M 0 170 Q 50 158, 100 142 T 200 112 T 320 95 L 320 170 L 0 170 Z" fill="url(#grad-semi)"/>
+              <path class="chart-path" d="M 0 170 Q 50 158, 100 142 T 200 112 T 320 95 L 320 170 L 0 170 Z" fill="url(#grad-semi)" stroke="#B88856" stroke-width="1.5" stroke-linejoin="round"/>
+              <path d="M 0 170 Q 50 158, 100 142 T 200 112 T 320 95" fill="none" stroke="#B88856" stroke-width="2" stroke-linecap="round"/>
 
               <!-- Layer 1: Productive Area (Bottommost) -->
-              <path class="chart-path" d="M 0 170 Q 50 164, 100 155 T 200 138 T 320 128 L 320 170 L 0 170 Z" fill="url(#grad-productive)"/>
+              <path class="chart-path" d="M 0 170 Q 50 164, 100 155 T 200 138 T 320 128 L 320 170 L 0 170 Z" fill="url(#grad-productive)" stroke="#58A366" stroke-width="1.5" stroke-linejoin="round"/>
+              <path d="M 0 170 Q 50 164, 100 155 T 200 138 T 320 128" fill="none" stroke="#58A366" stroke-width="2" stroke-linecap="round"/>
 
               <!-- Bottom Axis Line -->
               <line x1="0" y1="170" x2="320" y2="170" stroke="#594C3D" stroke-width="1.5"/>
@@ -263,7 +267,7 @@
           </div>
         </div>
 
-        <!-- VIEW C: WEEKLY 5-WEEK STACKED BAR CHART (Section 7.1) -->
+        <!-- VIEW C: WEEKLY 7-WEEK STACKED BAR CHART (Section 7.1) -->
         <div id="view-chart-weekly" class="hidden w-full flex flex-col space-y-1">
           <div class="relative w-full h-[180px] flex items-end justify-between px-2 pt-2">
             <div class="w-full h-full flex items-end justify-between pb-6" id="weekly-bars-container">
@@ -271,7 +275,7 @@
             </div>
           </div>
           <div class="text-[9px] text-ff-muted text-center italic">
-            Displaying the 5 most recent rolling weeks
+            Displaying the 7 most recent rolling weeks
           </div>
         </div>
 
@@ -638,6 +642,8 @@
           { label: 'Mar 9',  total: '32h 20m', prodH: 38, semiH: 25, distH: 42, othH: 15 },
           { label: 'Mar 16', total: '29h 00m', prodH: 44, semiH: 20, distH: 32, othH: 14 },
           { label: 'Mar 23', total: '31h 15m', prodH: 48, semiH: 22, distH: 30, othH: 16 },
+          { label: 'Mar 30', total: '30h 05m', prodH: 45, semiH: 21, distH: 33, othH: 15 },
+          { label: 'Apr 6',  total: '32h 10m', prodH: 46, semiH: 23, distH: 35, othH: 16 },
         ],
         apps: [
           { id: 'app-vscode', name: 'VS Code', emoji: '💻', category: 'productive', time: '7h 45m', minutes: 465, limit: 'No Limit' },
@@ -694,7 +700,7 @@
         renderDailyBars();
         updateDailySelection(selectedDailyDayIndex);
       } else if (tabKey === 'weekly') {
-        subTitle.innerText = "5-Week Rolling";
+        subTitle.innerText = "7-Week Rolling";
         mainTitle.innerText = "Weekly Totals";
         totalBadge.innerText = `${USAGE_DATA.weekly.total} Total`;
         renderWeeklyBars();
@@ -731,11 +737,11 @@
         col.className = 'flex flex-col items-center justify-end h-full flex-1 mx-1 cursor-pointer group';
 
         // Stacking layers: Productive (bottom) -> Semi -> Distracting -> Others (top)
-        // If selected: vibrant category colors. If not selected: dark greyscale per spec
-        const prodColor = isSelected ? 'bg-ff-productive' : 'bg-[#2A342B]';
-        const semiColor = isSelected ? 'bg-ff-semi' : 'bg-[#3A3228]';
-        const distColor = isSelected ? 'bg-[#40382E] border border-ff-border/50' : 'bg-[#222729]';
-        const othColor = isSelected ? 'bg-ff-others' : 'bg-[#1C2024]';
+        // If selected: VIVID vibrant category colors. If not selected: structured greyscale
+        const prodColor = isSelected ? 'bg-[#58A366]' : 'bg-[#2A342B]';
+        const semiColor = isSelected ? 'bg-[#B88856]' : 'bg-[#3A3228]';
+        const distColor = isSelected ? 'bg-[#C27838]' : 'bg-[#2E2A24]';
+        const othColor = isSelected ? 'bg-[#7E8F9F]' : 'bg-[#252A2E]';
 
         col.innerHTML = `
           <div class="w-full rounded-t-md overflow-hidden flex flex-col justify-end transition-all ${isSelected ? 'ring-2 ring-ff-primary ring-offset-1 ring-offset-ff-bg' : 'opacity-70 group-hover:opacity-100'}">
@@ -779,7 +785,7 @@
     }
 
     // -------------------------------------------------------------------------
-    // 4. Weekly 5-Week Multi-Week Stacked Bar Chart
+    // 4. Weekly 7-Week Multi-Week Stacked Bar Chart
     // -------------------------------------------------------------------------
     function renderWeeklyBars() {
       const container = document.getElementById('weekly-bars-container');
@@ -788,15 +794,15 @@
 
       USAGE_DATA.weekly.weeks.forEach(w => {
         const col = document.createElement('div');
-        col.className = 'flex flex-col items-center justify-end h-full flex-1 mx-1.5';
+        col.className = 'flex flex-col items-center justify-end h-full flex-1 mx-0.5';
         col.innerHTML = `
           <div class="w-full rounded-t-md overflow-hidden flex flex-col justify-end shadow-md">
-            <div style="height: ${w.othH}px" class="bg-ff-others w-full"></div>
-            <div style="height: ${w.distH}px" class="bg-[#38332B] border-t border-ff-border/50 w-full"></div>
-            <div style="height: ${w.semiH}px" class="bg-ff-semi w-full"></div>
-            <div style="height: ${w.prodH}px" class="bg-ff-productive w-full"></div>
+            <div style="height: ${w.othH}px" class="bg-[#7E8F9F] w-full"></div>
+            <div style="height: ${w.distH}px" class="bg-[#C27838] w-full"></div>
+            <div style="height: ${w.semiH}px" class="bg-[#B88856] w-full"></div>
+            <div style="height: ${w.prodH}px" class="bg-[#58A366] w-full"></div>
           </div>
-          <span class="text-[9px] mt-1.5 text-ff-muted font-medium whitespace-nowrap">
+          <span class="text-[8px] mt-1 text-ff-muted font-medium whitespace-nowrap">
             ${w.label}
           </span>
         `;
@@ -994,14 +1000,14 @@
           }
         },
         {
-          name: "6. Weekly 5-Week Multi-Week Chart Rendering",
+          name: "6. Weekly 7-Week Multi-Week Chart Rendering",
           run: () => {
             switchTab('weekly');
             const weeklyContainer = document.getElementById('weekly-bars-container');
-            if (!weeklyContainer || weeklyContainer.children.length !== 5) {
-              throw new Error(`Expected 5 multi-week bars, found ${weeklyContainer ? weeklyContainer.children.length : 0}`);
+            if (!weeklyContainer || weeklyContainer.children.length !== 7) {
+              throw new Error(`Expected 7 multi-week bars, found ${weeklyContainer ? weeklyContainer.children.length : 0}`);
             }
-            return "5 most recent rolling weeks render with full category colors and week-of dates";
+            return "7 most recent rolling weeks render with vivid category colors and week-of dates";
           }
         },
         {

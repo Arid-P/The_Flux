@@ -10,7 +10,7 @@ This registry coordinates concurrent/subsequent AI coding agents working in this
 | Agent Name | Role / Specialty | Status | Branch | Current Task / Active Scope | Reserved / Active Files | Port(s) Used |
 |---|---|---|---|---|---|---|
 | **Code1** | Lead UI Designer | **ACTIVE** | `ff` | Phase 1-B Step 5: Preset System (Presets CRUD in SQLite, interactive creation screen with steppers, emoji selector, category app restrictions, YouTube 3-way radio, and automated field tests per `ui_preset.md`). | `fluxfoxus/lib/features/presets/`, `fluxfoxus/lib/presentation/screens/preset_create_screen.dart`, `progress_tracker.md`, `agent_worklog.md` | `8085` |
-| **Code2** | Companion UI Designer | **IDLE** | `ff` | Phase 1-A UI: Usage Stats Screen Preview (`ui_mockups/usage_stats.html`) completed and served on port 8090; 10 automated test gates passing. All 5 primary tab screens now built and interlinked. | `ui_mockups/usage_stats.html`, `ui_mockups/planner.html`, `ui_mockups/home_screen.html`, `ui_mockups/app_limits.html`, `progress_tracker.md`, `agent_worklog.md` | `8086`, `8088`, `8089`, `8090` |
+| **Code2** | Companion UI Designer | **ACTIVE** | `ff` | Phase 1-A UI: Usage Stats visual refinement — vivid chart colors (Today Bézier strokes, Daily bar vividness, Weekly 7-bar horizon). All 10 automated test gates passing. | `ui_mockups/usage_stats.html`, `ui_mockups/planner.html`, `ui_mockups/home_screen.html`, `ui_mockups/app_limits.html`, `progress_tracker.md`, `agent_worklog.md` | `8086`, `8088`, `8089`, `8090` |
 
 ---
 

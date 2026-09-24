@@ -62,7 +62,7 @@ const testNames = [
   "3. Today Bézier Smooth Area Chart Layers",
   "4. 2×2 Legend Grid with Category Tokens",
   "5. Daily 7-Day Stacked Bar Chart & Selection Logic",
-  "6. Weekly 5-Week Multi-Week Chart Rendering",
+  "6. Weekly 7-Week Multi-Week Chart Rendering",
   "7. Sunday In-App Weekly Summary Card",
   "8. Live Search Bar Dynamic App Filtering",
   "9. App Detail Bottom Sheet with Limit Integration",

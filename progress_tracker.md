@@ -110,7 +110,7 @@
 - [x] 3-Tab Selector ("Today" | "Daily" | "Weekly") with text labels and Amber Autumn (`#CA9C68`) underline indicator.
 - [x] Today Tab: 24-hour smooth Bézier stacked area chart (~200px) with 6am, 12pm, 6pm, 12am X-axis labels and horizontal reference lines.
 - [x] Daily Tab: 7-day stacked bar chart (Mon–Sun) with interactive bar selection (selected day fully colored, others in greyscale).
-- [x] Weekly Tab: 5-week stacked bar chart with full category colors + Sunday In-App Weekly Summary Card (streak, total focused, delta comparison, max/min focus days, summary text, dismissible).
+- [x] Weekly Tab: 7-week stacked bar chart with vivid category colors (`#58A366`, `#B88856`, `#C27838`, `#7E8F9F`) + Sunday In-App Weekly Summary Card (streak, total focused, delta comparison, max/min focus days, summary text, dismissible).
 - [x] 2×2 Category Legend Grid with dividers (Productive `#4E7D56`, Semi-Productive `#906D4B`, Distracting `#38332B`, Others `#94A3B8`).
 - [x] App Section (All Tabs): Search bar with dynamic text filtering, app item rows (40×40 icon, app name, category pill, time spent), sorted descending by time, with interactive App Detail bottom sheet.
 - [x] Floating 5-tab pill navigation bar with Tab 2 (**Usage**) active in `#CA9C68`.
