@@ -13,7 +13,8 @@
 | **Project Setup and Skill Initialization** | Completed | Flutter project initialized, dependencies configured, developer skills and base configs setup. |
 | **Active Focus Session UI Design & Preview** | Completed | Static HTML/Tailwind mockup (`ui_mockups/active_focus_session.html`) adhering strictly to Rustic Medley palette reviewed and approved by user. |
 | **Phase 1-A Step 1: Design Tokens & Theme** | Completed | Flutter `ThemeTokens`, `AppTypography`, `AppSpacing`, `AppRadius`, `AppTheme.darkTheme` implemented; all dependencies resolved; Android minSdk 26/targetSdk 34 configured. |
-| **Phase 1-A Step 2: Database & Hive Persistence** | Next Up | SQLite tables (presets, sessions, streaks, limits) + Hive preferences/metadata boxes. |
+| **Phase 1-A Step 2: Database & Hive Persistence** | Completed | SQLite tables (`presets`, `preset_app_restrictions`, `focus_sessions`, `app_limits`, `streak_records`, `study_channels`) with cascade foreign keys & indexes; Hive boxes (`preferences`, `app_categories`, `app_metadata`); 11 unit tests passing, 0 lints. |
+| **Phase 1-A Step 3: Navigation Shell** | In Progress | Implementing `go_router` declarative routes matching TRD Section 6 and floating 5-tab pill nav bar matching `ui_navigation.md`. |
 | **Remaining UI and Backend Implementation** | Backlog | Complete UI screens, Riverpod state management, Background services, and MethodChannel IPC bridge. |
 
 ---
@@ -26,9 +27,10 @@
 - [x] Skills setup and configuration registered.
 - [x] Active Focus Session UI Mockup approved by user (served by `Code1` on port 8085).
 - [x] Home Screen UI Mockup approved by user (served by `Code2` on port 8086).
-- [x] Preset Creation & Channel Whitelist UI Mockup completed and verified (served by `Code2` on port 8087).
+- [x] Preset Creation & Channel Whitelist UI Mockup approved by user with dynamic category app count bug fixed and 12 automated field tests passing (served on port 8087).
 - [x] App Limits (Blocks Tab) UI Mockup completed and served (served by `Code2` on port 8088).
 - [x] Phase 1-A Step 1 completed: Flutter ThemeTokens, Typography, Spacing, Radius, Dark ThemeData, dependencies, and unit tests (100% passing, 0 lints).
+- [x] Phase 1-A Step 2 completed: SQLite tables with foreign keys and performance indexes (`app_database.dart`), Hive boxes for preferences/categories/metadata (`hive_storage_service.dart`), 11 automated unit tests passing, 0 lints.
 
 ---
 
@@ -53,8 +55,9 @@
 - [x] Floating pill bottom navigation bar with 5 grouped tabs.
 - [x] State switcher (Standard, Active Session Running, Upcoming 15m alert, Empty state).
 - [x] Local preview served on port 8086 (`ui_mockups/home_screen.html`), reviewed and approved by user.
+- [ ] In-browser automated test suite validating rolling weekly metrics, area chart layer ordering, state transitions, and IPC sync requirements.
 
-### 3.2 Active Work: Preset Creation & YouTube Whitelist Screen (`Code2`)
+### 3.2 Active Work: Preset Creation & YouTube Whitelist Screen (`Code1`)
 - [x] Preset Creation full-screen flow layout (`ui_preset.md`).
 - [x] Preset Name input with tappable Emoji selector button.
 - [x] Break Configuration 2-card grid with steppers (breaks 0–6, duration 1–15m).
@@ -63,7 +66,7 @@
 - [x] Description card with auto-styled textarea.
 - [x] Sticky bottom "Save Preset" pill button (`#CA9C68`).
 - [x] Interactive Emoji Picker sheet & Study Mode Channel Whitelist sheet with friction confirmation sentence flow.
-- [x] Local preview served on port 8087 (`ui_mockups/preset_creation.html`).
+- [x] Automated test suite & dynamic counting bugfix verified (served on port 8087).
 
 ### 3.3 Active Work: App Limits Screen (`Code2`)
 - [x] Blocks tab layout structure matching `ui_app_limits.md` and `ui_navigation.md`.
@@ -75,6 +78,8 @@
 - [x] Primary Save button in Ghost White (`#F8FAFC`) per spec exception.
 - [x] Turn-off flow: streak warning sheet (`🔥` to `🌧️`) with 3-second delay button and duration picker sheet.
 - [x] Add App sheet with search and quick-add actions.
+- [ ] Fix DOM reactivity: dynamic card insertion on Add, instant removal on Delete, status switch from Blocking to Paused on Turn-Off, and time limit text update on Save.
+- [ ] In-browser automated test runner validating all limit lifecycle operations.
 - [x] Local preview served on port 8088 (`ui_mockups/app_limits.html`).
 
 ---

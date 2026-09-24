@@ -9,8 +9,8 @@ This registry coordinates concurrent/subsequent AI coding agents working in this
 
 | Agent Name | Role / Specialty | Status | Branch | Current Task / Active Scope | Reserved / Active Files | Port(s) Used |
 |---|---|---|---|---|---|---|
-| **Code1** | Lead UI Designer | **ACTIVE** | `ff` | Completed Phase 1-A Step 1 (ThemeTokens, Design System, & Dependencies). Next: Step 2 (Database & Hive + DI). | `fluxfoxus/lib/core/`, `progress_tracker.md`, `agent_worklog.md` | `8085` |
-| **Code2** | Companion UI Designer | **ACTIVE** | `ff` | Generating and serving App Limits (Blocks Tab) UI preview (`ui_app_limits.md` + `ff_design_override.md`) with time picker, extra time steppers, and turn-off countdown flow. | `ui_mockups/app_limits.html`, `progress_tracker.md`, `agent_worklog.md` | `8086`, `8087`, `8088` |
+| **Code1** | Lead UI Designer | **ACTIVE** | `ff` | Phase 1-A Step 3: Navigation Shell (`go_router` routes per TRD Section 6, floating 5-tab pill navigation bar per `ui_navigation.md`, sub-container tab grouping, automated navigation tests). | `fluxfoxus/lib/core/navigation/`, `progress_tracker.md`, `agent_worklog.md` | `8085` |
+| **Code2** | Companion UI Designer | **ACTIVE** | `ff` | Refinement & Reactivity: (1) Add in-browser automated tests to `home_screen.html` (backend requirements, rolling metrics, state assertions); (2) Fix DOM reactivity for Add, Delete, Edit, and Turn-Off flows in `app_limits.html` with test runner. | `ui_mockups/home_screen.html`, `ui_mockups/app_limits.html`, `progress_tracker.md`, `agent_worklog.md` | `8086`, `8088` |
 
 ---
 
@@ -35,12 +35,23 @@ This registry coordinates concurrent/subsequent AI coding agents working in this
     - `theme.dart` (Barrel export).
   - Configured `fluxfoxus/lib/main.dart` with `ProviderScope` and `AppTheme.darkTheme`.
   - Added unit test suite `test/core/theme/theme_tokens_test.dart` (5 tests passing, `flutter analyze` 100% clean).
+  - Implemented Phase 1-A Step 2: Database & Storage:
+    - SQLite schema & tables (`presets`, `preset_app_restrictions`, `focus_sessions`, `app_limits`, `streak_records`, `study_channels`) with foreign key cascade delete and performance indexes (`app_database.dart`, `database_tables.dart`).
+    - Hive storage service (`hive_storage_service.dart`) with boxes for `preferences`, `app_categories`, and `app_metadata`.
+    - Automated unit tests (`app_database_test.dart`, `hive_storage_service_test.dart`) — 11 tests passing, 0 lints.
+* **What `Code1` is doing right now:**
+  - Implementing Phase 1-A Step 3: Navigation Shell:
+    - `go_router` declarative routes per TRD Section 6 (`/`, `/usage`, `/focus`, `/focus/session`, `/planner`, `/planner/preset/create`, `/planner/preset/:id/edit`, `/planner/preset/:id/channels`, `/blocks`).
+    - Floating pill bottom navigation bar per `ui_navigation.md`:
+      - 5 tabs: Home, Usage, Focus, Planner, Block
+      - Sub-container pill groups: [Usage + Focus] and [Planner + Block], Home standalone
+      - Full-screen takeover: nav bar hidden on `/focus/session`
+      - Rustic Medley tokens: surface `#2B2F2E`, border `#594C3D`, active `#CA9C68`, inactive `#94A3B8`/`#F8FAFC`.
+    - Automated tests for router configurations and navigation bar widget interactions.
 * **Next Steps for `Code1`:**
-  - Proceed with Phase 1-A Step 2: Database (SQLite schema for presets, sessions, streaks, limits) + Hive preferences/cache boxes.
-  - Proceed with Phase 1-A Step 3: Navigation Shell with `go_router` and 5-tab floating bar.
+  - Proceed with Phase 1-A Step 4: Permissions Onboarding Flow.
 * **Exclusive Resources / Do Not Overwrite:**
-  - `fluxfoxus/lib/core/`
-  - `fluxfoxus/pubspec.yaml`
+  - `fluxfoxus/lib/core/navigation/`
   - `progress_tracker.md` (Update collaboratively)
   - `agent_worklog.md` (Update collaboratively)
   - Port `8085` (Preview server remains up)
@@ -52,32 +63,24 @@ This registry coordinates concurrent/subsequent AI coding agents working in this
 * **Status:** `ACTIVE` (In-progress)
 * **Completed:**
   - Built static HTML/Tailwind preview of the **Home Screen** (`ui_mockups/home_screen.html`) with 24h Bézier stacked area chart, momentum legend grid, preset selector, and floating 5-tab pill nav bar. Preview served on port `8086`, reviewed and approved by user.
-  - Built static HTML/Tailwind preview of the **Preset Creation & Channel Whitelist Screen** (`ui_mockups/preset_creation.html`) with break steppers, collapsible app restrictions, YouTube 3-way radio, and discipline friction confirmation typing flow. Preview served on port `8087`.
+  - Built static HTML/Tailwind preview of the **Preset Creation & Channel Whitelist Screen** (`ui_mockups/preset_creation.html`) with break steppers, collapsible app restrictions, YouTube 3-way radio, and discipline friction confirmation typing flow. Preview served on port `8087`, verified with automated test runner by C1.
+  - Built static HTML/Tailwind preview of the **App Limits (Blocks Tab) Screen** (`ui_mockups/app_limits.html`), served on port `8088`.
 * **What `Code2` is doing right now:**
-  1. Generating static HTML/Tailwind preview of the **App Limits (Blocks Tab) Screen** (`ui_mockups/app_limits.html`) adhering strictly to `ui_app_limits.md` and `ff_design_override.md`.
-  2. Features:
-     - Header: "Blocks" with "Help" surface pill
-     - Section Header: "App Limits" with "+ Add App" action in `#14B8A6`
-     - Category Groups (Distracting, Semi-Productive, Others) with individual app cards
-     - App Cards: icon, name, "[X]m spent / [Y]m limit", chevron, status pills ("Blocking" with teal dot, "Paused" with sub-caption)
-     - Interactive App Settings Bottom Sheet:
-       - Header: App icon, title, streak badge (`🔥 12 days`), close button
-       - Dual Column Time Picker (Hours 0–6, Minutes 0–55 in 5m increments) with range enforcement
-       - Suggestion Bar: `💡 Suggested limit is 1h 30m based on your average usage`
-       - Extra Time Sessions Section: Steppers (0–6 sessions), chips ("5m", "10m", "15m"), total extra time indicator with >60m warning
-       - Primary Save button: Ghost White background `#F8FAFC` (intentional spec exception)
-       - Destructive Turn Off Block button
-     - Turn Off Block Flow:
-       - Streak warning sheet with 3-second countdown delay button
-       - Turn off duration sheet ("Rest of the day", "Till tomorrow", "7 days")
-     - Floating bottom navigation bar (Blocks tab active)
-  3. Serving the preview on port `8088`.
+  1. **Home Screen Automated Test Suite**:
+     - Adding an in-browser automated test runner (`#auto-test-modal`) to `ui_mockups/home_screen.html`.
+     - Validates backend requirements, rolling metric averages (Focused vs Weekly), 24h area chart layer ordering, 4 state transitions (Standard, Active Session Running, Upcoming 15m alert, Empty state), and FD ↔ FF IPC hooks (`com.fluxfoxus/fd_integration`).
+  2. **App Limits Screen Reactivity & DOM Mutation Fixes**:
+     - Investigating and fixing DOM reactivity in `ui_mockups/app_limits.html`:
+       - **Add App**: dynamically creates and appends new app cards to their proper category group.
+       - **Edit & Save**: dynamically updates card limit values, spent times, and active streaks.
+       - **Turn-off Limit**: dynamically switches badge from "Blocking" to "Paused" and adds "Turned off till [timestamp]".
+       - **Delete Limit**: dynamically removes the card from the UI.
+     - Adding an in-browser automated test runner modal to verify all limit CRUD and lifecycle mutations.
+  3. Strict constraint: No Flutter code written until explicitly requested; focus strictly on perfecting HTML/Tailwind screens and dynamic mockups.
 * **Exclusive Resources / Do Not Overwrite:**
-  - `ui_mockups/home_screen.html`
-  - `ui_mockups/preset_creation.html`
-  - `ui_mockups/app_limits.html`
+  - `ui_mockups/home_screen.html` (Code2 screen)
+  - `ui_mockups/app_limits.html` (Code2 screen)
   - Port `8086` (Home Screen preview)
-  - Port `8087` (Preset Creation preview)
   - Port `8088` (App Limits preview)
 
 ---
