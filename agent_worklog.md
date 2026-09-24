@@ -112,3 +112,7 @@ This registry coordinates concurrent/subsequent AI coding agents working in this
 3. **Branch Invariant:** **STAY ON BRANCH `ff`**. Do NOT switch to `main`, `fd`, or any other branch under any circumstances.
 4. **Coordinate File Access:** If you are working on the Flutter app backend, SQLite/Hive storage, or other feature specs, make sure not to overwrite files claimed by other active agents.
 5. **Update Upon Completion:** When your task is finished, update your status to `IDLE` or `COMPLETED`.
+6. **Mandatory Review Summary Section:** Whenever presenting any completed task/screen to the user for review, every agent (both `Code1` and `Code2`) must generate their response as usual, but **MUST ALSO append a standardized 'Review Summary' section at the end** that explicitly and clearly details:
+   - **What exactly the user has to review:** The specific buttons, interactive flows, modals, and test runners to click and test.
+   - **What the user is going to review:** The screens, URLs, ports, responsive states, transitions, and visual theme tokens being observed.
+   - **What exactly it is:** The architectural context, specification references (e.g. TRD/PRD sections), IPC bridge contracts, and UX purpose within FluxFoxus.

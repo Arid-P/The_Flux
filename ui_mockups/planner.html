@@ -371,7 +371,7 @@
         </div>
 
         <div class="pt-2 border-t border-ff-border/50 flex space-x-2">
-          <a href="preset_creation.html" class="flex-1 py-2.5 rounded-xl bg-ff-primary text-ff-bg text-center font-bold text-xs hover:bg-[#b88c5a] transition">
+          <a href="preset_creation.html?returnUrl=planner.html" class="flex-1 py-2.5 rounded-xl bg-ff-primary text-ff-bg text-center font-bold text-xs hover:bg-[#b88c5a] transition">
             Create New Preset
           </a>
           <button onclick="toggleFabModal(false)" class="px-4 py-2.5 rounded-xl bg-ff-bg border border-ff-border text-ff-muted text-xs hover:text-ff-text">
@@ -1059,6 +1059,35 @@
       renderCalendarStrip();
       renderSessionsForSelectedDay();
       startLiveTicker();
+
+      // Check if returning from newly saved preset in preset_creation.html
+      try {
+        const lastSaved = sessionStorage.getItem('ff_last_saved_preset');
+        if (lastSaved) {
+          sessionStorage.removeItem('ff_last_saved_preset');
+          const preset = JSON.parse(lastSaved);
+          if (SESSIONS_BY_DAY['Wed']) {
+            SESSIONS_BY_DAY['Wed'].sessions.push({
+              id: `s-custom-${Date.now()}`,
+              title: `${preset.name} Session`,
+              presetName: preset.name,
+              emoji: preset.emoji || '⚡',
+              source: 'FF',
+              timeRange: '5:30 pm - 6:30 pm',
+              state: 'scheduled',
+              durationText: '1h 00m',
+              subLabel: 'Planned'
+            });
+            // Ensure Wednesday is selected and re-render
+            selectedDayAbbr = 'Wed';
+            renderCalendarStrip();
+            renderSessionsForSelectedDay();
+          }
+          setTimeout(() => {
+            showToast(`Preset "${preset.name}" saved & added to schedule! 🎉`);
+          }, 400);
+        }
+      } catch (e) {}
     });
   </script>
 
