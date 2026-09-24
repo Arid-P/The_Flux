@@ -10,7 +10,7 @@ This registry coordinates concurrent/subsequent AI coding agents working in this
 | Agent Name | Role / Specialty | Status | Branch | Current Task / Active Scope | Reserved / Active Files | Port(s) Used |
 |---|---|---|---|---|---|---|
 | **Code1** | Lead UI Designer | **ACTIVE** | `ff` | Completed Phase 1-A Step 1 (ThemeTokens, Design System, & Dependencies). Next: Step 2 (Database & Hive + DI). | `fluxfoxus/lib/core/`, `progress_tracker.md`, `agent_worklog.md` | `8085` |
-| **Code2** | Companion UI Designer | **ACTIVE** | `ff` | Generating and serving Home Screen UI preview (`ui_home.md` + `ui_navigation.md` + `ff_design_override.md`) with floating nav bar & momentum chart. | `ui_mockups/home_screen.html`, `progress_tracker.md`, `agent_worklog.md` | `8086` |
+| **Code2** | Companion UI Designer | **ACTIVE** | `ff` | Generating and serving Preset Creation & Channel Whitelist UI preview (`ui_preset.md` + `ff_design_override.md`) with emoji picker & confirmation flow. | `ui_mockups/preset_creation.html`, `progress_tracker.md`, `agent_worklog.md` | `8086`, `8087` |
 
 ---
 
@@ -50,22 +50,27 @@ This registry coordinates concurrent/subsequent AI coding agents working in this
 * **Role:** Companion UI Designer
 * **Current Working Branch:** `ff` (Strict branch lock — DO NOT SWITCH BRANCHES)
 * **Status:** `ACTIVE` (In-progress)
+* **Completed:**
+  - Built static HTML/Tailwind preview of the **Home Screen** (`ui_mockups/home_screen.html`) with 24h Bézier stacked area chart, momentum legend grid, preset selector, and floating 5-tab pill nav bar.
+  - Preview served on port `8086`, reviewed and approved by user.
 * **What `Code2` is doing right now:**
-  1. Identified that `Code1` already completed the Active Focus Session Screen UI and is now working on Flutter theme tokens.
-  2. To avoid interference with `Code1`'s work, `Code2` is picking up the **Home Screen Preview** (`ui_home.md` + `ui_navigation.md` + `ff_design_override.md`).
-  3. Generating a static HTML/Tailwind mockup (`ui_mockups/home_screen.html`) featuring:
-     - Header with FF aperture emblem and dual stacked weekly/focused avg pills
-     - Momentum Card with 24h Bézier stacked area chart and 2×2 category legend grid
-     - Section dividers (`#594C3D`)
-     - Session Card with today's focus time ("1hr 43m"), selected preset pill, and 4 detail rows
-     - "Start Focusing" primary action pill button (`#CA9C68`)
-     - Floating pill bottom navigation bar (5 tabs: Home, Usage, Focus, Planner, Block) with group pills
-     - Interactive states: Normal, Active Session Running ("Resume Session" `#906D4B`), Upcoming Session banner (15-min warning), and Empty state
-     - Strict Rustic Medley color palette: `#13191F`, `#2B2F2E`, `#594C3D`, `#906D4B`, `#CA9C68`, `#F8FAFC`, `#94A3B8`
-  4. Serving the preview on port `8086`.
+  1. Generating static HTML/Tailwind preview of the **Preset Creation & YouTube Study Mode Whitelist Screen** (`ui_mockups/preset_creation.html`) adhering strictly to `ui_preset.md` and `ff_design_override.md`.
+  2. Features:
+     - Header: "New Preset" centered with Close button (×)
+     - Preset Name card with tappable Emoji picker trigger and text input
+     - Break Configuration 2-card grid: Stepper for Number of Breaks (0–6) and Duration Each (1–15 mins)
+     - App Restrictions: 4 collapsible category sections (Productive, Semi-Productive, Distracting, Others) with toggleable apps
+     - YouTube 3-way radio selection (Block completely, Allow completely, Study Mode with whitelisted channel count)
+     - YouTube Study Mode Configuration card with "Configure →" action
+     - Description textarea card with uppercase section label
+     - Sticky bottom "Save Preset" pill button (`#CA9C68`)
+     - Interactive sheets/modals: Emoji Picker bottom sheet & Channel Whitelist view with confirmation sentence typing flow!
+  3. Serving the preview on port `8087`.
 * **Exclusive Resources / Do Not Overwrite:**
   - `ui_mockups/home_screen.html`
-  - Port `8086`
+  - `ui_mockups/preset_creation.html`
+  - Port `8086` (Home Screen preview remains up)
+  - Port `8087` (Preset Creation preview)
 
 ---
 
