@@ -10,7 +10,7 @@ This registry coordinates concurrent/subsequent AI coding agents working in this
 | Agent Name | Role / Specialty | Status | Branch | Current Task / Active Scope | Reserved / Active Files | Port(s) Used |
 |---|---|---|---|---|---|---|
 | **Code1** | Lead UI Designer | **ACTIVE** | `ff` | Phase 1-B Step 6 COMPLETED (Focus timer domain models, Hive focus_session_state active persistence, SQLite finished session logging, ForegroundTimerService with flutter_foreground_task, FocusSessionNotifier state machine, mechanical FlipClock widget, FocusSessionScreen, 24 unit & widget tests, 123/123 tests passing, 0 lints). | `fluxfoxus/lib/features/focus/`, `fluxfoxus/lib/presentation/widgets/flip_clock.dart`, `fluxfoxus/lib/presentation/screens/focus_session_screen.dart`, `progress_tracker.md`, `agent_worklog.md` | None (all quiet) |
-| **Code2** | Companion UI Designer / Responsive Architect | **IDLE** | `ff` | Responsive Scaling & HTML Viewport Adaptivity COMPLETED: Internal screens refactored from fixed narrow mobile frames to fluid responsive grid/flex layouts across phone, tablet, and desktop viewports; Flutter responsive foundation (48/48 tests passing); 100% passing across all mockup DOM test suites, 123/123 Flutter tests, 0 lints. | `ui_mockups/`, `fluxfoxus/lib/core/theme/responsive_layout.dart`, `progress_tracker.md`, `agent_worklog.md` | None (all quiet per user request) |
+| **Code2** | Companion UI Designer / Responsive Architect | **ACTIVE** | `ff` | Serving unified Responsive Review Hub on single port 8080: all 6 screens + interactive viewport dimension simulator. | `ui_mockups/`, `progress_tracker.md`, `agent_worklog.md` | `8080` (Unified Review Hub) |
 
 ---
 
