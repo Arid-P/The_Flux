@@ -86,6 +86,39 @@ class FocusSessionRepository {
   }
 }
 
+/// Fake implementation of [FocusSessionRepository] for hermetic testing.
+class FakeFocusSessionRepository implements FocusSessionRepository {
+  FocusSession? active;
+  final List<FocusSession> finished = [];
+
+  @override
+  AppDatabase get appDatabase => AppDatabase();
+
+  @override
+  HiveStorageService get hiveStorageService => HiveStorageService();
+
+  @override
+  FocusSession? getActiveSession() => active;
+
+  @override
+  Future<void> saveActiveSession(FocusSession session) async {
+    active = session;
+  }
+
+  @override
+  Future<void> clearActiveSession() async {
+    active = null;
+  }
+
+  @override
+  Future<void> recordFinishedSession(FocusSession session) async {
+    finished.add(session);
+  }
+
+  @override
+  Future<List<Map<String, dynamic>>> getHistory() async => [];
+}
+
 /// Provider for FocusSessionRepository.
 final focusSessionRepositoryProvider = Provider<FocusSessionRepository>((ref) {
   final appDb = ref.watch(appDatabaseProvider);
@@ -95,3 +128,4 @@ final focusSessionRepositoryProvider = Provider<FocusSessionRepository>((ref) {
     hiveStorageService: hiveStorage,
   );
 });
+

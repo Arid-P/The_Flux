@@ -100,7 +100,34 @@ class DefaultForegroundTimerService implements ForegroundTimerService {
   }
 }
 
+/// Fake implementation of [ForegroundTimerService] for hermetic testing.
+class FakeForegroundTimerService implements ForegroundTimerService {
+  bool running = false;
+
+  @override
+  Future<void> init() async {}
+
+  @override
+  Future<bool> startService({required String title, required String text}) async {
+    running = true;
+    return true;
+  }
+
+  @override
+  Future<void> updateService({required String title, required String text}) async {}
+
+  @override
+  Future<bool> stopService() async {
+    running = false;
+    return true;
+  }
+
+  @override
+  Future<bool> get isRunning async => running;
+}
+
 /// Provider for ForegroundTimerService.
 final foregroundTimerServiceProvider = Provider<ForegroundTimerService>((ref) {
   return DefaultForegroundTimerService();
 });
+

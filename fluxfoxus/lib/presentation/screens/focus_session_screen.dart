@@ -4,6 +4,7 @@ import 'package:go_router/go_router.dart';
 import '../../core/navigation/app_routes.dart';
 import '../../core/theme/theme.dart';
 import '../../features/focus/focus.dart';
+import '../widgets/stop_focusing_modal.dart';
 
 /// FocusSessionScreen renders the full-screen takeover active focus session.
 /// Integrates with FocusSessionNotifier, mechanical FlipClock,
@@ -16,6 +17,7 @@ class FocusSessionScreen extends ConsumerStatefulWidget {
   final Duration? targetDuration;
   final int breaksTotal;
   final Duration breakDuration;
+  final int? countdownSecondsOverride;
 
   const FocusSessionScreen({
     super.key,
@@ -26,7 +28,9 @@ class FocusSessionScreen extends ConsumerStatefulWidget {
     this.targetDuration = const Duration(minutes: 90),
     this.breaksTotal = 2,
     this.breakDuration = const Duration(minutes: 5),
+    this.countdownSecondsOverride,
   });
+
 
   @override
   ConsumerState<FocusSessionScreen> createState() => _FocusSessionScreenState();
@@ -268,11 +272,51 @@ class _FocusSessionScreenState extends ConsumerState<FocusSessionScreen> {
                               height: 52,
                               child: ElevatedButton(
                                 key: const Key('stop_focusing_button'),
-                                onPressed: () {
-                                  context.go(AppRoutes.home);
-                                  ref
-                                      .read(focusSessionProvider.notifier)
-                                      .stopSession();
+                                onPressed: () async {
+                                  final wasRunning =
+                                      session.status == SessionStatus.running;
+                                  if (wasRunning) {
+                                    ref
+                                        .read(focusSessionProvider.notifier)
+                                        .pauseSession();
+                                  }
+
+                                  final streak = await ref
+                                      .read(streakRepositoryProvider)
+                                      .getCurrentStreak();
+                                  if (!context.mounted) return;
+
+                                  final confirmed =
+                                      await StopFocusingModal.show(
+                                    context,
+                                    streakDays: streak > 0 ? streak : 1,
+                                    countdownOverride:
+                                        widget.countdownSecondsOverride,
+                                  );
+
+                                  if (!context.mounted) return;
+
+                                  if (confirmed == true) {
+                                    try {
+                                      await ref
+                                          .read(streakRepositoryProvider)
+                                          .resetStreak();
+                                    } catch (_) {}
+                                    try {
+                                      await ref
+                                          .read(focusSessionProvider.notifier)
+                                          .stopSession();
+                                    } catch (_) {}
+                                    if (context.mounted) {
+                                      context.go(AppRoutes.home);
+                                    }
+                                  } else if (wasRunning) {
+                                    try {
+                                      await ref
+                                          .read(focusSessionProvider.notifier)
+                                          .resumeSession();
+                                    } catch (_) {}
+                                  }
                                 },
                                 style: ElevatedButton.styleFrom(
                                   backgroundColor: isBreak

@@ -12,6 +12,8 @@ import 'package:fluxfoxus/presentation/screens/preset_create_screen.dart';
 import 'package:fluxfoxus/presentation/screens/preset_edit_screen.dart';
 import 'package:fluxfoxus/presentation/screens/usage_stats_screen.dart';
 
+import 'package:fluxfoxus/features/focus/focus.dart';
+
 void main() {
   setUpAll(() {
     TestWidgetsFlutterBinding.ensureInitialized();
@@ -21,6 +23,11 @@ void main() {
   Widget buildTestApp({String initialLocation = AppRoutes.home}) {
     final testRouter = createAppRouter(initialLocation: initialLocation);
     return ProviderScope(
+      overrides: [
+        streakRepositoryProvider.overrideWithValue(FakeStreakRepository(initialStreak: 1)),
+        focusSessionRepositoryProvider.overrideWithValue(FakeFocusSessionRepository()),
+        foregroundTimerServiceProvider.overrideWithValue(FakeForegroundTimerService()),
+      ],
       child: MaterialApp.router(
         routerConfig: testRouter,
       ),
@@ -110,8 +117,15 @@ void main() {
       expect(find.byType(FocusSessionScreen), findsOneWidget);
       expect(find.byType(FloatingBottomNavBar), findsNothing);
 
-      // Tap Stop Focusing
+      // Tap Stop Focusing -> triggers modal
       await tester.tap(find.byKey(const Key('stop_focusing_button')));
+      await tester.pumpAndSettle();
+
+      // Advance virtual timer second-by-second past countdown delay
+      for (int i = 0; i < 26; i++) {
+        await tester.pump(const Duration(seconds: 1));
+      }
+      await tester.tap(find.byKey(const Key('modal_quit_session_button')));
       await tester.pumpAndSettle();
 
       // Returns to Home

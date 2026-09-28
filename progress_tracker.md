@@ -136,3 +136,15 @@
 - [ ] Foreground timer service and background workers (`flutter_foreground_task`, `workmanager`).
 - [ ] MethodChannel IPC bridge (`com.fluxfoxus/fd_integration`).
 
+
+
+####Prompt for C2
+```text
+Yeah i reviewed it, its fantastic. But i noticed an issue. I have 2 ways t
+  switch between the different pages, using the toggles at the top, and using the
+  island with different options at the bottom within the app window. If i switch
+  using the toggles at the top, everything works. But if i use the the island, it
+  comes back into a mobile ratio and stays in that. More appropriate it changes
+  the content accodring to the option and reverts bacl to the state we initally
+  had. So fix this as well.
+```

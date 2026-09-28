@@ -50,12 +50,18 @@ class _FakeFocusSessionRepository extends FocusSessionRepository {
 }
 
 void main() {
+  setUpAll(() {
+    TestWidgetsFlutterBinding.ensureInitialized();
+  });
+
   late _FakeForegroundService fakeForeground;
   late _FakeFocusSessionRepository fakeRepo;
+  late FakeStreakRepository fakeStreakRepo;
 
   setUp(() {
     fakeForeground = _FakeForegroundService();
     fakeRepo = _FakeFocusSessionRepository();
+    fakeStreakRepo = FakeStreakRepository(initialStreak: 5);
   });
 
   Widget buildTestApp({
@@ -68,6 +74,7 @@ void main() {
       overrides: [
         foregroundTimerServiceProvider.overrideWithValue(fakeForeground),
         focusSessionRepositoryProvider.overrideWithValue(fakeRepo),
+        streakRepositoryProvider.overrideWithValue(fakeStreakRepo),
       ],
       child: MaterialApp.router(
         routerConfig: router,
@@ -128,19 +135,60 @@ void main() {
       expect(find.text('COUNTDOWN ACTIVE'), findsOneWidget);
     });
 
-    testWidgets('Tapping Stop Focusing stops session and navigates to Home', (WidgetTester tester) async {
+    testWidgets('Tapping Stop Focusing displays StopFocusingModal and resets streak on Quit Session', (WidgetTester tester) async {
       await tester.pumpWidget(buildTestApp());
       await tester.pumpAndSettle();
 
       expect(find.byType(FocusSessionScreen), findsOneWidget);
+      expect(await fakeStreakRepo.getCurrentStreak(), 5);
+
+      // Tap Stop Focusing -> triggers friction modal
+      await tester.tap(find.byKey(const Key('stop_focusing_button')));
+      await tester.pumpAndSettle();
+
+      // Modal is visible with streak warning and heading
+      expect(find.text('Finish the goal?'), findsOneWidget);
+      expect(find.text('5 days'), findsOneWidget);
+
+      // Buttons are initially locked during countdown
+      final quitBtn = tester.widget<OutlinedButton>(find.byKey(const Key('modal_quit_session_button')));
+      expect(quitBtn.onPressed, isNull);
+
+      // Advance virtual timer past the discipline wait period
+      await tester.pump(const Duration(seconds: 25));
+
+      // Quit button is now unlocked
+      await tester.tap(find.byKey(const Key('modal_quit_session_button')));
+      await tester.pumpAndSettle();
+
+      // Should reset streak to 0 and navigate to Home
+      expect(await fakeStreakRepo.getCurrentStreak(), 0);
+      expect(find.byType(FocusSessionScreen), findsNothing);
+      expect(find.byType(FloatingBottomNavBar), findsOneWidget);
+    });
+
+    testWidgets('Tapping Keep Going in modal dismisses dialog and resumes session', (WidgetTester tester) async {
+      await tester.pumpWidget(buildTestApp());
+      await tester.pumpAndSettle();
 
       // Tap Stop Focusing
       await tester.tap(find.byKey(const Key('stop_focusing_button')));
       await tester.pumpAndSettle();
 
-      // Should navigate to Home
-      expect(find.byType(FocusSessionScreen), findsNothing);
-      expect(find.byType(FloatingBottomNavBar), findsOneWidget);
+      expect(find.text('Finish the goal?'), findsOneWidget);
+
+      // Advance virtual timer past countdown
+      await tester.pump(const Duration(seconds: 25));
+
+      // Tap Keep Going
+      await tester.tap(find.byKey(const Key('modal_keep_going_button')));
+      await tester.pumpAndSettle();
+
+      // Modal is dismissed, screen remains active, streak preserved
+      expect(find.text('Finish the goal?'), findsNothing);
+      expect(find.byType(FocusSessionScreen), findsOneWidget);
+      expect(await fakeStreakRepo.getCurrentStreak(), 5);
+      expect(find.text('COUNTDOWN ACTIVE'), findsOneWidget);
     });
   });
 }

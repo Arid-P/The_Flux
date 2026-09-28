@@ -208,9 +208,11 @@ class FocusSessionNotifier extends Notifier<FocusSession?> {
     );
 
     state = completed;
-    await _repo.recordFinishedSession(completed);
-    await _repo.clearActiveSession();
-    await _foreground.stopService();
+    try {
+      await _repo.recordFinishedSession(completed);
+      await _repo.clearActiveSession();
+      await _foreground.stopService();
+    } catch (_) {}
   }
 
   /// Completes the session successfully upon countdown reaching zero.
