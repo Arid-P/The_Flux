@@ -111,6 +111,12 @@
 
     <!-- MAIN SCROLLABLE FORM CONTENT -->
     <div class="flex-1 overflow-y-auto no-scrollbar py-4 space-y-5">
+
+      <!-- RESPONSIVE 2-COLUMN LAYOUT: Name+Breaks | Description side-by-side on tablet -->
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-5 md:gap-6 items-start">
+
+        <!-- COLUMN 1: PRESET NAME + BREAK CONFIG -->
+        <div class="space-y-5">
       
       <!-- 3. SECTION: PRESET NAME -->
       <div>
@@ -175,6 +181,11 @@
 
         </div>
       </div>
+
+        </div> <!-- end COLUMN 1: Preset Name + Breaks -->
+
+        <!-- COLUMN 2: APP RESTRICTIONS + DESCRIPTION -->
+        <div class="space-y-5">
 
       <!-- 5. SECTION: APP RESTRICTIONS -->
       <div>
@@ -361,6 +372,11 @@
                     class="w-full bg-transparent text-xs text-ff-text placeholder-ff-muted/50 focus:outline-none resize-none leading-relaxed">Deep work on IOQM Number Theory modular arithmetic & polynomials</textarea>
         </div>
       </div>
+        </div>
+      </div>
+
+        </div> <!-- end COLUMN 2: App Restrictions + Description -->
+      </div> <!-- end RESPONSIVE 2-COLUMN LAYOUT -->
 
       <div class="h-2"></div>
     </div>

@@ -143,69 +143,77 @@
         </div>
       </div>
 
-      <!-- 4. STATS ROW (Section 6) -->
-      <div class="grid grid-cols-2 gap-3">
-        <!-- Card 1: Focus Total -->
-        <div class="bg-ff-surface border border-ff-border rounded-xl p-3.5 flex flex-col justify-between">
-          <div class="flex items-center justify-between mb-1">
-            <span class="text-[10px] font-bold uppercase tracking-wider text-ff-muted">Focus</span>
-            <span class="text-xs">🎯</span>
+      <!-- RESPONSIVE 2-COLUMN LAYOUT: Stats + Sessions side-by-side on tablet -->
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-6 items-start">
+
+        <!-- COLUMN 1: STATS + FAB CONTEXT -->
+        <div class="space-y-4">
+          <!-- 4. STATS ROW (Section 6) — 2 cards stacked vertically or side by side -->
+          <div class="grid grid-cols-2 gap-3">
+            <!-- Card 1: Focus Total -->
+            <div class="bg-ff-surface border border-ff-border rounded-xl p-3.5 flex flex-col justify-between">
+              <div class="flex items-center justify-between mb-1">
+                <span class="text-[10px] font-bold uppercase tracking-wider text-ff-muted">Focus</span>
+                <span class="text-xs">🎯</span>
+              </div>
+              <div class="flex items-baseline space-x-1.5">
+                <span id="stat-focus-total" class="text-xl font-bold text-ff-text tracking-tight">2h 27m</span>
+              </div>
+              <span id="stat-focus-sessions-count" class="text-[10px] text-ff-accent mt-0.5">3 sessions logged</span>
+            </div>
+
+            <!-- Card 2: Usage Total -->
+            <div class="bg-ff-surface border border-ff-border rounded-xl p-3.5 flex flex-col justify-between">
+              <div class="flex items-center justify-between mb-1">
+                <span class="text-[10px] font-bold uppercase tracking-wider text-ff-muted">Usage</span>
+                <span class="text-xs">📱</span>
+              </div>
+              <div class="flex items-baseline space-x-1.5">
+                <span id="stat-usage-total" class="text-xl font-bold text-ff-text tracking-tight">6h 18m</span>
+              </div>
+              <span id="stat-usage-sublabel" class="text-[10px] text-ff-muted mt-0.5">Screen on time</span>
+            </div>
           </div>
-          <div class="flex items-baseline space-x-1.5">
-            <span id="stat-focus-total" class="text-xl font-bold text-ff-text tracking-tight">2h 27m</span>
+
+          <!-- Empty State Container (Section 7.5) — shown when no sessions -->
+          <div id="planner-empty-state" class="hidden bg-ff-surface border border-ff-border rounded-2xl p-8 flex flex-col items-center justify-center text-center space-y-3">
+            <div class="w-16 h-16 rounded-full bg-ff-bg/80 border border-ff-border flex items-center justify-center text-ff-muted">
+              <!-- FF Aperture Icon Muted -->
+              <svg class="w-8 h-8 text-ff-muted" viewBox="0 0 100 100" fill="none">
+                <circle cx="50" cy="50" r="44" stroke="currentColor" stroke-width="4" stroke-opacity="0.3"/>
+                <path d="M50 10 L84.6 30 L84.6 70 L50 90 L15.4 70 L15.4 30 Z" stroke="currentColor" stroke-width="3" stroke-opacity="0.4"/>
+                <circle cx="50" cy="50" r="14" fill="currentColor" fill-opacity="0.2"/>
+              </svg>
+            </div>
+            <div>
+              <h3 class="text-sm font-bold text-ff-text">No sessions for this day</h3>
+              <p class="text-xs text-ff-muted mt-1 max-w-[220px]">
+                Enjoy your scheduled rest or tap "+ Add Preset" below to plan a new focus block.
+              </p>
+            </div>
+            <button onclick="handleFabAddPreset()" class="px-3.5 py-1.5 rounded-full bg-ff-primary/20 text-ff-primary border border-ff-primary/30 text-xs font-semibold hover:bg-ff-primary/30 transition">
+              + Schedule Session
+            </button>
           </div>
-          <span id="stat-focus-sessions-count" class="text-[10px] text-ff-accent mt-0.5">3 sessions logged</span>
         </div>
 
-        <!-- Card 2: Usage Total -->
-        <div class="bg-ff-surface border border-ff-border rounded-xl p-3.5 flex flex-col justify-between">
-          <div class="flex items-center justify-between mb-1">
-            <span class="text-[10px] font-bold uppercase tracking-wider text-ff-muted">Usage</span>
-            <span class="text-xs">📱</span>
+        <!-- COLUMN 2: SESSION LIST (Section 7) -->
+        <div class="space-y-2.5">
+          <div class="flex items-center justify-between px-1">
+            <h2 id="session-list-heading" class="text-xs font-bold text-ff-muted uppercase tracking-wider">
+              Scheduled Sessions
+            </h2>
+            <span id="session-list-count" class="text-[10px] text-ff-muted font-mono">
+              3 items
+            </span>
           </div>
-          <div class="flex items-baseline space-x-1.5">
-            <span id="stat-usage-total" class="text-xl font-bold text-ff-text tracking-tight">6h 18m</span>
-          </div>
-          <span id="stat-usage-sublabel" class="text-[10px] text-ff-muted mt-0.5">Screen on time</span>
-        </div>
-      </div>
 
-      <!-- 5. SESSION LIST (Section 7) -->
-      <div class="space-y-2.5">
-        <div class="flex items-center justify-between px-1">
-          <h2 id="session-list-heading" class="text-xs font-bold text-ff-muted uppercase tracking-wider">
-            Scheduled Sessions
-          </h2>
-          <span id="session-list-count" class="text-[10px] text-ff-muted font-mono">
-            3 items
-          </span>
+          <!-- Scrollable Session Cards Container -->
+          <div id="session-cards-container" class="space-y-2.5">
+            <!-- Dynamically populated by renderSessionsForSelectedDay() -->
+          </div>
         </div>
 
-        <!-- Scrollable Session Cards Container -->
-        <div id="session-cards-container" class="space-y-2.5">
-          <!-- Dynamically populated by renderSessionsForSelectedDay() -->
-        </div>
-
-        <!-- Empty State Container (Section 7.5) -->
-        <div id="planner-empty-state" class="hidden bg-ff-surface border border-ff-border rounded-2xl p-8 flex flex-col items-center justify-center text-center space-y-3">
-          <div class="w-16 h-16 rounded-full bg-ff-bg/80 border border-ff-border flex items-center justify-center text-ff-muted">
-            <!-- FF Aperture Icon Muted -->
-            <svg class="w-8 h-8 text-ff-muted" viewBox="0 0 100 100" fill="none">
-              <circle cx="50" cy="50" r="44" stroke="currentColor" stroke-width="4" stroke-opacity="0.3"/>
-              <path d="M50 10 L84.6 30 L84.6 70 L50 90 L15.4 70 L15.4 30 Z" stroke="currentColor" stroke-width="3" stroke-opacity="0.4"/>
-              <circle cx="50" cy="50" r="14" fill="currentColor" fill-opacity="0.2"/>
-            </svg>
-          </div>
-          <div>
-            <h3 class="text-sm font-bold text-ff-text">No sessions for this day</h3>
-            <p class="text-xs text-ff-muted mt-1 max-w-[220px]">
-              Enjoy your scheduled rest or tap "+ Add Preset" below to plan a new focus block.
-            </p>
-          </div>
-          <button onclick="handleFabAddPreset()" class="px-3.5 py-1.5 rounded-full bg-ff-primary/20 text-ff-primary border border-ff-primary/30 text-xs font-semibold hover:bg-ff-primary/30 transition">
-            + Schedule Session
-          </button>
-        </div>
       </div>
 
     </div>

@@ -164,8 +164,13 @@
         </div>
       </div>
 
-      <!-- 4. DYNAMIC CHART CONTAINER (Changes per tab) -->
-      <div id="chart-section" class="bg-ff-surface border border-ff-border rounded-2xl p-3.5 flex flex-col justify-between">
+      <!-- RESPONSIVE 2-COLUMN LAYOUT: Chart+Legend | App List side-by-side on tablet -->
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-6 items-start">
+
+        <!-- COLUMN 1: CHART + LEGEND -->
+        <div class="space-y-4">
+          <!-- 4. DYNAMIC CHART CONTAINER (Changes per tab) -->
+          <div id="chart-section" class="bg-ff-surface border border-ff-border rounded-2xl p-3.5 flex flex-col justify-between">
         
         <!-- Chart Title Row -->
         <div class="flex items-center justify-between mb-2">
@@ -324,6 +329,10 @@
 
         </div>
       </div>
+        </div> <!-- end COLUMN 1 -->
+
+        <!-- COLUMN 2: APP SECTION -->
+        <div class="space-y-3">
 
       <!-- 6. APP SECTION (Section 8: Search Bar + App List) -->
       <div class="space-y-3">
@@ -375,6 +384,9 @@
         </div>
 
       </div>
+
+        </div> <!-- end COLUMN 2 -->
+      </div> <!-- end RESPONSIVE 2-COLUMN LAYOUT -->
 
     </div>
 
