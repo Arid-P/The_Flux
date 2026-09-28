@@ -31,7 +31,7 @@
   </script>
   <style>
     body {
-      background-color: #0d1217;
+      background-color: #0b0f14;
       font-family: 'Inter', sans-serif;
       color: #F8FAFC;
     }
@@ -51,7 +51,7 @@
     }
   </style>
 </head>
-<body class="min-h-screen flex flex-col bg-[#0d1217]">
+<body class="min-h-screen flex flex-col bg-[#0b0f14]">
 
   <!-- TOP HEADER / CONTROL BAR -->
   <header class="w-full bg-ff-bg border-b border-ff-border px-5 py-3 sticky top-0 z-50 shadow-2xl flex flex-wrap items-center justify-between gap-4">
@@ -62,10 +62,10 @@
       </div>
       <div>
         <h1 class="text-sm font-bold text-ff-text tracking-wide flex items-center gap-2">
-          FluxFoxus Review Hub
+          FluxFoxus Responsive Review Hub
           <span class="text-[10px] px-2 py-0.5 rounded-full bg-ff-primary/20 text-ff-primary border border-ff-primary/40 font-mono">Phase 1-A & 1-B</span>
         </h1>
-        <p class="text-[11px] text-ff-muted">Responsive Scaling, Aspect Ratios & Navigation Review</p>
+        <p class="text-[11px] text-ff-muted">Adaptive Viewport, Tablet Layouts & Screen Orientation</p>
       </div>
     </div>
 
@@ -91,7 +91,7 @@
       </button>
     </div>
 
-    <!-- Actions (Direct Link & Open Tab) -->
+    <!-- Standalone Link Button -->
     <div class="flex items-center space-x-2">
       <a id="btn-standalone" href="home_screen.html" target="_blank" class="px-3 py-1.5 text-xs font-semibold rounded-lg bg-ff-surface text-ff-text border border-ff-border hover:border-ff-primary hover:text-ff-primary transition flex items-center gap-1.5">
         <span>↗</span>
@@ -106,12 +106,12 @@
     <!-- Viewport Presets -->
     <div class="flex items-center flex-wrap gap-1.5">
       <span class="text-[11px] font-bold text-ff-primary uppercase tracking-wider mr-1 flex items-center gap-1">
-        <span>📐</span> Profiles:
+        <span>📐</span> Viewports:
       </span>
       <button onclick="setViewport(320, 568, 'Narrow Phone', this)" class="vp-btn px-2.5 py-1 rounded-md bg-ff-surface border border-ff-border text-ff-muted hover:text-ff-text transition">
         📱 Narrow (320×568)
       </button>
-      <button onclick="setViewport(390, 844, 'Standard Phone', this)" class="vp-btn px-2.5 py-1 rounded-md bg-ff-primary text-ff-bg font-bold border border-ff-primary shadow-sm transition">
+      <button onclick="setViewport(390, 844, 'Standard Phone', this)" class="vp-btn px-2.5 py-1 rounded-md bg-ff-surface border border-ff-border text-ff-muted hover:text-ff-text transition">
         📱 Standard (390×844)
       </button>
       <button onclick="setViewport(640, 360, 'Landscape Compact', this)" class="vp-btn px-2.5 py-1 rounded-md bg-ff-surface border border-ff-border text-ff-muted hover:text-ff-text transition">
@@ -120,7 +120,7 @@
       <button onclick="setViewport(844, 390, 'Landscape Standard', this)" class="vp-btn px-2.5 py-1 rounded-md bg-ff-surface border border-ff-border text-ff-muted hover:text-ff-text transition">
         🔄 Land Std (844×390)
       </button>
-      <button onclick="setViewport(768, 1024, 'Tablet Portrait', this)" class="vp-btn px-2.5 py-1 rounded-md bg-ff-surface border border-ff-border text-ff-muted hover:text-ff-text transition">
+      <button onclick="setViewport(768, 1024, 'Tablet Portrait', this)" class="vp-btn px-2.5 py-1 rounded-md bg-ff-primary text-ff-bg font-bold border border-ff-primary shadow-sm transition">
         📱 Tablet (768×1024)
       </button>
       <button onclick="setViewport(1024, 768, 'Tablet Landscape', this)" class="vp-btn px-2.5 py-1 rounded-md bg-ff-surface border border-ff-border text-ff-muted hover:text-ff-text transition">
@@ -152,7 +152,7 @@
 
       <!-- Current Dimensions Badge -->
       <div id="dim-badge" class="px-2.5 py-1 rounded-md bg-ff-bg border border-ff-border font-mono text-[11px] text-ff-accent">
-        390 × 844 px
+        768 × 1024 px (Tablet Portrait)
       </div>
     </div>
   </div>
@@ -161,16 +161,8 @@
   <main class="flex-1 flex flex-col items-center justify-start p-6 overflow-auto custom-scrollbar">
     <div id="stage-wrapper" class="device-stage relative flex flex-col items-center justify-center transition-all duration-300">
       <!-- Device Bezel Frame -->
-      <div id="device-bezel" class="relative bg-ff-bg rounded-[40px] border-[4px] border-ff-border shadow-2xl overflow-hidden transition-all duration-300 flex flex-col">
-        <!-- Bezel Speaker & Camera Notch (Simulated) -->
-        <div id="device-notch" class="w-full flex items-center justify-center pt-2 pb-1 bg-ff-bg shrink-0">
-          <div class="w-20 h-3.5 bg-ff-surface rounded-full border border-ff-border/50 flex items-center justify-center space-x-2">
-            <div class="w-1.5 h-1.5 rounded-full bg-ff-border"></div>
-            <div class="w-8 h-1 rounded-full bg-ff-border/80"></div>
-          </div>
-        </div>
-
-        <!-- Embedded Iframe -->
+      <div id="device-bezel" class="relative bg-ff-bg rounded-2xl border-[3px] border-ff-border shadow-2xl overflow-hidden transition-all duration-300 flex flex-col">
+        <!-- Embedded Iframe that receives the full viewport dimensions -->
         <iframe 
           id="preview-frame" 
           src="home_screen.html" 
@@ -184,7 +176,7 @@
     <div class="mt-8 max-w-4xl w-full bg-ff-surface/60 border border-ff-border rounded-2xl p-4 text-xs text-ff-muted">
       <div class="flex items-center justify-between mb-2">
         <span class="font-bold text-ff-text uppercase tracking-wider text-[11px]">Direct Screen Links:</span>
-        <span class="text-emerald-400 font-medium">✓ Port 8080 Active & Public</span>
+        <span class="text-emerald-400 font-medium">✓ Responsive Layouts Enabled Across All Viewports</span>
       </div>
       <div class="grid grid-cols-2 md:grid-cols-3 gap-2">
         <a href="home_screen.html" target="_blank" class="p-2 rounded-lg bg-ff-bg hover:border-ff-primary border border-ff-border text-ff-text transition flex items-center justify-between">
@@ -216,8 +208,8 @@
   </main>
 
   <script>
-    let currentWidth = 390;
-    let currentHeight = 844;
+    let currentWidth = 768;
+    let currentHeight = 1024;
     let currentScale = 1;
     let currentScreen = 'home_screen.html';
 
@@ -238,20 +230,17 @@
       currentHeight = h;
 
       const bezel = document.getElementById('device-bezel');
-      const notch = document.getElementById('device-notch');
       const badge = document.getElementById('dim-badge');
 
       if (w === '100%') {
         bezel.style.width = '100%';
         bezel.style.height = '85vh';
-        bezel.style.borderRadius = '16px';
-        notch.style.display = 'none';
-        badge.textContent = 'Full Viewport';
+        bezel.style.borderRadius = '12px';
+        badge.textContent = 'Full Viewport (Fluid Desktop)';
       } else {
         bezel.style.width = w + 'px';
         bezel.style.height = h + 'px';
-        bezel.style.borderRadius = (w >= 768) ? '24px' : '40px';
-        notch.style.display = (w >= 768 || h <= 450) ? 'none' : 'flex';
+        bezel.style.borderRadius = (w >= 768) ? '20px' : '28px';
         badge.textContent = `${w} × ${h} px (${label})`;
       }
 
@@ -291,9 +280,9 @@
       }
     }
 
-    // Initialize default standard phone
+    // Default to Tablet Portrait (768x1024) to immediately demonstrate adaptive responsive layout
     window.addEventListener('DOMContentLoaded', () => {
-      setViewport(390, 844, 'Standard Phone', null);
+      setViewport(768, 1024, 'Tablet Portrait', null);
     });
   </script>
 </body>

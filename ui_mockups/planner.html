@@ -64,41 +64,29 @@
     }
   </style>
 </head>
-<body class="min-h-screen flex flex-col items-center justify-center p-3 text-ff-text">
+<body class="min-h-screen w-full bg-ff-bg text-ff-text flex flex-col">
 
   <!-- TOP TOOLBAR CONTROLS (Preview Controller) -->
-  <div class="w-full max-w-sm mb-3 px-1 flex flex-col space-y-2">
-    <div class="flex items-center justify-between text-xs text-ff-muted">
-      <div class="flex items-center space-x-1.5">
-        <span class="w-2 h-2 rounded-full bg-emerald-400 inline-block animate-pulse"></span>
-        <span class="font-bold text-ff-text">Planner Screen Preview</span>
-        <span class="px-1.5 py-0.5 rounded bg-ff-primary/20 text-ff-primary text-[10px] font-mono">Port 8089</span>
-      </div>
-      <button onclick="runPlannerAutoTests()" class="px-2.5 py-1 rounded-full bg-ff-primary text-ff-bg font-bold text-[11px] hover:bg-[#b88c5a] transition flex items-center space-x-1 shadow-md">
-        <span>🧪</span>
-        <span>Run Auto Tests</span>
-      </button>
+  <div class="w-full bg-[#182028] border-b border-ff-border px-4 py-2.5 flex flex-wrap items-center justify-between gap-2 shadow-md text-xs sticky top-0 z-40">
+    <div class="flex items-center space-x-2">
+      <span class="text-ff-primary font-bold tracking-wide uppercase text-[11px]">Planner Controls:</span>
+      <button onclick="selectDayByAbbr('Mon')" class="px-2 py-0.5 rounded-lg bg-ff-surface hover:border-ff-border border border-transparent text-ff-text font-mono text-[10px]">Mon (Past)</button>
+      <button onclick="selectDayByAbbr('Wed')" class="px-2 py-0.5 rounded-lg bg-ff-primary/20 text-ff-primary border border-ff-primary/40 font-mono text-[10px]">Wed (Today)</button>
+      <button onclick="selectDayByAbbr('Fri')" class="px-2 py-0.5 rounded-lg bg-ff-surface hover:border-ff-border border border-transparent text-ff-text font-mono text-[10px]">Fri (FD Sync)</button>
+      <button onclick="selectDayByAbbr('Sun')" class="px-2 py-0.5 rounded-lg bg-ff-surface hover:border-ff-border border border-transparent text-ff-text font-mono text-[10px]">Sun (Empty)</button>
     </div>
-
-    <!-- Quick State Presets -->
-    <div class="flex items-center justify-between bg-ff-surface/90 border border-ff-border px-2.5 py-1.5 rounded-xl text-[11px]">
-      <span class="text-ff-muted font-medium">Jump to Day:</span>
-      <div class="flex items-center space-x-1.5">
-        <button onclick="selectDayByAbbr('Mon')" class="px-2 py-0.5 rounded-lg bg-ff-bg hover:border-ff-border border border-transparent text-ff-text font-mono text-[10px]">Mon (Past)</button>
-        <button onclick="selectDayByAbbr('Wed')" class="px-2 py-0.5 rounded-lg bg-ff-primary/20 text-ff-primary border border-ff-primary/40 font-mono text-[10px]">Wed (Today)</button>
-        <button onclick="selectDayByAbbr('Fri')" class="px-2 py-0.5 rounded-lg bg-ff-bg hover:border-ff-border border border-transparent text-ff-text font-mono text-[10px]">Fri (FD Sync)</button>
-        <button onclick="selectDayByAbbr('Sun')" class="px-2 py-0.5 rounded-lg bg-ff-bg hover:border-ff-border border border-transparent text-ff-text font-mono text-[10px]">Sun (Empty)</button>
-      </div>
-    </div>
+    <button onclick="runPlannerAutoTests()" class="px-3 py-1 rounded-full bg-emerald-500/20 text-emerald-400 border border-emerald-500/40 font-bold hover:bg-emerald-500/30 transition flex items-center space-x-1 shadow-md">
+      <span>🧪</span>
+      <span>Run Auto Tests</span>
+    </button>
   </div>
 
-  <!-- PHONE CONTAINER (390 x 844 px standard iPhone / Modern Android aspect) -->
-  <div class="relative w-[390px] h-[844px] bg-ff-bg rounded-[44px] border-[5px] border-[#38332B] shadow-2xl flex flex-col overflow-hidden">
+  <!-- RESPONSIVE APP CONTAINER -->
+  <div class="w-full max-w-5xl mx-auto flex-1 flex flex-col justify-between p-4 sm:p-6 md:p-8 relative min-h-screen">
 
     <!-- Top Speaker Notch & Status Bar -->
-    <div class="w-full shrink-0 pt-3 px-6 flex items-center justify-between text-xs text-ff-muted select-none">
+    <div class="w-full shrink-0 pt-1 pb-3 px-1 flex items-center justify-between text-xs text-ff-muted select-none">
       <span class="font-semibold text-ff-text font-mono text-xs">9:41</span>
-      <div class="w-20 h-4 bg-black rounded-full mx-auto"></div>
       <div class="flex items-center space-x-1.5">
         <svg class="w-3.5 h-3.5 fill-current" viewBox="0 0 24 24"><path d="M12 3c-4.97 0-9 4.03-9 9 0 2.12.74 4.07 1.97 5.61L4.35 18.25l1.41 1.41 1.07-1.07A8.96 8.96 0 0012 21c4.97 0 9-4.03 9-9s-4.03-9-9-9z"/></svg>
         <svg class="w-3.5 h-3.5 fill-current" viewBox="0 0 24 24"><path d="M2 17h20v2H2zm1.15-4.05L4 11.97l6.97-6.97a1.5 1.5 0 012.12 0L20.06 12l.85.98-1.52 1.32-6.27-6.27a.5.5 0 00-.71 0l-6.27 6.27-1.99-1.35z"/></svg>
@@ -107,7 +95,7 @@
     </div>
 
     <!-- MAIN SCROLLABLE APP BODY -->
-    <div class="flex-1 flex flex-col px-5 pt-3 pb-24 overflow-y-auto no-scrollbar space-y-4">
+    <div class="flex-1 flex flex-col pt-1 pb-24 overflow-y-auto no-scrollbar space-y-4">
 
       <!-- 1. HEADER (Section 3) -->
       <div class="flex items-center justify-between pt-1">
@@ -229,8 +217,8 @@
     </div>
 
     <!-- 7. FLOATING PILL NAVIGATION BAR (Section 2 & ui_navigation.md) -->
-    <div class="absolute bottom-4 left-4 right-4 z-20">
-      <div class="w-full h-16 bg-ff-surface border border-ff-border rounded-full px-3 flex items-center justify-between shadow-2xl">
+    <div class="absolute bottom-4 left-4 right-4 z-20 flex justify-center">
+      <div class="w-full max-w-md h-16 bg-ff-surface border border-ff-border rounded-full px-3 flex items-center justify-between shadow-2xl">
         
         <!-- Tab 1: Home -->
         <a href="home_screen.html" class="flex flex-col items-center justify-center px-2 py-1 text-ff-muted hover:text-ff-text transition">

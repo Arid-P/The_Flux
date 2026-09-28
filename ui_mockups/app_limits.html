@@ -49,32 +49,33 @@
     }
   </style>
 </head>
-<body class="min-h-screen flex flex-col items-center justify-center p-4 text-ff-text">
+<body class="min-h-screen w-full bg-ff-bg text-ff-text flex flex-col">
 
   <!-- TOP TOOLBAR (Preview Controller) -->
-  <div class="mb-5 flex flex-wrap items-center justify-center gap-2 bg-[#182028] border border-ff-border px-4 py-2.5 rounded-2xl shadow-xl max-w-2xl text-xs">
-    <span class="text-ff-primary font-bold tracking-wide uppercase text-[11px] mr-2">Interactive Sheets:</span>
-    <button onclick="openSettingsSheet('instagram')" class="px-3 py-1.5 rounded-lg bg-ff-primary text-ff-bg font-bold transition">
-      Open Instagram Settings
-    </button>
-    <button onclick="triggerTurnOffBlock('instagram')" class="px-3 py-1.5 rounded-lg bg-ff-surface text-ff-text border border-ff-border font-medium hover:border-ff-danger transition">
-      Test Turn-Off Flow (3s Delay)
-    </button>
-    <button onclick="toggleAddAppSheet(true)" class="px-3 py-1.5 rounded-lg bg-ff-surface text-ff-text border border-ff-border font-medium hover:border-ff-primary transition">
-      + Add App Sheet
-    </button>
-    <div class="h-4 w-px bg-ff-border mx-1"></div>
+  <div class="w-full bg-[#182028] border-b border-ff-border px-4 py-2.5 flex flex-wrap items-center justify-between gap-2 shadow-md text-xs sticky top-0 z-30">
+    <div class="flex items-center space-x-2">
+      <span class="text-ff-primary font-bold tracking-wide uppercase text-[11px]">Blocks Controls:</span>
+      <button onclick="openSettingsSheet('instagram')" class="px-2.5 py-1 rounded-lg bg-ff-primary text-ff-bg font-bold transition">
+        Instagram Settings
+      </button>
+      <button onclick="triggerTurnOffBlock('instagram')" class="px-2.5 py-1 rounded-lg bg-ff-surface text-ff-text border border-ff-border font-medium hover:border-ff-danger transition">
+        Turn-Off Flow
+      </button>
+      <button onclick="toggleAddAppSheet(true)" class="px-2.5 py-1 rounded-lg bg-ff-surface text-ff-text border border-ff-border font-medium hover:border-ff-primary transition">
+        + Add App
+      </button>
+    </div>
     <button onclick="runAppLimitsAutoTests()" class="px-3.5 py-1.5 rounded-lg bg-emerald-500/20 text-emerald-400 border border-emerald-500/40 font-bold hover:bg-emerald-500/30 transition flex items-center space-x-1.5">
       <span>🧪</span>
       <span>Run Automated Tests</span>
     </button>
   </div>
 
-  <!-- PHONE CONTAINER SIMULATOR -->
-  <div class="relative w-[390px] h-[830px] bg-ff-bg rounded-[44px] border-[3px] border-ff-border shadow-2xl overflow-hidden flex flex-col justify-between">
+  <!-- RESPONSIVE APP CONTAINER -->
+  <div class="w-full max-w-5xl mx-auto flex-1 flex flex-col justify-between p-4 sm:p-6 md:p-8 relative min-h-screen">
     
     <!-- TOP BAR (Status Bar + Header) -->
-    <div class="w-full shrink-0 pt-5 px-5 pb-3 border-b border-ff-border/60 bg-ff-bg z-10">
+    <div class="w-full shrink-0 pb-3 border-b border-ff-border/60 bg-ff-bg z-10">
       <!-- ANDROID STATUS BAR -->
       <div class="w-full flex items-center justify-between text-[11px] text-ff-muted font-medium pb-2 px-1">
         <span>09:42</span>
@@ -98,7 +99,7 @@
     </div>
 
     <!-- MAIN SCROLLABLE CONTENT BODY -->
-    <div class="flex-1 overflow-y-auto no-scrollbar px-5 py-4 space-y-4">
+    <div class="flex-1 overflow-y-auto no-scrollbar py-4 space-y-5">
       
       <!-- 4. SECTION HEADER ROW -->
       <div class="flex items-center justify-between pt-1">
@@ -118,7 +119,7 @@
         </div>
 
         <!-- Dynamic Container: Distracting App Cards -->
-        <div id="list-distracting" class="space-y-2.5"></div>
+        <div id="list-distracting" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3.5"></div>
       </div>
 
       <!-- 5. CATEGORY GROUP: SEMI-PRODUCTIVE -->
@@ -130,7 +131,7 @@
         </div>
 
         <!-- Dynamic Container: Semi-Productive App Cards -->
-        <div id="list-semi" class="space-y-2.5"></div>
+        <div id="list-semi" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3.5"></div>
       </div>
 
       <!-- 5. CATEGORY GROUP: OTHERS -->
@@ -142,15 +143,15 @@
         </div>
 
         <!-- Dynamic Container: Others App Cards -->
-        <div id="list-others" class="space-y-2.5"></div>
+        <div id="list-others" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3.5"></div>
       </div>
 
       <div class="h-4"></div>
     </div>
 
     <!-- BOTTOM FLOATING PILL NAVIGATION BAR -->
-    <div class="w-full shrink-0 p-4 pt-1 bg-ff-bg">
-      <div class="w-full h-16 bg-ff-surface border border-ff-border rounded-full px-3 flex items-center justify-between shadow-xl">
+    <div class="w-full shrink-0 pt-3 pb-1">
+      <div class="w-full max-w-md mx-auto h-16 bg-ff-surface border border-ff-border rounded-full px-3 flex items-center justify-between shadow-xl">
         
         <!-- Tab 1: Home -->
         <a href="home_screen.html" class="flex flex-col items-center justify-center px-2 py-1 text-ff-text hover:text-ff-primary transition">

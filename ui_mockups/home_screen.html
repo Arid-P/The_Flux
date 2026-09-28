@@ -55,32 +55,33 @@
     }
   </style>
 </head>
-<body class="min-h-screen flex flex-col items-center justify-center p-4 text-ff-text">
+<body class="min-h-screen w-full bg-ff-bg text-ff-text flex flex-col">
 
   <!-- TOP TOOLBAR CONTROLS (Preview Controller) -->
-  <div class="mb-5 flex flex-wrap items-center justify-center gap-2 bg-[#182028] border border-ff-border px-4 py-2.5 rounded-2xl shadow-xl max-w-2xl text-xs">
-    <span class="text-ff-primary font-bold tracking-wide uppercase text-[11px] mr-2">State Controls:</span>
-    <button onclick="setHomeState('normal')" id="btn-state-normal" class="px-3 py-1.5 rounded-lg bg-ff-primary text-ff-bg font-bold transition">
-      Standard State
-    </button>
-    <button onclick="setHomeState('active_session')" id="btn-state-active" class="px-3 py-1.5 rounded-lg bg-ff-surface text-ff-text border border-ff-border font-medium hover:border-ff-accent transition">
-      Active Session Running
-    </button>
-    <button onclick="setHomeState('upcoming')" id="btn-state-upcoming" class="px-3 py-1.5 rounded-lg bg-ff-surface text-ff-text border border-ff-border font-medium hover:border-ff-accent transition">
-      Upcoming (15m Alert)
-    </button>
-    <button onclick="setHomeState('empty')" id="btn-state-empty" class="px-3 py-1.5 rounded-lg bg-ff-surface text-ff-text border border-ff-border font-medium hover:border-ff-accent transition">
-      No Preset (Empty)
-    </button>
-    <div class="h-4 w-px bg-ff-border mx-1"></div>
-    <button onclick="runHomeScreenAutoTests()" class="px-3.5 py-1.5 rounded-lg bg-emerald-500/20 text-emerald-400 border border-emerald-500/40 font-bold hover:bg-emerald-500/30 transition flex items-center space-x-1.5">
+  <div class="w-full bg-[#182028] border-b border-ff-border px-4 py-2.5 flex flex-wrap items-center justify-between gap-2 shadow-md text-xs sticky top-0 z-30">
+    <div class="flex items-center space-x-2">
+      <span class="text-ff-primary font-bold tracking-wide uppercase text-[11px]">Home Controls:</span>
+      <button onclick="setHomeState('normal')" id="btn-state-normal" class="px-2.5 py-1 rounded-lg bg-ff-primary text-ff-bg font-bold transition">
+        Standard
+      </button>
+      <button onclick="setHomeState('active_session')" id="btn-state-active" class="px-2.5 py-1 rounded-lg bg-ff-surface text-ff-text border border-ff-border font-medium hover:border-ff-accent transition">
+        Active Session
+      </button>
+      <button onclick="setHomeState('upcoming')" id="btn-state-upcoming" class="px-2.5 py-1 rounded-lg bg-ff-surface text-ff-text border border-ff-border font-medium hover:border-ff-accent transition">
+        Upcoming Alert
+      </button>
+      <button onclick="setHomeState('empty')" id="btn-state-empty" class="px-2.5 py-1 rounded-lg bg-ff-surface text-ff-text border border-ff-border font-medium hover:border-ff-accent transition">
+        Empty (No Preset)
+      </button>
+    </div>
+    <button onclick="runHomeScreenAutoTests()" class="px-3 py-1 rounded-lg bg-emerald-500/20 text-emerald-400 border border-emerald-500/40 font-bold hover:bg-emerald-500/30 transition flex items-center space-x-1.5 shadow-sm">
       <span>🧪</span>
       <span>Run Automated Tests</span>
     </button>
   </div>
 
-  <!-- PHONE CONTAINER SIMULATOR -->
-  <div class="relative w-[390px] h-[830px] bg-ff-bg rounded-[44px] border-[3px] border-ff-border shadow-2xl overflow-hidden flex flex-col justify-between p-5">
+  <!-- RESPONSIVE APP CONTAINER (Adapts fluidly to phone, tablet, and desktop) -->
+  <div class="w-full max-w-5xl mx-auto flex-1 flex flex-col justify-between p-4 sm:p-6 md:p-8">
     
     <!-- TOP SECTION (Status Bar + Header + Banner) -->
     <div class="w-full shrink-0">
@@ -137,192 +138,194 @@
     </div>
 
     <!-- MAIN SCROLLABLE CONTENT BODY -->
-    <div class="flex-1 overflow-y-auto no-scrollbar space-y-3.5 my-3">
+    <div class="flex-1 overflow-y-auto no-scrollbar my-3">
       
-      <!-- SECTION DIVIDER 1 -->
-      <div class="h-px bg-ff-border w-full"></div>
-
-      <!-- 4. MOMENTUM CARD -->
-      <div class="bg-ff-surface border border-ff-border rounded-xl p-4 shadow-md">
-        <!-- Card Header -->
-        <div class="flex items-center justify-between mb-2.5">
-          <h2 class="text-sm font-semibold text-ff-text tracking-tight">Momentum</h2>
-          <span class="text-[11px] text-ff-muted font-medium">Last 24h</span>
-        </div>
-
-        <!-- Smooth Bézier Stacked Area Chart (SVG) -->
-        <div class="relative w-full h-32 my-1">
-          <svg class="w-full h-full overflow-visible" viewBox="0 0 320 120" preserveAspectRatio="none">
-            <defs>
-              <linearGradient id="gradProductive" x1="0" y1="0" x2="0" y2="1">
-                <stop offset="0%" stop-color="#14B8A6" stop-opacity="0.75"/>
-                <stop offset="100%" stop-color="#14B8A6" stop-opacity="0.1"/>
-              </linearGradient>
-              <linearGradient id="gradSemi" x1="0" y1="0" x2="0" y2="1">
-                <stop offset="0%" stop-color="#906D4B" stop-opacity="0.75"/>
-                <stop offset="100%" stop-color="#906D4B" stop-opacity="0.1"/>
-              </linearGradient>
-              <linearGradient id="gradDistracting" x1="0" y1="0" x2="0" y2="1">
-                <stop offset="0%" stop-color="#1A2333" stop-opacity="0.8"/>
-                <stop offset="100%" stop-color="#1A2333" stop-opacity="0.2"/>
-              </linearGradient>
-              <linearGradient id="gradOthers" x1="0" y1="0" x2="0" y2="1">
-                <stop offset="0%" stop-color="#94A3B8" stop-opacity="0.5"/>
-                <stop offset="100%" stop-color="#94A3B8" stop-opacity="0.05"/>
-              </linearGradient>
-            </defs>
-
-            <!-- Layer 1: Productive (Bottom) -->
-            <path d="M 0,120 L 0,85 C 40,75 80,105 120,65 C 160,30 200,80 240,45 C 280,35 300,50 320,60 L 320,120 Z" fill="url(#gradProductive)"/>
-            <path d="M 0,85 C 40,75 80,105 120,65 C 160,30 200,80 240,45 C 280,35 300,50 320,60" fill="none" stroke="#14B8A6" stroke-width="1.8"/>
-
-            <!-- Layer 2: Semi-Productive -->
-            <path d="M 0,85 C 40,75 80,105 120,65 C 160,30 200,80 240,45 C 280,35 300,50 320,60 L 320,38 C 290,30 260,20 220,35 C 180,45 140,25 100,45 C 60,65 30,55 0,65 Z" fill="url(#gradSemi)"/>
-            <path d="M 0,65 C 30,55 60,65 100,45 C 140,25 180,45 220,35 C 260,20 290,30 320,38" fill="none" stroke="#906D4B" stroke-width="1.5"/>
-
-            <!-- Layer 3: Distracting -->
-            <path d="M 0,65 C 30,55 60,65 100,45 C 140,25 180,45 220,35 C 260,20 290,30 320,38 L 320,24 C 280,18 240,22 200,16 C 160,12 120,28 80,26 C 40,24 20,40 0,42 Z" fill="url(#gradDistracting)"/>
-
-            <!-- Layer 4: Others (Top) -->
-            <path d="M 0,42 C 20,40 40,24 80,26 C 120,28 160,12 200,16 C 240,22 280,18 320,24 L 320,15 C 280,8 240,12 200,8 C 160,5 120,18 80,16 C 40,14 20,28 0,30 Z" fill="url(#gradOthers)"/>
-          </svg>
-        </div>
-
-        <!-- X-Axis Labels -->
-        <div class="flex justify-between text-[10px] text-ff-muted font-medium pt-1 px-1">
-          <span>6am</span>
-          <span>12pm</span>
-          <span>6pm</span>
-          <span>12am</span>
-        </div>
-
-        <!-- 4.4 2×2 Legend Grid with dividers -->
-        <div class="mt-3 pt-2.5 border-t border-ff-border grid grid-cols-2 divide-x divide-ff-border">
-          
-          <!-- Col 1 -->
-          <div class="pr-3 space-y-2">
-            <!-- Productive -->
-            <div class="flex items-center justify-between text-xs">
-              <div class="flex items-center space-x-1.5">
-                <span class="w-2 h-2 rounded-full bg-ff-productive"></span>
-                <span class="text-[11px] text-ff-muted">Productive</span>
-              </div>
-              <span class="font-bold text-ff-text text-[11px]">2h 15m</span>
-            </div>
-            <!-- Distracting -->
-            <div class="flex items-center justify-between text-xs pt-1.5 border-t border-ff-border">
-              <div class="flex items-center space-x-1.5">
-                <span class="w-2 h-2 rounded-full bg-[#1A2333] border border-ff-muted"></span>
-                <span class="text-[11px] text-ff-muted">Distracting</span>
-              </div>
-              <span class="font-bold text-ff-text text-[11px]">45m</span>
-            </div>
-          </div>
-
-          <!-- Col 2 -->
-          <div class="pl-3 space-y-2">
-            <!-- Semi-Productive -->
-            <div class="flex items-center justify-between text-xs">
-              <div class="flex items-center space-x-1.5">
-                <span class="w-2 h-2 rounded-full bg-ff-semi"></span>
-                <span class="text-[11px] text-ff-muted">Semi-Prod</span>
-              </div>
-              <span class="font-bold text-ff-text text-[11px]">1h 05m</span>
-            </div>
-            <!-- Others -->
-            <div class="flex items-center justify-between text-xs pt-1.5 border-t border-ff-border">
-              <div class="flex items-center space-x-1.5">
-                <span class="w-2 h-2 rounded-full bg-ff-muted"></span>
-                <span class="text-[11px] text-ff-muted">Others</span>
-              </div>
-              <span class="font-bold text-ff-text text-[11px]">20m</span>
-            </div>
-          </div>
-
-        </div>
-
-      </div>
-
-      <!-- SECTION DIVIDER 2 -->
-      <div class="h-px bg-ff-border w-full"></div>
-
-      <!-- 5. SESSION CARD -->
-      <div id="session-card" class="bg-ff-surface border border-ff-border border-l-4 border-l-ff-primary rounded-xl p-4 shadow-md">
+      <!-- RESPONSIVE 2-COLUMN GRID (Single column on mobile, dual-column on tablet/desktop) -->
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-5 md:gap-8 items-start">
         
-        <!-- Top Row: Today's Focus Time + Preset Selector -->
-        <div id="preset-selector-row" class="flex items-center justify-between pb-3 border-b border-ff-border">
-          <!-- Total Focus Time Today -->
+        <!-- COLUMN 1: MOMENTUM CARD & CHART -->
+        <div class="space-y-4">
+          <!-- 4. MOMENTUM CARD -->
+          <div class="bg-ff-surface border border-ff-border rounded-xl p-4 sm:p-5 shadow-md">
+            <!-- Card Header -->
+            <div class="flex items-center justify-between mb-2.5">
+              <h2 class="text-sm font-semibold text-ff-text tracking-tight">Momentum</h2>
+              <span class="text-[11px] text-ff-muted font-medium">Last 24h</span>
+            </div>
+
+            <!-- Smooth Bézier Stacked Area Chart (SVG) -->
+            <div class="relative w-full h-36 my-1">
+              <svg class="w-full h-full overflow-visible" viewBox="0 0 320 120" preserveAspectRatio="none">
+                <defs>
+                  <linearGradient id="gradProductive" x1="0" y1="0" x2="0" y2="1">
+                    <stop offset="0%" stop-color="#14B8A6" stop-opacity="0.75"/>
+                    <stop offset="100%" stop-color="#14B8A6" stop-opacity="0.1"/>
+                  </linearGradient>
+                  <linearGradient id="gradSemi" x1="0" y1="0" x2="0" y2="1">
+                    <stop offset="0%" stop-color="#906D4B" stop-opacity="0.75"/>
+                    <stop offset="100%" stop-color="#906D4B" stop-opacity="0.1"/>
+                  </linearGradient>
+                  <linearGradient id="gradDistracting" x1="0" y1="0" x2="0" y2="1">
+                    <stop offset="0%" stop-color="#1A2333" stop-opacity="0.8"/>
+                    <stop offset="100%" stop-color="#1A2333" stop-opacity="0.2"/>
+                  </linearGradient>
+                  <linearGradient id="gradOthers" x1="0" y1="0" x2="0" y2="1">
+                    <stop offset="0%" stop-color="#94A3B8" stop-opacity="0.5"/>
+                    <stop offset="100%" stop-color="#94A3B8" stop-opacity="0.05"/>
+                  </linearGradient>
+                </defs>
+
+                <!-- Layer 1: Productive (Bottom) -->
+                <path d="M 0,120 L 0,85 C 40,75 80,105 120,65 C 160,30 200,80 240,45 C 280,35 300,50 320,60 L 320,120 Z" fill="url(#gradProductive)"/>
+                <path d="M 0,85 C 40,75 80,105 120,65 C 160,30 200,80 240,45 C 280,35 300,50 320,60" fill="none" stroke="#14B8A6" stroke-width="1.8"/>
+
+                <!-- Layer 2: Semi-Productive -->
+                <path d="M 0,85 C 40,75 80,105 120,65 C 160,30 200,80 240,45 C 280,35 300,50 320,60 L 320,38 C 290,30 260,20 220,35 C 180,45 140,25 100,45 C 60,65 30,55 0,65 Z" fill="url(#gradSemi)"/>
+                <path d="M 0,65 C 30,55 60,65 100,45 C 140,25 180,45 220,35 C 260,20 290,30 320,38" fill="none" stroke="#906D4B" stroke-width="1.5"/>
+
+                <!-- Layer 3: Distracting -->
+                <path d="M 0,65 C 30,55 60,65 100,45 C 140,25 180,45 220,35 C 260,20 290,30 320,38 L 320,24 C 280,18 240,22 200,16 C 160,12 120,28 80,26 C 40,24 20,40 0,42 Z" fill="url(#gradDistracting)"/>
+
+                <!-- Layer 4: Others (Top) -->
+                <path d="M 0,42 C 20,40 40,24 80,26 C 120,28 160,12 200,16 C 240,22 280,18 320,24 L 320,15 C 280,8 240,12 200,8 C 160,5 120,18 80,16 C 40,14 20,28 0,30 Z" fill="url(#gradOthers)"/>
+              </svg>
+            </div>
+
+            <!-- X-Axis Labels -->
+            <div class="flex justify-between text-[10px] text-ff-muted font-medium pt-1 px-1">
+              <span>6am</span>
+              <span>12pm</span>
+              <span>6pm</span>
+              <span>12am</span>
+            </div>
+
+            <!-- 4.4 2×2 Legend Grid with dividers -->
+            <div class="mt-3 pt-2.5 border-t border-ff-border grid grid-cols-2 divide-x divide-ff-border">
+              
+              <!-- Col 1 -->
+              <div class="pr-3 space-y-2">
+                <!-- Productive -->
+                <div class="flex items-center justify-between text-xs">
+                  <div class="flex items-center space-x-1.5">
+                    <span class="w-2 h-2 rounded-full bg-ff-productive"></span>
+                    <span class="text-[11px] text-ff-muted">Productive</span>
+                  </div>
+                  <span class="font-bold text-ff-text text-[11px]">2h 15m</span>
+                </div>
+                <!-- Distracting -->
+                <div class="flex items-center justify-between text-xs pt-1.5 border-t border-ff-border">
+                  <div class="flex items-center space-x-1.5">
+                    <span class="w-2 h-2 rounded-full bg-[#1A2333] border border-ff-muted"></span>
+                    <span class="text-[11px] text-ff-muted">Distracting</span>
+                  </div>
+                  <span class="font-bold text-ff-text text-[11px]">45m</span>
+                </div>
+              </div>
+
+              <!-- Col 2 -->
+              <div class="pl-3 space-y-2">
+                <!-- Semi-Productive -->
+                <div class="flex items-center justify-between text-xs">
+                  <div class="flex items-center space-x-1.5">
+                    <span class="w-2 h-2 rounded-full bg-ff-semi"></span>
+                    <span class="text-[11px] text-ff-muted">Semi-Prod</span>
+                  </div>
+                  <span class="font-bold text-ff-text text-[11px]">1h 05m</span>
+                </div>
+                <!-- Others -->
+                <div class="flex items-center justify-between text-xs pt-1.5 border-t border-ff-border">
+                  <div class="flex items-center space-x-1.5">
+                    <span class="w-2 h-2 rounded-full bg-ff-muted"></span>
+                    <span class="text-[11px] text-ff-muted">Others</span>
+                  </div>
+                  <span class="font-bold text-ff-text text-[11px]">20m</span>
+                </div>
+              </div>
+
+            </div>
+
+          </div>
+        </div>
+
+        <!-- COLUMN 2: SESSION CARD + CTA -->
+        <div class="space-y-4">
+          <!-- 5. SESSION CARD -->
+          <div id="session-card" class="bg-ff-surface border border-ff-border border-l-4 border-l-ff-primary rounded-xl p-4 sm:p-5 shadow-md">
+            
+            <!-- Top Row: Today's Focus Time + Preset Selector -->
+            <div id="preset-selector-row" class="flex items-center justify-between pb-3 border-b border-ff-border">
+              <!-- Total Focus Time Today -->
+              <div>
+                <span class="text-[10px] text-ff-muted uppercase tracking-wider font-semibold block">Today's Focus</span>
+                <span id="session-today-time" class="text-2xl font-mono font-bold text-ff-text">1hr 43m</span>
+              </div>
+
+              <!-- Preset Pill & Chevron -->
+              <div class="flex items-center space-x-1.5 bg-ff-bg/60 border border-ff-border px-3 py-1.5 rounded-full cursor-pointer hover:border-ff-primary transition">
+                <span id="preset-emoji" class="text-sm">⚡</span>
+                <span id="preset-title" class="text-xs font-semibold text-ff-text">Math Olympiad</span>
+                <span class="text-[10px] text-ff-muted ml-0.5">▾</span>
+              </div>
+            </div>
+
+            <!-- 5.3 Detail Rows -->
+            <div id="session-details-list" class="pt-2 text-xs space-y-2">
+              
+              <!-- Row 1: Duration -->
+              <div class="flex items-center justify-between py-1 border-b border-ff-border/50">
+                <span class="text-ff-muted">Duration</span>
+                <span id="detail-duration" class="font-medium text-ff-text">08:30pm — 11:00pm</span>
+              </div>
+
+              <!-- Row 2: Breaks -->
+              <div class="flex items-center justify-between py-1 border-b border-ff-border/50">
+                <span class="text-ff-muted">Breaks</span>
+                <span id="detail-breaks" class="font-medium text-ff-text">4 Sessions</span>
+              </div>
+
+              <!-- Row 3: Break Time (each) -->
+              <div class="flex items-center justify-between py-1 border-b border-ff-border/50">
+                <span class="text-ff-muted">Break Time (each)</span>
+                <span id="detail-break-time" class="font-medium text-ff-text">10m</span>
+              </div>
+
+              <!-- Row 4: Description -->
+              <div id="detail-desc-container" class="pt-1">
+                <span class="text-[9px] uppercase tracking-wider font-bold text-ff-muted block mb-0.5">Description</span>
+                <p id="detail-desc" class="italic text-ff-text text-[11px] leading-relaxed">
+                  Deep work on IOQM Number Theory modular arithmetic & polynomials
+                </p>
+              </div>
+
+            </div>
+
+            <!-- Empty State Container (Hidden by default) -->
+            <div id="empty-state-details" class="hidden py-4 text-center">
+              <p class="text-xs text-ff-muted mb-2">No focus preset configured yet.</p>
+              <a href="preset_creation.html?returnUrl=home_screen.html" class="inline-flex items-center text-xs font-bold text-ff-primary hover:underline">
+                Create one →
+              </a>
+            </div>
+
+          </div>
+
+          <!-- 6. START FOCUSING BUTTON -->
           <div>
-            <span class="text-[10px] text-ff-muted uppercase tracking-wider font-semibold block">Today's Focus</span>
-            <span id="session-today-time" class="text-2xl font-mono font-bold text-ff-text">1hr 43m</span>
-          </div>
-
-          <!-- Preset Pill & Chevron -->
-          <div class="flex items-center space-x-1.5 bg-ff-bg/60 border border-ff-border px-3 py-1.5 rounded-full cursor-pointer hover:border-ff-primary transition">
-            <span id="preset-emoji" class="text-sm">⚡</span>
-            <span id="preset-title" class="text-xs font-semibold text-ff-text">Math Olympiad</span>
-            <span class="text-[10px] text-ff-muted ml-0.5">▾</span>
+            <button id="btn-primary-cta" onclick="handlePrimaryCTA()"
+                    class="w-full py-4 px-6 bg-ff-primary hover:bg-[#b88c5a] text-ff-bg font-bold text-sm tracking-wide rounded-full text-center transition-all duration-200 active:scale-98 shadow-lg flex items-center justify-center space-x-2">
+              <span id="cta-button-text">Start Focusing</span>
+            </button>
           </div>
         </div>
 
-        <!-- 5.3 Detail Rows -->
-        <div id="session-details-list" class="pt-2 text-xs space-y-2">
-          
-          <!-- Row 1: Duration -->
-          <div class="flex items-center justify-between py-1 border-b border-ff-border/50">
-            <span class="text-ff-muted">Duration</span>
-            <span id="detail-duration" class="font-medium text-ff-text">08:30pm — 11:00pm</span>
-          </div>
-
-          <!-- Row 2: Breaks -->
-          <div class="flex items-center justify-between py-1 border-b border-ff-border/50">
-            <span class="text-ff-muted">Breaks</span>
-            <span id="detail-breaks" class="font-medium text-ff-text">4 Sessions</span>
-          </div>
-
-          <!-- Row 3: Break Time (each) -->
-          <div class="flex items-center justify-between py-1 border-b border-ff-border/50">
-            <span class="text-ff-muted">Break Time (each)</span>
-            <span id="detail-break-time" class="font-medium text-ff-text">10m</span>
-          </div>
-
-          <!-- Row 4: Description -->
-          <div id="detail-desc-container" class="pt-1">
-            <span class="text-[9px] uppercase tracking-wider font-bold text-ff-muted block mb-0.5">Description</span>
-            <p id="detail-desc" class="italic text-ff-text text-[11px] leading-relaxed">
-              Deep work on IOQM Number Theory modular arithmetic & polynomials
-            </p>
-          </div>
-
-        </div>
-
-        <!-- Empty State Container (Hidden by default) -->
-        <div id="empty-state-details" class="hidden py-4 text-center">
-          <p class="text-xs text-ff-muted mb-2">No focus preset configured yet.</p>
-          <a href="preset_creation.html?returnUrl=home_screen.html" class="inline-flex items-center text-xs font-bold text-ff-primary hover:underline">
-            Create one →
-          </a>
-        </div>
-
-      </div>
-
-      <!-- SECTION DIVIDER 3 -->
-      <div class="h-px bg-ff-border w-full"></div>
-
-      <!-- 6. START FOCUSING BUTTON -->
-      <div>
-        <button id="btn-primary-cta" onclick="handlePrimaryCTA()"
-                class="w-full py-4 px-6 bg-ff-primary hover:bg-[#b88c5a] text-ff-bg font-bold text-sm tracking-wide rounded-full text-center transition-all duration-200 active:scale-98 shadow-lg flex items-center justify-center space-x-2">
-          <span id="cta-button-text">Start Focusing</span>
-        </button>
       </div>
 
     </div>
 
     <!-- BOTTOM SECTION: FLOATING PILL NAVIGATION BAR -->
-    <div class="w-full shrink-0 pt-2">
+    <div class="w-full shrink-0 pt-3 pb-1">
       <!-- 1.1 Persistent Floating Pill Nav Bar -->
-      <div class="w-full h-16 bg-ff-surface border border-ff-border rounded-full px-3 flex items-center justify-between shadow-xl">
+      <div class="w-full max-w-md mx-auto h-16 bg-ff-surface border border-ff-border rounded-full px-3 flex items-center justify-between shadow-xl">
         
         <!-- Tab 1: Home (Standalone Leftmost) -->
         <button class="flex flex-col items-center justify-center px-2 py-1 text-ff-primary">

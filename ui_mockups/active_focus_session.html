@@ -115,27 +115,29 @@
     }
   </style>
 </head>
-<body class="min-h-screen flex flex-col items-center justify-center p-4 text-ff-text">
+<body class="min-h-screen w-full bg-ff-bg text-ff-text flex flex-col">
 
   <!-- TOP TOOLBAR CONTROLS (Preview Controller) -->
-  <div class="mb-6 flex flex-wrap items-center justify-center gap-2 bg-[#182028] border border-ff-border px-4 py-2.5 rounded-2xl shadow-xl max-w-xl text-xs">
-    <span class="text-ff-primary font-bold tracking-wide uppercase text-[11px] mr-2">Preview Controls:</span>
-    <button onclick="setMode('focus')" id="btn-mode-focus" class="px-3 py-1.5 rounded-lg bg-ff-primary text-ff-bg font-bold transition">
-      Focus Mode
-    </button>
-    <button onclick="setMode('break')" id="btn-mode-break" class="px-3 py-1.5 rounded-lg bg-ff-surface text-ff-text border border-ff-border font-medium hover:border-ff-accent transition">
-      Break Window
-    </button>
-    <button onclick="toggleStopModal(true)" class="px-3 py-1.5 rounded-lg bg-ff-surface text-ff-text border border-ff-border font-medium hover:border-ff-primary transition">
-      Trigger Stop Modal
-    </button>
-    <button onclick="triggerFlipAnimation()" class="px-3 py-1.5 rounded-lg bg-ff-surface text-ff-accent border border-ff-border font-medium hover:bg-ff-surface/80 transition">
-      ↻ Test Flip
-    </button>
+  <div class="w-full bg-[#182028] border-b border-ff-border px-4 py-2.5 flex flex-wrap items-center justify-between gap-2 shadow-md text-xs sticky top-0 z-30">
+    <div class="flex items-center space-x-2">
+      <span class="text-ff-primary font-bold tracking-wide uppercase text-[11px]">Session Controls:</span>
+      <button onclick="setMode('focus')" id="btn-mode-focus" class="px-2.5 py-1 rounded-lg bg-ff-primary text-ff-bg font-bold transition">
+        Focus Mode
+      </button>
+      <button onclick="setMode('break')" id="btn-mode-break" class="px-2.5 py-1 rounded-lg bg-ff-surface text-ff-text border border-ff-border font-medium hover:border-ff-accent transition">
+        Break Window
+      </button>
+      <button onclick="toggleStopModal(true)" class="px-2.5 py-1 rounded-lg bg-ff-surface text-ff-text border border-ff-border font-medium hover:border-ff-primary transition">
+        Stop Modal
+      </button>
+      <button onclick="triggerFlipAnimation()" class="px-2.5 py-1 rounded-lg bg-ff-surface text-ff-accent border border-ff-border font-medium hover:bg-ff-surface/80 transition">
+        ↻ Test Flip
+      </button>
+    </div>
   </div>
 
-  <!-- PHONE CONTAINER SIMULATOR -->
-  <div class="relative w-[380px] h-[800px] bg-ff-bg rounded-[44px] border-[3px] border-ff-border shadow-2xl overflow-hidden flex flex-col justify-between p-6">
+  <!-- RESPONSIVE APP CONTAINER -->
+  <div class="w-full max-w-4xl mx-auto flex-1 flex flex-col justify-between p-4 sm:p-6 md:p-8 relative">
     
     <!-- ANDROID STATUS BAR -->
     <div class="w-full flex items-center justify-between text-[11px] text-ff-muted font-medium pt-1 px-1">
@@ -152,7 +154,7 @@
     <!-- 1.3 HEADER ROW -->
     <div class="w-full flex items-center justify-between mt-4">
       <!-- Left: Preset Name Pill -->
-      <div id="preset-pill" class="flex items-center space-x-2 bg-ff-primary px-3.5 py-1.5 rounded-full transition-colors duration-300">
+      <div id="preset-pill" class="flex items-center space-x-2 bg-ff-primary px-3.5 py-1.5 rounded-full transition-colors duration-300 shadow-md">
         <span class="text-xs">⚡</span>
         <span id="preset-name" class="text-xs font-semibold text-ff-bg tracking-tight">Math Olympiad</span>
       </div>
@@ -168,55 +170,58 @@
       </div>
     </div>
 
-    <!-- 1.4 MAIN DISPLAY: MECHANICAL FLIP CLOCK -->
-    <div class="flex-1 flex flex-col items-center justify-center space-y-4 my-auto">
+    <!-- 1.4 MAIN DISPLAY: MECHANICAL FLIP CLOCK (Adaptive: Stacks on portrait, Side-by-side on landscape/tablet) -->
+    <div class="flex-1 flex flex-col items-center justify-center my-auto py-6">
       
-      <!-- TOP CARD: HOURS -->
-      <div id="card-hours" class="relative w-[280px] h-[190px] bg-ff-surface rounded-2xl border border-ff-border flex items-center justify-center shadow-lg transition-all duration-300">
-        <!-- Mechanical Split Seam -->
-        <div class="flip-card-seam"></div>
-        <div class="hinge-notch-left"></div>
-        <div class="hinge-notch-right"></div>
-        
-        <!-- Subtle Top/Bottom Realistic Shadowing -->
-        <div class="half-card-top"></div>
-        <div class="half-card-bottom"></div>
+      <!-- Cards Container -->
+      <div class="flex flex-col sm:flex-row items-center justify-center gap-4 sm:gap-6 md:gap-8 my-auto">
+        <!-- TOP/LEFT CARD: HOURS -->
+        <div id="card-hours" class="relative w-[260px] sm:w-[260px] md:w-[290px] h-[160px] sm:h-[180px] md:h-[200px] bg-ff-surface rounded-2xl border border-ff-border flex items-center justify-center shadow-2xl transition-all duration-300">
+          <!-- Mechanical Split Seam -->
+          <div class="flip-card-seam"></div>
+          <div class="hinge-notch-left"></div>
+          <div class="hinge-notch-right"></div>
+          
+          <!-- Subtle Top/Bottom Realistic Shadowing -->
+          <div class="half-card-top"></div>
+          <div class="half-card-bottom"></div>
 
-        <!-- Digit Display -->
-        <span id="hours-display" class="font-mono text-7xl font-bold tracking-tight text-ff-text transition-colors duration-300 z-10 select-none">
-          02
-        </span>
+          <!-- Digit Display -->
+          <span id="hours-display" class="font-mono text-6xl sm:text-7xl md:text-8xl font-bold tracking-tight text-ff-text transition-colors duration-300 z-10 select-none">
+            02
+          </span>
 
-        <!-- Sub-Label: HOURS -->
-        <span class="absolute bottom-2.5 right-3.5 text-[10px] font-bold tracking-widest text-ff-muted uppercase select-none z-10">
-          HOURS
-        </span>
-      </div>
+          <!-- Sub-Label: HOURS -->
+          <span class="absolute bottom-2.5 right-3.5 text-[10px] font-bold tracking-widest text-ff-muted uppercase select-none z-10">
+            HOURS
+          </span>
+        </div>
 
-      <!-- BOTTOM CARD: MINUTES -->
-      <div id="card-minutes" class="relative w-[280px] h-[190px] bg-ff-surface rounded-2xl border border-ff-border flex items-center justify-center shadow-lg transition-all duration-300">
-        <!-- Mechanical Split Seam -->
-        <div class="flip-card-seam"></div>
-        <div class="hinge-notch-left"></div>
-        <div class="hinge-notch-right"></div>
+        <!-- BOTTOM/RIGHT CARD: MINUTES -->
+        <div id="card-minutes" class="relative w-[260px] sm:w-[260px] md:w-[290px] h-[160px] sm:h-[180px] md:h-[200px] bg-ff-surface rounded-2xl border border-ff-border flex items-center justify-center shadow-2xl transition-all duration-300">
+          <!-- Mechanical Split Seam -->
+          <div class="flip-card-seam"></div>
+          <div class="hinge-notch-left"></div>
+          <div class="hinge-notch-right"></div>
 
-        <!-- Subtle Top/Bottom Realistic Shadowing -->
-        <div class="half-card-top"></div>
-        <div class="half-card-bottom"></div>
+          <!-- Subtle Top/Bottom Realistic Shadowing -->
+          <div class="half-card-top"></div>
+          <div class="half-card-bottom"></div>
 
-        <!-- Digit Display -->
-        <span id="minutes-display" class="font-mono text-7xl font-bold tracking-tight text-ff-text transition-colors duration-300 z-10 select-none">
-          45
-        </span>
+          <!-- Digit Display -->
+          <span id="minutes-display" class="font-mono text-6xl sm:text-7xl md:text-8xl font-bold tracking-tight text-ff-text transition-colors duration-300 z-10 select-none">
+            45
+          </span>
 
-        <!-- Sub-Label: MINUTES -->
-        <span class="absolute bottom-2.5 right-3.5 text-[10px] font-bold tracking-widest text-ff-muted uppercase select-none z-10">
-          MINUTES
-        </span>
+          <!-- Sub-Label: MINUTES -->
+          <span class="absolute bottom-2.5 right-3.5 text-[10px] font-bold tracking-widest text-ff-muted uppercase select-none z-10">
+            MINUTES
+          </span>
+        </div>
       </div>
 
       <!-- TIMER MODE INDICATOR SUB-BAR -->
-      <div class="flex items-center space-x-2 text-xs text-ff-muted/80 pt-1">
+      <div class="flex items-center space-x-2 text-xs text-ff-muted/80 pt-4">
         <span class="w-1.5 h-1.5 rounded-full bg-ff-primary animate-pulse"></span>
         <span id="timer-mode-label" class="tracking-wide uppercase text-[10px] font-semibold">Countdown Active</span>
       </div>
@@ -224,7 +229,7 @@
     </div>
 
     <!-- 1.5 BOTTOM CONTROLS BAR -->
-    <div class="w-full flex items-center justify-between gap-3 mb-3">
+    <div class="w-full max-w-md mx-auto flex items-center justify-between gap-3 mb-4">
       
       <!-- Left (~50% width): Stop Focusing Button -->
       <button onclick="toggleStopModal(true)" 

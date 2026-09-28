@@ -10,7 +10,7 @@ This registry coordinates concurrent/subsequent AI coding agents working in this
 | Agent Name | Role / Specialty | Status | Branch | Current Task / Active Scope | Reserved / Active Files | Port(s) Used |
 |---|---|---|---|---|---|---|
 | **Code1** | Lead UI Designer | **ACTIVE** | `ff` | Phase 1-B Step 6 COMPLETED (Focus timer domain models, Hive focus_session_state active persistence, SQLite finished session logging, ForegroundTimerService with flutter_foreground_task, FocusSessionNotifier state machine, mechanical FlipClock widget, FocusSessionScreen, 24 unit & widget tests, 123/123 tests passing, 0 lints). | `fluxfoxus/lib/features/focus/`, `fluxfoxus/lib/presentation/widgets/flip_clock.dart`, `fluxfoxus/lib/presentation/screens/focus_session_screen.dart`, `progress_tracker.md`, `agent_worklog.md` | None (all quiet) |
-| **Code2** | Companion UI Designer / Responsive Architect | **IDLE** | `ff` | Responsive Scaling & Adaptive Layouts (Phase 1-A & Phase 1-B Step 5) COMPLETED: Full adaptive scaling across all aspect ratios (320px to 1024px) and orientations (portrait & landscape); 48/48 responsive test assertions passing, 93/93 total Flutter tests passing, 0 lints. | `fluxfoxus/lib/core/theme/responsive_layout.dart`, `fluxfoxus/lib/presentation/screens/`, `fluxfoxus/lib/core/navigation/`, `progress_tracker.md`, `agent_worklog.md` | `8086`, `8088`, `8089`, `8090` |
+| **Code2** | Companion UI Designer / Responsive Architect | **IDLE** | `ff` | Responsive Scaling & HTML Viewport Adaptivity COMPLETED: Internal screens refactored from fixed narrow mobile frames to fluid responsive grid/flex layouts across phone, tablet, and desktop viewports; Flutter responsive foundation (48/48 tests passing); 100% passing across all mockup DOM test suites, 123/123 Flutter tests, 0 lints. | `ui_mockups/`, `fluxfoxus/lib/core/theme/responsive_layout.dart`, `progress_tracker.md`, `agent_worklog.md` | None (all quiet per user request) |
 
 ---
 
@@ -116,13 +116,15 @@ This registry coordinates concurrent/subsequent AI coding agents working in this
     - In-browser automated test runner (`#auto-test-modal`) testing all 10 feature gates (100% passing).
     - Local preview served on port `8090`.
   - Built standalone verification test scripts (`test_usage_stats.js`, `test_code2_screens.js`) passing 100% of DOM, color tokens, and state assertions across all screens.
+  - Refactored HTML mockups (`home_screen.html`, `active_focus_session.html`, `planner.html`, `preset_creation.html`, `app_limits.html`, `usage_stats.html`, `index.html`) so internal screens adapt responsively to viewport simulator dimensions (320px, 390px, 640px, 768px, 1024px, 100% full window), utilizing full width/height with dynamic grid layouts (`md:grid-cols-2`, `lg:grid-cols-3`), responsive flip-clock orientation (horizontal split seam cards), and centered navigation/floating action buttons.
 * **What `Code2` is doing right now:**
-  - `IDLE` / All Responsive Scaling & Adaptive Layout tasks completed and verified:
-    - Built reusable `ResponsiveLayout` utilities (`AppBreakpoints`, `ResponsiveContent`, `AdaptiveScrollBody`).
+  - `IDLE` / All Responsive Scaling & Viewport Adaptivity tasks completed and verified:
+    - Built reusable `ResponsiveLayout` utilities (`AppBreakpoints`, `ResponsiveContent`, `AdaptiveScrollBody`) in Flutter.
     - Fixed horizontal overflows on narrow devices (320px) in `HomeScreen`, `FocusSessionScreen`, `AppLimitsScreen`, and `PresetCreateScreen`.
     - Fixed vertical overflows on low-height landscape orientations (360px–390px) in `PermissionsOnboardingFlowScreen`, `FocusSessionScreen`, `PlannerScreen`, and `UsageStatsScreen`.
     - Constrained tablet & desktop presentations (`ResponsiveContent` max-width 600px centered).
-    - 48 responsive tests passing in `test/responsive_test.dart` and 93/93 total Flutter tests passing with 0 analyzer lints.
+    - 48 responsive tests passing in `test/responsive_test.dart` and 123/123 total Flutter tests passing with 0 analyzer lints.
+    - All background preview ports closed and idle per user directive.
 * **Exclusive Resources / Do Not Overwrite:**
   - `fluxfoxus/lib/core/theme/responsive_layout.dart`
   - `fluxfoxus/test/responsive_test.dart`
@@ -130,10 +132,7 @@ This registry coordinates concurrent/subsequent AI coding agents working in this
   - `ui_mockups/planner.html` (Code2 screen)
   - `ui_mockups/home_screen.html` (Code2 screen)
   - `ui_mockups/app_limits.html` (Code2 screen)
-  - Port `8086` (Home Screen preview)
-  - Port `8088` (App Limits preview)
-  - Port `8089` (Planner preview)
-  - Port `8090` (Usage Stats preview)
+  - `ui_mockups/index.html` (Simulator Hub)
 
 ---
 
