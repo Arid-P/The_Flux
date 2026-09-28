@@ -9,7 +9,7 @@ This registry coordinates concurrent/subsequent AI coding agents working in this
 
 | Agent Name | Role / Specialty | Status | Branch | Current Task / Active Scope | Reserved / Active Files | Port(s) Used |
 |---|---|---|---|---|---|---|
-| **Code1** | Lead UI Designer | **ACTIVE** | `ff` | Phase 1-B Step 5 COMPLETED (Presets SQLite CRUD, interactive creation screen, emoji picker, break steppers, app restrictions, YouTube mode, Test 7 resolved with fake repo, 51/51 tests passing, 0 lints). Awaiting user command to start Phase 1-B Step 6. | `fluxfoxus/lib/features/presets/`, `fluxfoxus/lib/presentation/screens/preset_create_screen.dart`, `progress_tracker.md`, `agent_worklog.md` | `8085` |
+| **Code1** | Lead UI Designer | **ACTIVE** | `ff` | Phase 1-B Step 6 COMPLETED (Focus timer domain models, Hive focus_session_state active persistence, SQLite finished session logging, ForegroundTimerService with flutter_foreground_task, FocusSessionNotifier state machine, mechanical FlipClock widget, FocusSessionScreen, 24 unit & widget tests, 123/123 tests passing, 0 lints). | `fluxfoxus/lib/features/focus/`, `fluxfoxus/lib/presentation/widgets/flip_clock.dart`, `fluxfoxus/lib/presentation/screens/focus_session_screen.dart`, `progress_tracker.md`, `agent_worklog.md` | None (all quiet) |
 | **Code2** | Companion UI Designer / Responsive Architect | **IDLE** | `ff` | Responsive Scaling & Adaptive Layouts (Phase 1-A & Phase 1-B Step 5) COMPLETED: Full adaptive scaling across all aspect ratios (320px to 1024px) and orientations (portrait & landscape); 48/48 responsive test assertions passing, 93/93 total Flutter tests passing, 0 lints. | `fluxfoxus/lib/core/theme/responsive_layout.dart`, `fluxfoxus/lib/presentation/screens/`, `fluxfoxus/lib/core/navigation/`, `progress_tracker.md`, `agent_worklog.md` | `8086`, `8088`, `8089`, `8090` |
 
 ---
@@ -63,22 +63,26 @@ This registry coordinates concurrent/subsequent AI coding agents working in this
     - Full Preset Creation screen per `ui_preset.md` (Name input, Emoji selector bottom sheet, Break steppers 0-6 breaks & 1-15m duration, App restrictions with 4 categories, YouTube 3-way radio).
     - Fixed Test 7 Riverpod async teardown timeout in `preset_create_screen_test.dart` using hermetic in-memory `_FakePresetsRepository`.
     - 12 automated unit & widget tests (5 repository tests + 7 widget tests) passing (51/51 total test suite passing, `flutter analyze` 0 issues).
+  - Implemented Phase 1-B Step 6: Focus Timer + Foreground Service:
+    - Domain models (`FocusSession`, `TimerMode`, `SessionStatus`) with drift-free delta arithmetic, break tracking, and serialization.
+    - `ForegroundTimerService` abstraction and `DefaultForegroundTimerService` utilizing `flutter_foreground_task`.
+    - `FocusSessionRepository` integrating active session persistence in Hive (`focus_session_state`) and completed session logging into SQLite (`focus_sessions`).
+    - `FocusSessionNotifier` state machine (start, pause, resume, break, stop, complete) with 5s auto-save to Hive and background notification synchronization.
+    - Mechanical split-line `FlipClock` widget per `ff_design_override.md` (horizontal split seam in `#CA9C68`, hinge notches, monospace digits, break state color shifts).
+    - `FocusSessionScreen` integrated with `focusSessionProvider`, responsive layout, pill header, Break/Pause/Stop controls, full-screen takeover navigation.
+    - 24 new unit & widget tests (`focus_session_test.dart`, `focus_session_notifier_test.dart`, `flip_clock_test.dart`, `focus_session_screen_test.dart`).
+    - Full test suite verified: 123/123 tests passing, 48/48 responsive layout tests passing, 0 analyzer issues.
 * **What `Code1` is doing right now:**
-  - Phase 1-B Step 5 is fully verified and completed.
-  - Standing by awaiting user instruction to begin Phase 1-B Step 6 (Focus Timer + Foreground Service).
+  - Phase 1-B Step 6 is fully completed, tested, and verified.
+  - Active ports audited and all preview/stale servers terminated.
 * **Next Steps for `Code1`:**
-  - Once user triggers Step 1B.6:
-    - Implement foreground timer service (`flutter_foreground_task`).
-    - Implement `FocusSessionNotifier` state machine (Countdown, Stopwatch, Open-Ended).
-    - Implement mechanical split-line `FlipClock` widget.
-    - Implement Hive `focus_session_state` persistence.
-    - Complete `FocusSessionScreen` and comprehensive widget tests.
+  - Await user command or proceed to Phase 1-B Step 7 / remaining tasks.
 * **Exclusive Resources / Do Not Overwrite:**
-  - `fluxfoxus/lib/features/presets/`
-  - `fluxfoxus/lib/presentation/screens/preset_create_screen.dart`
+  - `fluxfoxus/lib/features/focus/`
+  - `fluxfoxus/lib/presentation/widgets/flip_clock.dart`
+  - `fluxfoxus/lib/presentation/screens/focus_session_screen.dart`
   - `progress_tracker.md` (Update collaboratively)
   - `agent_worklog.md` (Update collaboratively)
-  - Port `8085` (Preview server remains up)
 
 ### Agent: `Code2`
 * **Assigned Identity:** `Code2`

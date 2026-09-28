@@ -69,7 +69,8 @@ All spec docs are in `/workspaces/The_Flux/prompts_docx/`. The most critical one
 | Phase 1-A Step 2: Database & Storage | `ee261d0` | SQLite 6 tables, Hive 3 boxes, 11 unit tests passing |
 | Phase 1-A Step 3: Navigation Shell | `24db347` | go_router, floating pill nav bar, full-screen takeover on /focus/session, ApertureIcon, 10 tests passing |
 | Phase 1-A Step 4: Permissions Onboarding | `7c7d54f` | 4-step wizard, PermissionService, PermissionsNotifier, 13 tests passing |
-| Phase 1-B Step 5: Preset System | **`7ab48a2`** | **Latest push — details below** |
+| Phase 1-B Step 5: Preset System | `7ab48a2` | Presets SQLite CRUD, interactive creation screen, emoji picker, break steppers, app restrictions, YouTube mode, fake repo fix, 51/51 tests passing |
+| Phase 1-B Step 6: Focus Timer + Foreground Service | Current | Focus timer domain models, Hive focus_session_state 5s persistence, SQLite logging, ForegroundTimerService, FocusSessionNotifier, mechanical FlipClock, FocusSessionScreen, 123/123 tests passing, 0 lints |
 
 ### Phase 1-B Step 5 (Latest — Commit `7ab48a2`)
 
@@ -335,9 +336,6 @@ When resuming as Code1:
 
 1. **Read** `agent_worklog.md` to check Code2's current files
 2. **Read** this `code1.md` fully
-3. **Fix Test 7** in `preset_create_screen_test.dart` (see Section 6 — use FakePresetsRepository approach)
-4. **Run** `flutter test` to confirm ALL tests pass (should be 51+ tests, 0 failures)
-5. **Update** `progress_tracker.md` — mark Step 5 as ✅ Completed
-6. **Update** `agent_worklog.md` — move Code1 to Step 6
-7. **Begin** Phase 1-B Step 6: Focus Timer + Foreground Service (see Section 7)
-8. **Run** `code1.py` (see below) — it will bootstrap the Step 6 folder structure
+3. **Phase 1-B Step 5 & Step 6** are ✅ Completed with 123/123 tests passing and 0 analyzer lints.
+4. **All preview servers** and unused ports are cleanly shut down.
+5. **Next Step:** Phase 1-B Step 7 (or next task per user instruction).

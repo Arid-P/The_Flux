@@ -6,15 +6,18 @@ class HiveStorageService {
   static const String boxPreferences = 'preferences';
   static const String boxAppCategories = 'app_categories';
   static const String boxAppMetadata = 'app_metadata';
+  static const String boxFocusSessionState = 'focus_session_state';
 
   // Preference keys
   static const String keyMinSessionsPerDay = 'minimumSessionsPerDay';
   static const String keyLastUsedPresetId = 'lastUsedPresetId';
   static const String keyConfirmAfterHours = 'sessionStartConfirmAfterHours';
+  static const String keyActiveSession = 'active_session';
 
   Box? _prefBox;
   Box<String>? _categoriesBox;
   Box<Map>? _metadataBox;
+  Box? _focusSessionBox;
 
   /// Initializes Hive and opens all required boxes.
   Future<void> init({String? subDir}) async {
@@ -27,6 +30,7 @@ class HiveStorageService {
     _prefBox = await Hive.openBox(boxPreferences);
     _categoriesBox = await Hive.openBox<String>(boxAppCategories);
     _metadataBox = await Hive.openBox<Map>(boxAppMetadata);
+    _focusSessionBox = await Hive.openBox(boxFocusSessionState);
   }
 
   // ---------------------------------------------------------------------------
@@ -96,11 +100,37 @@ class HiveStorageService {
   }
 
   // ---------------------------------------------------------------------------
+  // Focus Session State Accessors
+  // ---------------------------------------------------------------------------
+  Box? get focusSessionBox {
+    if (_focusSessionBox == null || !_focusSessionBox!.isOpen) {
+      return null;
+    }
+    return _focusSessionBox!;
+  }
+
+  Map? getActiveFocusSession() {
+    if (_focusSessionBox == null || !_focusSessionBox!.isOpen) return null;
+    return _focusSessionBox!.get(keyActiveSession) as Map?;
+  }
+
+  Future<void> saveActiveFocusSession(Map sessionMap) async {
+    if (_focusSessionBox == null || !_focusSessionBox!.isOpen) return;
+    await _focusSessionBox!.put(keyActiveSession, sessionMap);
+  }
+
+  Future<void> clearActiveFocusSession() async {
+    if (_focusSessionBox == null || !_focusSessionBox!.isOpen) return;
+    await _focusSessionBox!.delete(keyActiveSession);
+  }
+
+  // ---------------------------------------------------------------------------
   // Lifecycle
   // ---------------------------------------------------------------------------
   Future<void> close() async {
     await _prefBox?.close();
     await _categoriesBox?.close();
     await _metadataBox?.close();
+    await _focusSessionBox?.close();
   }
 }

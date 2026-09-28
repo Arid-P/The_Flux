@@ -1,22 +1,105 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import '../../core/navigation/app_routes.dart';
 import '../../core/theme/theme.dart';
+import '../../features/focus/focus.dart';
 
 /// FocusSessionScreen renders the full-screen takeover active focus session.
-/// Bottom navigation bar is hidden per ui_navigation.md Section 1.6 & 3.4.
-class FocusSessionScreen extends StatefulWidget {
-  const FocusSessionScreen({super.key});
+/// Integrates with FocusSessionNotifier, mechanical FlipClock,
+/// break state handling, and bottom navigation takeover per TRD Section 8 & ui_navigation.md.
+class FocusSessionScreen extends ConsumerStatefulWidget {
+  final String? presetId;
+  final String? presetName;
+  final String? presetEmoji;
+  final TimerMode timerMode;
+  final Duration? targetDuration;
+  final int breaksTotal;
+  final Duration breakDuration;
+
+  const FocusSessionScreen({
+    super.key,
+    this.presetId,
+    this.presetName,
+    this.presetEmoji,
+    this.timerMode = TimerMode.countdown,
+    this.targetDuration = const Duration(minutes: 90),
+    this.breaksTotal = 2,
+    this.breakDuration = const Duration(minutes: 5),
+  });
 
   @override
-  State<FocusSessionScreen> createState() => _FocusSessionScreenState();
+  ConsumerState<FocusSessionScreen> createState() => _FocusSessionScreenState();
 }
 
-class _FocusSessionScreenState extends State<FocusSessionScreen> {
-  bool _isPaused = false;
+class _FocusSessionScreenState extends ConsumerState<FocusSessionScreen> {
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      _ensureSessionStarted();
+    });
+  }
+
+  void _ensureSessionStarted() {
+    final current = ref.read(focusSessionProvider);
+    if (current == null || !current.status.isActive) {
+      ref.read(focusSessionProvider.notifier).startSession(
+            presetId: widget.presetId,
+            presetName: widget.presetName ?? 'Deep Work',
+            presetEmoji: widget.presetEmoji ?? '⚡',
+            timerMode: widget.timerMode,
+            targetDuration: widget.targetDuration,
+            breaksTotal: widget.breaksTotal,
+            breakDuration: widget.breakDuration,
+          );
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
+    final session = ref.watch(focusSessionProvider) ??
+        FocusSession(
+          id: 'initial',
+          presetId: widget.presetId,
+          presetName: widget.presetName ?? 'Deep Work',
+          presetEmoji: widget.presetEmoji ?? '⚡',
+          timerMode: widget.timerMode,
+          status: SessionStatus.running,
+          elapsed: Duration.zero,
+          targetDuration: widget.targetDuration,
+          breaksTotal: widget.breaksTotal,
+          breaksTaken: 0,
+          breakDuration: widget.breakDuration,
+          startedAt: DateTime.now(),
+        );
+
+    final isBreak = session.status == SessionStatus.onBreak;
+    final isPaused = session.status == SessionStatus.paused;
+
+    // Display duration: remaining for countdown, elapsed for stopwatch/openEnded, breakRemaining for break
+    final Duration displayDuration;
+    if (isBreak) {
+      displayDuration = session.breakRemaining;
+    } else if (session.timerMode == TimerMode.countdown &&
+        session.targetDuration != null) {
+      displayDuration = session.remaining;
+    } else {
+      displayDuration = session.elapsed;
+    }
+
+    final bool showHours = displayDuration.inHours > 0;
+    final int topValue =
+        showHours ? displayDuration.inHours : displayDuration.inMinutes.remainder(60);
+    final String topLabel = showHours ? 'HOURS' : 'MINUTES';
+    final int bottomValue = showHours
+        ? displayDuration.inMinutes.remainder(60)
+        : displayDuration.inSeconds.remainder(60);
+    final String bottomLabel = showHours ? 'MINUTES' : 'SECONDS';
+
+    final Color digitColor =
+        isBreak ? ThemeTokens.accent : ThemeTokens.textPrimary;
+
     return Scaffold(
       backgroundColor: ThemeTokens.background,
       body: SafeArea(
@@ -27,41 +110,143 @@ class _FocusSessionScreenState extends State<FocusSessionScreen> {
             child: LayoutBuilder(
               builder: (context, constraints) {
                 final isLandscape = AppBreakpoints.isLandscape(context);
-                final bool useHorizontalClock = isLandscape || constraints.maxHeight < 500;
+                final bool useHorizontalClock =
+                    isLandscape || constraints.maxHeight < 500;
 
                 return AdaptiveScrollBody(
                   child: Column(
                     children: [
                       const SizedBox(height: AppSpacing.s),
+
                       // Header Row
                       Row(
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
                           Flexible(
                             child: Container(
-                              padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 6),
+                              padding: const EdgeInsets.symmetric(
+                                horizontal: 14,
+                                vertical: 6,
+                              ),
                               decoration: BoxDecoration(
                                 color: ThemeTokens.primary,
-                                borderRadius: BorderRadius.circular(ThemeTokens.radiusPill),
+                                borderRadius:
+                                    BorderRadius.circular(ThemeTokens.radiusPill),
                               ),
-                              child: Text(
-                                'Deep Work',
-                                maxLines: 1,
-                                overflow: TextOverflow.ellipsis,
-                                style: AppTypography.caption(
-                                  color: ThemeTokens.background,
-                                  weight: FontWeight.w600,
-                                ),
+                              child: Row(
+                                mainAxisSize: MainAxisSize.min,
+                                children: [
+                                  Text(
+                                    session.presetEmoji,
+                                    style: const TextStyle(fontSize: 14),
+                                  ),
+                                  const SizedBox(width: 6),
+                                  Flexible(
+                                    child: Text(
+                                      session.presetName,
+                                      maxLines: 1,
+                                      overflow: TextOverflow.ellipsis,
+                                      style: AppTypography.caption(
+                                        color: ThemeTokens.background,
+                                        weight: FontWeight.w600,
+                                      ),
+                                    ),
+                                  ),
+                                ],
                               ),
                             ),
                           ),
                           const SizedBox(width: AppSpacing.s),
                           Flexible(
-                            child: Text(
-                              '10:00 AM – 10:25 AM',
-                              maxLines: 1,
-                              overflow: TextOverflow.ellipsis,
-                              style: AppTypography.caption(color: ThemeTokens.textMuted),
+                            child: isBreak
+                                ? Text(
+                                    'BREAK',
+                                    style: AppTypography.heading3(
+                                      color: ThemeTokens.accent,
+                                      weight: FontWeight.w800,
+                                    ),
+                                  )
+                                : Text(
+                                    '${session.timerMode.label.toUpperCase()} MODE',
+                                    maxLines: 1,
+                                    overflow: TextOverflow.ellipsis,
+                                    style: AppTypography.micro(
+                                      color: ThemeTokens.textMuted,
+                                      weight: FontWeight.w600,
+                                    ),
+                                  ),
+                          ),
+                        ],
+                      ),
+
+                      const Spacer(),
+
+                      // Mechanical Split-Line Flip Clock
+                      Padding(
+                        padding: const EdgeInsets.symmetric(vertical: 12),
+                        child: useHorizontalClock
+                            ? Row(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: [
+                                  _buildMechanicalCard(
+                                    topValue,
+                                    topLabel,
+                                    digitColor: digitColor,
+                                    isCompact: constraints.maxHeight < 360,
+                                  ),
+                                  const SizedBox(width: 16),
+                                  _buildMechanicalCard(
+                                    bottomValue,
+                                    bottomLabel,
+                                    digitColor: digitColor,
+                                    isCompact: constraints.maxHeight < 360,
+                                  ),
+                                ],
+                              )
+                            : Column(
+                                mainAxisSize: MainAxisSize.min,
+                                children: [
+                                  _buildMechanicalCard(
+                                    topValue,
+                                    topLabel,
+                                    digitColor: digitColor,
+                                  ),
+                                  const SizedBox(height: 12),
+                                  _buildMechanicalCard(
+                                    bottomValue,
+                                    bottomLabel,
+                                    digitColor: digitColor,
+                                  ),
+                                ],
+                              ),
+                      ),
+
+                      // Timer Mode Status Pill Sub-Bar
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Container(
+                            width: 6,
+                            height: 6,
+                            decoration: BoxDecoration(
+                              color: isBreak
+                                  ? ThemeTokens.accent
+                                  : (isPaused
+                                      ? ThemeTokens.textMuted
+                                      : ThemeTokens.primary),
+                              shape: BoxShape.circle,
+                            ),
+                          ),
+                          const SizedBox(width: 6),
+                          Text(
+                            isBreak
+                                ? 'BREAK WINDOW ACTIVE'
+                                : (isPaused
+                                    ? 'SESSION PAUSED'
+                                    : '${session.timerMode.label.toUpperCase()} ACTIVE'),
+                            style: AppTypography.micro(
+                              color: ThemeTokens.textMuted,
+                              weight: FontWeight.w600,
                             ),
                           ),
                         ],
@@ -69,47 +254,28 @@ class _FocusSessionScreenState extends State<FocusSessionScreen> {
 
                       const Spacer(),
 
-                      // Mechanical Flip Clock Display (adaptive layout: horizontal in landscape/short, vertical in portrait)
-                      Padding(
-                        padding: const EdgeInsets.symmetric(vertical: 12),
-                        child: useHorizontalClock
-                            ? Row(
-                                mainAxisAlignment: MainAxisAlignment.center,
-                                children: [
-                                  _buildFlipClockCard('24', 'MINUTES', isCompact: constraints.maxHeight < 360),
-                                  const SizedBox(width: 16),
-                                  _buildFlipClockCard('59', 'SECONDS', isCompact: constraints.maxHeight < 360),
-                                ],
-                              )
-                            : Column(
-                                mainAxisSize: MainAxisSize.min,
-                                children: [
-                                  _buildFlipClockCard('24', 'MINUTES'),
-                                  const SizedBox(height: 12),
-                                  _buildFlipClockCard('59', 'SECONDS'),
-                                ],
-                              ),
-                      ),
-
-                      const Spacer(),
-
                       // Bottom Controls Row
                       Row(
                         children: [
-                          // Stop Focusing Button
+                          // 1. Stop Focusing Button
                           Expanded(
                             flex: 5,
                             child: SizedBox(
                               height: 52,
                               child: ElevatedButton(
                                 key: const Key('stop_focusing_button'),
-                                onPressed: () => context.go(AppRoutes.home),
+                                onPressed: () {
+                                  context.go(AppRoutes.home);
+                                  ref
+                                      .read(focusSessionProvider.notifier)
+                                      .stopSession();
+                                },
                                 style: ElevatedButton.styleFrom(
-                                  backgroundColor: ThemeTokens.surface,
-                                  foregroundColor: ThemeTokens.textPrimary,
-                                  side: const BorderSide(color: ThemeTokens.border, width: 1),
+                                  backgroundColor: ThemeTokens.primary,
+                                  foregroundColor: ThemeTokens.background,
                                   shape: RoundedRectangleBorder(
-                                    borderRadius: BorderRadius.circular(ThemeTokens.radiusPill),
+                                    borderRadius: BorderRadius.circular(
+                                        ThemeTokens.radiusPill),
                                   ),
                                   elevation: 0,
                                 ),
@@ -117,7 +283,9 @@ class _FocusSessionScreenState extends State<FocusSessionScreen> {
                                   fit: BoxFit.scaleDown,
                                   child: Text(
                                     'Stop Focusing',
-                                    style: AppTypography.button(color: ThemeTokens.textPrimary),
+                                    style: AppTypography.button(
+                                      color: ThemeTokens.background,
+                                    ),
                                   ),
                                 ),
                               ),
@@ -126,24 +294,45 @@ class _FocusSessionScreenState extends State<FocusSessionScreen> {
 
                           const SizedBox(width: AppSpacing.s),
 
-                          // Break Button
+                          // 2. Break Button
                           Expanded(
                             flex: 3,
                             child: SizedBox(
                               height: 52,
                               child: OutlinedButton(
-                                onPressed: () {},
+                                key: const Key('focus_break_button'),
+                                onPressed: isBreak
+                                    ? () => ref
+                                        .read(focusSessionProvider.notifier)
+                                        .endBreak()
+                                    : (session.canTakeBreak
+                                        ? () => ref
+                                            .read(focusSessionProvider.notifier)
+                                            .startBreak()
+                                        : null),
                                 style: OutlinedButton.styleFrom(
-                                  side: const BorderSide(color: ThemeTokens.accent, width: 1.5),
+                                  side: BorderSide(
+                                    color: isBreak || session.canTakeBreak
+                                        ? ThemeTokens.accent
+                                        : ThemeTokens.border,
+                                    width: 1.5,
+                                  ),
                                   shape: RoundedRectangleBorder(
-                                    borderRadius: BorderRadius.circular(ThemeTokens.radiusPill),
+                                    borderRadius: BorderRadius.circular(
+                                        ThemeTokens.radiusPill),
                                   ),
                                 ),
                                 child: FittedBox(
                                   fit: BoxFit.scaleDown,
                                   child: Text(
-                                    'Break (1)',
-                                    style: AppTypography.button(color: ThemeTokens.accent),
+                                    isBreak
+                                        ? 'End Break'
+                                        : 'Break (${session.breaksTotal - session.breaksTaken})',
+                                    style: AppTypography.button(
+                                      color: isBreak || session.canTakeBreak
+                                          ? ThemeTokens.accent
+                                          : ThemeTokens.textMuted,
+                                    ),
                                   ),
                                 ),
                               ),
@@ -152,14 +341,22 @@ class _FocusSessionScreenState extends State<FocusSessionScreen> {
 
                           const SizedBox(width: AppSpacing.s),
 
-                          // Pause / Play Circle
+                          // 3. Pause / Play Circle Button
                           InkWell(
+                            key: const Key('focus_pause_play_button'),
                             onTap: () {
-                              setState(() {
-                                _isPaused = !_isPaused;
-                              });
+                              if (isPaused) {
+                                ref
+                                    .read(focusSessionProvider.notifier)
+                                    .resumeSession();
+                              } else {
+                                ref
+                                    .read(focusSessionProvider.notifier)
+                                    .pauseSession();
+                              }
                             },
-                            borderRadius: BorderRadius.circular(ThemeTokens.radiusPill),
+                            borderRadius:
+                                BorderRadius.circular(ThemeTokens.radiusPill),
                             child: Container(
                               width: 52,
                               height: 52,
@@ -169,7 +366,7 @@ class _FocusSessionScreenState extends State<FocusSessionScreen> {
                               ),
                               alignment: Alignment.center,
                               child: Icon(
-                                _isPaused ? Icons.play_arrow : Icons.pause,
+                                isPaused ? Icons.play_arrow : Icons.pause,
                                 color: ThemeTokens.background,
                                 size: 26,
                               ),
@@ -190,49 +387,146 @@ class _FocusSessionScreenState extends State<FocusSessionScreen> {
     );
   }
 
-  Widget _buildFlipClockCard(String digits, String unit, {bool isCompact = false}) {
+  Widget _buildMechanicalCard(
+    int value,
+    String unit, {
+    required Color digitColor,
+    bool isCompact = false,
+  }) {
     final double cardWidth = isCompact ? 140 : 180;
     final double cardHeight = isCompact ? 84 : 110;
     final double fontSize = isCompact ? 42 : 56;
     final double seamTop = isCompact ? 41 : 54;
+    final String digits = value.toString().padLeft(2, '0');
 
     return Container(
       width: cardWidth,
       height: cardHeight,
       decoration: BoxDecoration(
         color: ThemeTokens.surface,
-        borderRadius: BorderRadius.circular(ThemeTokens.radiusLg),
+        borderRadius: BorderRadius.circular(AppRadius.card),
         border: Border.all(color: ThemeTokens.border, width: 1),
       ),
       child: Stack(
         alignment: Alignment.center,
         children: [
-          // Horizontal Split Seam
+          // Top Half Subtle Shading
+          Positioned(
+            top: 0,
+            left: 0,
+            right: 0,
+            bottom: cardHeight / 2,
+            child: Container(
+              decoration: BoxDecoration(
+                borderRadius: const BorderRadius.only(
+                  topLeft: Radius.circular(AppRadius.card),
+                  topRight: Radius.circular(AppRadius.card),
+                ),
+                gradient: LinearGradient(
+                  begin: Alignment.topCenter,
+                  end: Alignment.bottomCenter,
+                  colors: [
+                    Colors.white.withValues(alpha: 0.02),
+                    Colors.black.withValues(alpha: 0.18),
+                  ],
+                ),
+              ),
+            ),
+          ),
+
+          // Bottom Half Subtle Shading
+          Positioned(
+            top: cardHeight / 2,
+            left: 0,
+            right: 0,
+            bottom: 0,
+            child: Container(
+              decoration: BoxDecoration(
+                borderRadius: const BorderRadius.only(
+                  bottomLeft: Radius.circular(AppRadius.card),
+                  bottomRight: Radius.circular(AppRadius.card),
+                ),
+                gradient: LinearGradient(
+                  begin: Alignment.topCenter,
+                  end: Alignment.bottomCenter,
+                  colors: [
+                    Colors.black.withValues(alpha: 0.18),
+                    Colors.white.withValues(alpha: 0.02),
+                  ],
+                ),
+              ),
+            ),
+          ),
+
+          // Mechanical Split Seam Line in ThemeTokens.primary (#CA9C68)
           Positioned(
             left: 0,
             right: 0,
             top: seamTop,
             child: Container(
               height: 1.5,
-              color: ThemeTokens.border,
+              color: ThemeTokens.primary,
             ),
           ),
+
+          // Left Hinge Notch
+          Positioned(
+            left: -1,
+            top: seamTop - 5,
+            child: Container(
+              width: 5,
+              height: 10,
+              decoration: BoxDecoration(
+                color: ThemeTokens.background,
+                border: Border.all(color: ThemeTokens.border, width: 1),
+                borderRadius: const BorderRadius.only(
+                  topRight: Radius.circular(3),
+                  bottomRight: Radius.circular(3),
+                ),
+              ),
+            ),
+          ),
+
+          // Right Hinge Notch
+          Positioned(
+            right: -1,
+            top: seamTop - 5,
+            child: Container(
+              width: 5,
+              height: 10,
+              decoration: BoxDecoration(
+                color: ThemeTokens.background,
+                border: Border.all(color: ThemeTokens.border, width: 1),
+                borderRadius: const BorderRadius.only(
+                  topLeft: Radius.circular(3),
+                  bottomLeft: Radius.circular(3),
+                ),
+              ),
+            ),
+          ),
+
           // Digits
           Text(
             digits,
             style: TextStyle(
+              fontFamily: 'monospace',
               fontSize: fontSize,
               fontWeight: FontWeight.w700,
-              color: ThemeTokens.textPrimary,
+              color: digitColor,
               letterSpacing: 2,
             ),
           ),
+
           // Unit label
           Positioned(
             bottom: isCompact ? 3 : 6,
+            right: isCompact ? 8 : 12,
             child: Text(
               unit,
-              style: AppTypography.micro(color: ThemeTokens.textMuted),
+              style: AppTypography.micro(
+                color: ThemeTokens.textMuted.withValues(alpha: 0.8),
+                weight: FontWeight.w600,
+              ),
             ),
           ),
         ],

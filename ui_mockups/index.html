@@ -1,0 +1,300 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>FluxFoxus (FF) — Multi-Screen Responsive Review Hub</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@600;700&display=swap" rel="stylesheet">
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            'ff-bg': '#13191F',        // River Styx
+            'ff-surface': '#2B2F2E',   // Carbon Fibre
+            'ff-border': '#594C3D',    // Afternoon Tea
+            'ff-accent': '#906D4B',    // Tanned Wood
+            'ff-primary': '#CA9C68',   // Amber Autumn
+            'ff-text': '#F8FAFC',      // Ghost White
+            'ff-muted': '#94A3B8',     // Muted caption
+          },
+          fontFamily: {
+            sans: ['Inter', 'sans-serif'],
+            mono: ['JetBrains Mono', 'monospace'],
+          }
+        }
+      }
+    }
+  </script>
+  <style>
+    body {
+      background-color: #0d1217;
+      font-family: 'Inter', sans-serif;
+      color: #F8FAFC;
+    }
+    .custom-scrollbar::-webkit-scrollbar {
+      width: 6px;
+      height: 6px;
+    }
+    .custom-scrollbar::-webkit-scrollbar-thumb {
+      background: #594C3D;
+      border-radius: 9999px;
+    }
+    .custom-scrollbar::-webkit-scrollbar-track {
+      background: #13191F;
+    }
+    .device-stage {
+      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+  </style>
+</head>
+<body class="min-h-screen flex flex-col bg-[#0d1217]">
+
+  <!-- TOP HEADER / CONTROL BAR -->
+  <header class="w-full bg-ff-bg border-b border-ff-border px-5 py-3 sticky top-0 z-50 shadow-2xl flex flex-wrap items-center justify-between gap-4">
+    <!-- Brand Title -->
+    <div class="flex items-center space-x-3">
+      <div class="w-8 h-8 rounded-xl bg-ff-surface border border-ff-border flex items-center justify-center text-ff-primary font-bold shadow-md">
+        FF
+      </div>
+      <div>
+        <h1 class="text-sm font-bold text-ff-text tracking-wide flex items-center gap-2">
+          FluxFoxus Review Hub
+          <span class="text-[10px] px-2 py-0.5 rounded-full bg-ff-primary/20 text-ff-primary border border-ff-primary/40 font-mono">Phase 1-A & 1-B</span>
+        </h1>
+        <p class="text-[11px] text-ff-muted">Responsive Scaling, Aspect Ratios & Navigation Review</p>
+      </div>
+    </div>
+
+    <!-- Screen Tabs -->
+    <div class="flex items-center flex-wrap gap-1.5 bg-ff-surface/90 border border-ff-border p-1 rounded-xl text-xs custom-scrollbar">
+      <button onclick="selectScreen('home_screen.html', this)" class="screen-tab px-3 py-1.5 rounded-lg bg-ff-primary text-ff-bg font-bold shadow-sm transition">
+        🏠 Home
+      </button>
+      <button onclick="selectScreen('active_focus_session.html', this)" class="screen-tab px-3 py-1.5 rounded-lg text-ff-text hover:bg-ff-bg border border-transparent hover:border-ff-border font-medium transition">
+        ⏱️ Focus Session
+      </button>
+      <button onclick="selectScreen('planner.html', this)" class="screen-tab px-3 py-1.5 rounded-lg text-ff-text hover:bg-ff-bg border border-transparent hover:border-ff-border font-medium transition">
+        📅 Planner
+      </button>
+      <button onclick="selectScreen('preset_creation.html', this)" class="screen-tab px-3 py-1.5 rounded-lg text-ff-text hover:bg-ff-bg border border-transparent hover:border-ff-border font-medium transition">
+        ⚙️ Preset System
+      </button>
+      <button onclick="selectScreen('app_limits.html', this)" class="screen-tab px-3 py-1.5 rounded-lg text-ff-text hover:bg-ff-bg border border-transparent hover:border-ff-border font-medium transition">
+        🚫 App Limits
+      </button>
+      <button onclick="selectScreen('usage_stats.html', this)" class="screen-tab px-3 py-1.5 rounded-lg text-ff-text hover:bg-ff-bg border border-transparent hover:border-ff-border font-medium transition">
+        📊 Usage Stats
+      </button>
+    </div>
+
+    <!-- Actions (Direct Link & Open Tab) -->
+    <div class="flex items-center space-x-2">
+      <a id="btn-standalone" href="home_screen.html" target="_blank" class="px-3 py-1.5 text-xs font-semibold rounded-lg bg-ff-surface text-ff-text border border-ff-border hover:border-ff-primary hover:text-ff-primary transition flex items-center gap-1.5">
+        <span>↗</span>
+        <span>Open Standalone</span>
+      </a>
+    </div>
+  </header>
+
+  <!-- SECONDARY TOOLBAR: VIEWPORT & ORIENTATION CONTROLLERS -->
+  <div class="w-full bg-[#151c24] border-b border-ff-border px-5 py-2.5 flex flex-wrap items-center justify-between gap-3 text-xs">
+    
+    <!-- Viewport Presets -->
+    <div class="flex items-center flex-wrap gap-1.5">
+      <span class="text-[11px] font-bold text-ff-primary uppercase tracking-wider mr-1 flex items-center gap-1">
+        <span>📐</span> Profiles:
+      </span>
+      <button onclick="setViewport(320, 568, 'Narrow Phone', this)" class="vp-btn px-2.5 py-1 rounded-md bg-ff-surface border border-ff-border text-ff-muted hover:text-ff-text transition">
+        📱 Narrow (320×568)
+      </button>
+      <button onclick="setViewport(390, 844, 'Standard Phone', this)" class="vp-btn px-2.5 py-1 rounded-md bg-ff-primary text-ff-bg font-bold border border-ff-primary shadow-sm transition">
+        📱 Standard (390×844)
+      </button>
+      <button onclick="setViewport(640, 360, 'Landscape Compact', this)" class="vp-btn px-2.5 py-1 rounded-md bg-ff-surface border border-ff-border text-ff-muted hover:text-ff-text transition">
+        🔄 Land Compact (640×360)
+      </button>
+      <button onclick="setViewport(844, 390, 'Landscape Standard', this)" class="vp-btn px-2.5 py-1 rounded-md bg-ff-surface border border-ff-border text-ff-muted hover:text-ff-text transition">
+        🔄 Land Std (844×390)
+      </button>
+      <button onclick="setViewport(768, 1024, 'Tablet Portrait', this)" class="vp-btn px-2.5 py-1 rounded-md bg-ff-surface border border-ff-border text-ff-muted hover:text-ff-text transition">
+        📱 Tablet (768×1024)
+      </button>
+      <button onclick="setViewport(1024, 768, 'Tablet Landscape', this)" class="vp-btn px-2.5 py-1 rounded-md bg-ff-surface border border-ff-border text-ff-muted hover:text-ff-text transition">
+        💻 Tablet Land (1024×768)
+      </button>
+      <button onclick="setViewport('100%', '100%', 'Full Window', this)" class="vp-btn px-2.5 py-1 rounded-md bg-ff-surface border border-ff-border text-ff-muted hover:text-ff-text transition">
+        🖥️ Full Viewport
+      </button>
+    </div>
+
+    <!-- Quick Adjustments: Orientation Flip & Scale Slider -->
+    <div class="flex items-center space-x-3">
+      <button onclick="flipOrientation()" title="Flip Portrait ↔ Landscape" class="px-2.5 py-1 rounded-md bg-ff-surface border border-ff-border hover:border-ff-accent text-ff-text font-medium transition flex items-center gap-1.5">
+        <span>🔄</span>
+        <span>Flip Orientation</span>
+      </button>
+      
+      <!-- Scale Dropdown -->
+      <div class="flex items-center space-x-1.5 bg-ff-surface border border-ff-border px-2 py-0.5 rounded-md text-[11px]">
+        <span class="text-ff-muted">Scale:</span>
+        <select id="scale-select" onchange="setScale(this.value)" class="bg-transparent text-ff-text font-medium outline-none cursor-pointer">
+          <option value="1" selected class="bg-ff-surface text-ff-text">100%</option>
+          <option value="0.85" class="bg-ff-surface text-ff-text">85%</option>
+          <option value="0.75" class="bg-ff-surface text-ff-text">75%</option>
+          <option value="0.6" class="bg-ff-surface text-ff-text">60%</option>
+          <option value="0.5" class="bg-ff-surface text-ff-text">50%</option>
+        </select>
+      </div>
+
+      <!-- Current Dimensions Badge -->
+      <div id="dim-badge" class="px-2.5 py-1 rounded-md bg-ff-bg border border-ff-border font-mono text-[11px] text-ff-accent">
+        390 × 844 px
+      </div>
+    </div>
+  </div>
+
+  <!-- MAIN STAGE (SIMULATOR CONTAINER) -->
+  <main class="flex-1 flex flex-col items-center justify-start p-6 overflow-auto custom-scrollbar">
+    <div id="stage-wrapper" class="device-stage relative flex flex-col items-center justify-center transition-all duration-300">
+      <!-- Device Bezel Frame -->
+      <div id="device-bezel" class="relative bg-ff-bg rounded-[40px] border-[4px] border-ff-border shadow-2xl overflow-hidden transition-all duration-300 flex flex-col">
+        <!-- Bezel Speaker & Camera Notch (Simulated) -->
+        <div id="device-notch" class="w-full flex items-center justify-center pt-2 pb-1 bg-ff-bg shrink-0">
+          <div class="w-20 h-3.5 bg-ff-surface rounded-full border border-ff-border/50 flex items-center justify-center space-x-2">
+            <div class="w-1.5 h-1.5 rounded-full bg-ff-border"></div>
+            <div class="w-8 h-1 rounded-full bg-ff-border/80"></div>
+          </div>
+        </div>
+
+        <!-- Embedded Iframe -->
+        <iframe 
+          id="preview-frame" 
+          src="home_screen.html" 
+          class="w-full flex-1 border-0 bg-ff-bg"
+          title="Screen Simulator Frame">
+        </iframe>
+      </div>
+    </div>
+
+    <!-- QUICK LINKS FOOTER -->
+    <div class="mt-8 max-w-4xl w-full bg-ff-surface/60 border border-ff-border rounded-2xl p-4 text-xs text-ff-muted">
+      <div class="flex items-center justify-between mb-2">
+        <span class="font-bold text-ff-text uppercase tracking-wider text-[11px]">Direct Screen Links:</span>
+        <span class="text-emerald-400 font-medium">✓ Port 8080 Active & Public</span>
+      </div>
+      <div class="grid grid-cols-2 md:grid-cols-3 gap-2">
+        <a href="home_screen.html" target="_blank" class="p-2 rounded-lg bg-ff-bg hover:border-ff-primary border border-ff-border text-ff-text transition flex items-center justify-between">
+          <span>Home Screen</span>
+          <span class="text-[10px] text-ff-accent font-mono">/home_screen.html</span>
+        </a>
+        <a href="active_focus_session.html" target="_blank" class="p-2 rounded-lg bg-ff-bg hover:border-ff-primary border border-ff-border text-ff-text transition flex items-center justify-between">
+          <span>Focus Session</span>
+          <span class="text-[10px] text-ff-accent font-mono">/active_focus_session.html</span>
+        </a>
+        <a href="planner.html" target="_blank" class="p-2 rounded-lg bg-ff-bg hover:border-ff-primary border border-ff-border text-ff-text transition flex items-center justify-between">
+          <span>Planner Screen</span>
+          <span class="text-[10px] text-ff-accent font-mono">/planner.html</span>
+        </a>
+        <a href="preset_creation.html" target="_blank" class="p-2 rounded-lg bg-ff-bg hover:border-ff-primary border border-ff-border text-ff-text transition flex items-center justify-between">
+          <span>Preset System</span>
+          <span class="text-[10px] text-ff-accent font-mono">/preset_creation.html</span>
+        </a>
+        <a href="app_limits.html" target="_blank" class="p-2 rounded-lg bg-ff-bg hover:border-ff-primary border border-ff-border text-ff-text transition flex items-center justify-between">
+          <span>App Limits</span>
+          <span class="text-[10px] text-ff-accent font-mono">/app_limits.html</span>
+        </a>
+        <a href="usage_stats.html" target="_blank" class="p-2 rounded-lg bg-ff-bg hover:border-ff-primary border border-ff-border text-ff-text transition flex items-center justify-between">
+          <span>Usage Stats</span>
+          <span class="text-[10px] text-ff-accent font-mono">/usage_stats.html</span>
+        </a>
+      </div>
+    </div>
+  </main>
+
+  <script>
+    let currentWidth = 390;
+    let currentHeight = 844;
+    let currentScale = 1;
+    let currentScreen = 'home_screen.html';
+
+    function selectScreen(url, btn) {
+      currentScreen = url;
+      document.getElementById('preview-frame').src = url;
+      document.getElementById('btn-standalone').href = url;
+
+      // Update screen tab buttons
+      document.querySelectorAll('.screen-tab').forEach(b => {
+        b.className = 'screen-tab px-3 py-1.5 rounded-lg text-ff-text hover:bg-ff-bg border border-transparent hover:border-ff-border font-medium transition';
+      });
+      btn.className = 'screen-tab px-3 py-1.5 rounded-lg bg-ff-primary text-ff-bg font-bold shadow-sm transition';
+    }
+
+    function setViewport(w, h, label, btn) {
+      currentWidth = w;
+      currentHeight = h;
+
+      const bezel = document.getElementById('device-bezel');
+      const notch = document.getElementById('device-notch');
+      const badge = document.getElementById('dim-badge');
+
+      if (w === '100%') {
+        bezel.style.width = '100%';
+        bezel.style.height = '85vh';
+        bezel.style.borderRadius = '16px';
+        notch.style.display = 'none';
+        badge.textContent = 'Full Viewport';
+      } else {
+        bezel.style.width = w + 'px';
+        bezel.style.height = h + 'px';
+        bezel.style.borderRadius = (w >= 768) ? '24px' : '40px';
+        notch.style.display = (w >= 768 || h <= 450) ? 'none' : 'flex';
+        badge.textContent = `${w} × ${h} px (${label})`;
+      }
+
+      // Update preset buttons
+      if (btn) {
+        document.querySelectorAll('.vp-btn').forEach(b => {
+          b.className = 'vp-btn px-2.5 py-1 rounded-md bg-ff-surface border border-ff-border text-ff-muted hover:text-ff-text transition';
+        });
+        btn.className = 'vp-btn px-2.5 py-1 rounded-md bg-ff-primary text-ff-bg font-bold border border-ff-primary shadow-sm transition';
+      }
+
+      applyScale();
+    }
+
+    function flipOrientation() {
+      if (currentWidth === '100%') return;
+      const temp = currentWidth;
+      currentWidth = currentHeight;
+      currentHeight = temp;
+
+      setViewport(currentWidth, currentHeight, (currentWidth > currentHeight ? 'Landscape' : 'Portrait'), null);
+    }
+
+    function setScale(scaleVal) {
+      currentScale = parseFloat(scaleVal);
+      applyScale();
+    }
+
+    function applyScale() {
+      const wrapper = document.getElementById('stage-wrapper');
+      if (currentScale === 1) {
+        wrapper.style.transform = 'none';
+        wrapper.style.transformOrigin = 'center top';
+      } else {
+        wrapper.style.transform = `scale(${currentScale})`;
+        wrapper.style.transformOrigin = 'center top';
+      }
+    }
+
+    // Initialize default standard phone
+    window.addEventListener('DOMContentLoaded', () => {
+      setViewport(390, 844, 'Standard Phone', null);
+    });
+  </script>
+</body>
+</html>
