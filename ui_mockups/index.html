@@ -3,6 +3,9 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+  <meta http-equiv="Pragma" content="no-cache">
+  <meta http-equiv="Expires" content="0">
   <title>FluxFoxus (FF) — Multi-Screen Responsive Review Hub</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -159,9 +162,9 @@
 
   <!-- MAIN STAGE (SIMULATOR CONTAINER) -->
   <main class="flex-1 flex flex-col items-center justify-start p-6 overflow-auto custom-scrollbar">
-    <div id="stage-wrapper" class="device-stage relative flex flex-col items-center justify-center transition-all duration-300">
+    <div id="stage-wrapper" class="device-stage relative flex flex-col items-center justify-center transition-all duration-300 w-full max-w-full">
       <!-- Device Bezel Frame -->
-      <div id="device-bezel" class="relative bg-ff-bg rounded-2xl border-[3px] border-ff-border shadow-2xl overflow-hidden transition-all duration-300 flex flex-col">
+      <div id="device-bezel" style="width: 768px; height: 1024px; max-width: 100%;" class="relative bg-ff-bg rounded-2xl border-[3px] border-ff-border shadow-2xl overflow-hidden transition-all duration-300 flex flex-col">
         <!-- Embedded Iframe that receives the full viewport dimensions -->
         <iframe 
           id="preview-frame" 
@@ -213,16 +216,24 @@
     let currentScale = 1;
     let currentScreen = 'home_screen.html';
 
+    function getBustedUrl(url) {
+      const sep = url.includes('?') ? '&' : '?';
+      return url + sep + 't=' + Date.now();
+    }
+
     function selectScreen(url, btn) {
       currentScreen = url;
-      document.getElementById('preview-frame').src = url;
-      document.getElementById('btn-standalone').href = url;
+      const busted = getBustedUrl(url);
+      document.getElementById('preview-frame').src = busted;
+      document.getElementById('btn-standalone').href = busted;
 
       // Update screen tab buttons
       document.querySelectorAll('.screen-tab').forEach(b => {
         b.className = 'screen-tab px-3 py-1.5 rounded-lg text-ff-text hover:bg-ff-bg border border-transparent hover:border-ff-border font-medium transition';
       });
-      btn.className = 'screen-tab px-3 py-1.5 rounded-lg bg-ff-primary text-ff-bg font-bold shadow-sm transition';
+      if (btn) {
+        btn.className = 'screen-tab px-3 py-1.5 rounded-lg bg-ff-primary text-ff-bg font-bold shadow-sm transition';
+      }
     }
 
     function setViewport(w, h, label, btn) {
@@ -231,16 +242,21 @@
 
       const bezel = document.getElementById('device-bezel');
       const badge = document.getElementById('dim-badge');
+      const stage = document.getElementById('stage-wrapper');
 
       if (w === '100%') {
+        stage.style.width = '100%';
         bezel.style.width = '100%';
-        bezel.style.height = '85vh';
-        bezel.style.borderRadius = '12px';
+        bezel.style.maxWidth = '100%';
+        bezel.style.height = 'calc(100vh - 160px)';
+        bezel.style.borderRadius = '8px';
         badge.textContent = 'Full Viewport (Fluid Desktop)';
       } else {
+        stage.style.width = 'auto';
         bezel.style.width = w + 'px';
+        bezel.style.maxWidth = '100%';
         bezel.style.height = h + 'px';
-        bezel.style.borderRadius = (w >= 768) ? '20px' : '28px';
+        bezel.style.borderRadius = (w >= 768) ? '16px' : '28px';
         badge.textContent = `${w} × ${h} px (${label})`;
       }
 
@@ -282,6 +298,7 @@
 
     // Default to Tablet Portrait (768x1024) to immediately demonstrate adaptive responsive layout
     window.addEventListener('DOMContentLoaded', () => {
+      selectScreen('home_screen.html', document.querySelector('.screen-tab'));
       setViewport(768, 1024, 'Tablet Portrait', null);
     });
   </script>
