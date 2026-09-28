@@ -119,7 +119,7 @@ void main() {
 
       expect(find.text('BREAK'), findsOneWidget);
       expect(find.text('BREAK WINDOW ACTIVE'), findsOneWidget);
-      expect(find.text('End Break'), findsOneWidget);
+      expect(find.text('End Break Early'), findsOneWidget);
 
       // Tap End Break
       await tester.tap(find.byKey(const Key('focus_break_button')));

@@ -66,6 +66,10 @@ class _FakeFocusSessionRepository extends FocusSessionRepository {
 }
 
 void main() {
+  setUpAll(() {
+    TestWidgetsFlutterBinding.ensureInitialized();
+  });
+
   late _FakeForegroundService fakeForeground;
   late _FakeFocusSessionRepository fakeRepo;
   late ProviderContainer container;

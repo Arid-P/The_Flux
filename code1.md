@@ -219,52 +219,49 @@ fluxfoxus/test/core/navigation/
 
 ---
 
-## 7. Next Immediate Task (after fixing Test 7)
+---
 
-### Task: Phase 1-B Step 6 — Focus Timer + Foreground Service
+## 7. Next Immediate Task
 
-**Reference Doc:** `prompts_docx/C1/GMP_FF_BUILD.md` → Phase 1-B Step 6  
-**TRD Reference:** TRD Section 8 (Focus Session State Machine)
+### Task: Phase 1-B Step 8 — Stop Focusing Modal (Discipline Friction)
+
+**Reference Docs:**
+- `prompts_docx/C1/GMP_FF_BUILD.md` → Phase 1-B Step 8
+- `prompts_docx/FLUXFOXUS/Phase 1/ui_focus_session.md` → Section 3 (Stop Focusing Modal)
+- `prompts_docx/FLUXFOXUS/Phase 1/FF_TRD_v1.0.md` → Section 5.3.3 (Wait Time Calculation & Streak Reset)
+- `ff_design_override.md` → Rustic Medley Palette
 
 **What to build:**
-1. **`flutter_foreground_task` Foreground Service** — keeps timer alive when app is backgrounded, shows persistent notification with elapsed/remaining time.
-2. **3 Timer Modes:**
-   - `Countdown` — counts DOWN from preset total duration (e.g. 90m)
-   - `Stopwatch` — counts UP indefinitely
-   - `Open-Ended` — no duration limit, stops on user action
-3. **Timer State Persistence** — Hive `focus_session_state` box. Writes every 5 seconds. Survives app kill.
-4. **Flip-Clock Widget** — Mechanical split-line flip card animation for HH:MM:SS per `active_focus_session.html` mockup. Cards in `#13191F` bg, split seam line in `#CA9C68`.
-5. **Focus Session State Machine:**
-   - States: `idle`, `running`, `paused`, `break`, `completed`
-   - `FocusSessionNotifier` Riverpod AsyncNotifier
-   - `focusSessionProvider`, `timerStateProvider`, `activePresetProvider`
-6. **`FocusSessionScreen`** — Full-screen takeover (nav bar hidden), flip clock, header status (preset name pill + break count), bottom controls (Stop, Break, Pause/Play).
-7. **Automated Tests:**
-   - `focus_timer_test.dart` — unit tests for timer arithmetic, state transitions
-   - `focus_session_screen_test.dart` — widget tests for all controls and state display
+1. **`StopFocusingModal` Widget:**
+   - Centered floating card with 12px radius, `#2B2F2E` surface, `#594C3D` border, blurred backdrop.
+   - Mechanical alert bell icon (`#CA9C68`).
+   - "Finish the goal?" heading + "You will break your focus streak if you stop now." subtitle.
+   - Streak row: [Amber dot] X days → [Grey dot] 0 days.
+   - Wait timer (15–25s calculated formula from TRD §5.3.3):
+     - Both buttons disabled during countdown.
+     - Live inline counter: "Quit Session (18s)".
+   - Actions:
+     - "Keep Going" (Primary, `#CA9C68`): Closes modal, resumes session.
+     - "Quit Session" (Secondary, outlined `#906D4B`): Resets streak, logs session stopped, navigates to Home.
+2. **Wait Time Formula:**
+   - `calculateWaitSeconds({required int streakDays, required Duration todayDistractingUsage, required Duration avgDistractingUsage})`.
+3. **Streak Reset & Focus Session Integration:**
+   - Trigger modal on "Stop Focusing" button tap in `FocusSessionScreen`.
+4. **Automated Unit & Widget Tests:**
+   - Formula validation unit tests, modal layout widget tests, countdown timer & action tests.
 
-**Key File Paths for Step 6:**
+**Key File Paths for Step 8:**
 ```
-fluxfoxus/lib/features/focus/
-  domain/focus_session.dart
-  domain/timer_mode.dart
-  domain/session_status.dart
-  data/focus_session_repository.dart
-  services/foreground_timer_service.dart
-  presentation/focus_session_notifier.dart
-
-fluxfoxus/lib/presentation/screens/
-  focus_session_screen.dart            # Already scaffolded (update it)
-
 fluxfoxus/lib/presentation/widgets/
-  flip_clock.dart                      # New: mechanical flip card widget
-  flip_clock_digit.dart                # Single digit flip card
+  stop_focusing_modal.dart             # Stop Focusing friction modal & wait calculation
 
-fluxfoxus/test/features/focus/
-  focus_timer_test.dart
-fluxfoxus/test/presentation/screens/
-  focus_session_screen_test.dart
+fluxfoxus/lib/features/focus/
+  domain/wait_time_calculator.dart     # Formula per TRD 5.3.3
+
+fluxfoxus/test/presentation/widgets/
+  stop_focusing_modal_test.dart        # Unit & widget tests for modal
 ```
+
 
 ---
 
@@ -336,6 +333,7 @@ When resuming as Code1:
 
 1. **Read** `agent_worklog.md` to check Code2's current files
 2. **Read** this `code1.md` fully
-3. **Phase 1-B Step 5 & Step 6** are ✅ Completed with 123/123 tests passing and 0 analyzer lints.
-4. **All preview servers** and unused ports are cleanly shut down.
-5. **Next Step:** Phase 1-B Step 7 (or next task per user instruction).
+3. **Phase 1-B Step 5, Step 6, and Step 7** are ✅ Completed with 128/128 tests passing and 0 analyzer lints.
+4. **All preview servers** and unused ports are cleanly shut down (PID 69402 serving port 8080 unified review hub active).
+5. **Next Step:** Phase 1-B Step 8 (Stop Focusing Modal).
+

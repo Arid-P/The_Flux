@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:uuid/uuid.dart';
 import '../data/focus_session_repository.dart';
@@ -131,7 +132,11 @@ class FocusSessionNotifier extends Notifier<FocusSession?> {
   /// Transitions the session into Break mode.
   Future<void> startBreak() async {
     final current = state;
-    if (current == null || !current.status.isActive) return;
+    if (current == null || !current.status.isActive || !current.canTakeBreak) return;
+
+    try {
+      HapticFeedback.mediumImpact();
+    } catch (_) {}
 
     final now = DateTime.now();
     Duration updatedElapsed = current.elapsed;
@@ -163,6 +168,10 @@ class FocusSessionNotifier extends Notifier<FocusSession?> {
   Future<void> endBreak() async {
     final current = state;
     if (current == null || current.status != SessionStatus.onBreak) return;
+
+    try {
+      HapticFeedback.heavyImpact();
+    } catch (_) {}
 
     final now = DateTime.now();
     final updated = current.copyWith(
@@ -207,6 +216,9 @@ class FocusSessionNotifier extends Notifier<FocusSession?> {
   /// Completes the session successfully upon countdown reaching zero.
   Future<void> _completeSession(FocusSession session) async {
     _ticker?.cancel();
+    try {
+      HapticFeedback.heavyImpact();
+    } catch (_) {}
     final now = DateTime.now();
     final completed = session.copyWith(
       status: SessionStatus.completed,

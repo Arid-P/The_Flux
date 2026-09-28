@@ -192,6 +192,7 @@ class _FocusSessionScreenState extends ConsumerState<FocusSessionScreen> {
                                     topValue,
                                     topLabel,
                                     digitColor: digitColor,
+                                    isBreak: isBreak,
                                     isCompact: constraints.maxHeight < 360,
                                   ),
                                   const SizedBox(width: 16),
@@ -199,6 +200,7 @@ class _FocusSessionScreenState extends ConsumerState<FocusSessionScreen> {
                                     bottomValue,
                                     bottomLabel,
                                     digitColor: digitColor,
+                                    isBreak: isBreak,
                                     isCompact: constraints.maxHeight < 360,
                                   ),
                                 ],
@@ -210,12 +212,14 @@ class _FocusSessionScreenState extends ConsumerState<FocusSessionScreen> {
                                     topValue,
                                     topLabel,
                                     digitColor: digitColor,
+                                    isBreak: isBreak,
                                   ),
                                   const SizedBox(height: 12),
                                   _buildMechanicalCard(
                                     bottomValue,
                                     bottomLabel,
                                     digitColor: digitColor,
+                                    isBreak: isBreak,
                                   ),
                                 ],
                               ),
@@ -259,7 +263,7 @@ class _FocusSessionScreenState extends ConsumerState<FocusSessionScreen> {
                         children: [
                           // 1. Stop Focusing Button
                           Expanded(
-                            flex: 5,
+                            flex: isBreak ? 4 : 5,
                             child: SizedBox(
                               height: 52,
                               child: ElevatedButton(
@@ -271,11 +275,21 @@ class _FocusSessionScreenState extends ConsumerState<FocusSessionScreen> {
                                       .stopSession();
                                 },
                                 style: ElevatedButton.styleFrom(
-                                  backgroundColor: ThemeTokens.primary,
-                                  foregroundColor: ThemeTokens.background,
+                                  backgroundColor: isBreak
+                                      ? ThemeTokens.surface
+                                      : ThemeTokens.primary,
+                                  foregroundColor: isBreak
+                                      ? ThemeTokens.textPrimary
+                                      : ThemeTokens.background,
                                   shape: RoundedRectangleBorder(
                                     borderRadius: BorderRadius.circular(
                                         ThemeTokens.radiusPill),
+                                    side: isBreak
+                                        ? const BorderSide(
+                                            color: ThemeTokens.border,
+                                            width: 1,
+                                          )
+                                        : BorderSide.none,
                                   ),
                                   elevation: 0,
                                 ),
@@ -284,7 +298,9 @@ class _FocusSessionScreenState extends ConsumerState<FocusSessionScreen> {
                                   child: Text(
                                     'Stop Focusing',
                                     style: AppTypography.button(
-                                      color: ThemeTokens.background,
+                                      color: isBreak
+                                          ? ThemeTokens.textPrimary
+                                          : ThemeTokens.background,
                                     ),
                                   ),
                                 ),
@@ -292,86 +308,115 @@ class _FocusSessionScreenState extends ConsumerState<FocusSessionScreen> {
                             ),
                           ),
 
-                          const SizedBox(width: AppSpacing.s),
-
-                          // 2. Break Button
-                          Expanded(
-                            flex: 3,
-                            child: SizedBox(
-                              height: 52,
-                              child: OutlinedButton(
-                                key: const Key('focus_break_button'),
-                                onPressed: isBreak
-                                    ? () => ref
-                                        .read(focusSessionProvider.notifier)
-                                        .endBreak()
-                                    : (session.canTakeBreak
-                                        ? () => ref
+                          // 2. Break / End Break Early Button (absent if 0 breaks configured and not currently on break)
+                          if (session.breaksTotal > 0 || isBreak) ...[
+                            const SizedBox(width: AppSpacing.s),
+                            Expanded(
+                              flex: isBreak ? 5 : 3,
+                              child: SizedBox(
+                                height: 52,
+                                child: isBreak
+                                    ? ElevatedButton(
+                                        key: const Key('focus_break_button'),
+                                        onPressed: () => ref
                                             .read(focusSessionProvider.notifier)
-                                            .startBreak()
-                                        : null),
-                                style: OutlinedButton.styleFrom(
-                                  side: BorderSide(
-                                    color: isBreak || session.canTakeBreak
-                                        ? ThemeTokens.accent
-                                        : ThemeTokens.border,
-                                    width: 1.5,
-                                  ),
-                                  shape: RoundedRectangleBorder(
-                                    borderRadius: BorderRadius.circular(
-                                        ThemeTokens.radiusPill),
-                                  ),
+                                            .endBreak(),
+                                        style: ElevatedButton.styleFrom(
+                                          backgroundColor: ThemeTokens.primary,
+                                          foregroundColor:
+                                              ThemeTokens.background,
+                                          shape: RoundedRectangleBorder(
+                                            borderRadius:
+                                                BorderRadius.circular(
+                                                    ThemeTokens.radiusPill),
+                                          ),
+                                          elevation: 0,
+                                        ),
+                                        child: FittedBox(
+                                          fit: BoxFit.scaleDown,
+                                          child: Text(
+                                            'End Break Early',
+                                            style: AppTypography.button(
+                                              color: ThemeTokens.background,
+                                              weight: FontWeight.w700,
+                                            ),
+                                          ),
+                                        ),
+                                      )
+                                    : Opacity(
+                                        opacity: session.canTakeBreak ? 1.0 : 0.4,
+                                        child: OutlinedButton(
+                                          key: const Key('focus_break_button'),
+                                          onPressed: session.canTakeBreak
+                                              ? () => ref
+                                                  .read(focusSessionProvider
+                                                      .notifier)
+                                                  .startBreak()
+                                              : null,
+                                          style: OutlinedButton.styleFrom(
+                                            side: BorderSide(
+                                              color: session.canTakeBreak
+                                                  ? ThemeTokens.accent
+                                                  : ThemeTokens.border,
+                                              width: 1.5,
+                                            ),
+                                            shape: RoundedRectangleBorder(
+                                              borderRadius:
+                                                  BorderRadius.circular(
+                                                      ThemeTokens.radiusPill),
+                                            ),
+                                          ),
+                                          child: FittedBox(
+                                            fit: BoxFit.scaleDown,
+                                            child: Text(
+                                              'Break (${session.breaksTotal - session.breaksTaken})',
+                                              style: AppTypography.button(
+                                                color: session.canTakeBreak
+                                                    ? ThemeTokens.accent
+                                                    : ThemeTokens.textMuted,
+                                              ),
+                                            ),
+                                          ),
+                                        ),
+                                      ),
+                              ),
+                            ),
+                          ],
+
+                          // 3. Pause / Play Circle Button (absent during break mode per ui_focus_session.md Section 2.4)
+                          if (!isBreak) ...[
+                            const SizedBox(width: AppSpacing.s),
+                            InkWell(
+                              key: const Key('focus_pause_play_button'),
+                              onTap: () {
+                                if (isPaused) {
+                                  ref
+                                      .read(focusSessionProvider.notifier)
+                                      .resumeSession();
+                                } else {
+                                  ref
+                                      .read(focusSessionProvider.notifier)
+                                      .pauseSession();
+                                }
+                              },
+                              borderRadius:
+                                  BorderRadius.circular(ThemeTokens.radiusPill),
+                              child: Container(
+                                width: 52,
+                                height: 52,
+                                decoration: const BoxDecoration(
+                                  color: ThemeTokens.primary,
+                                  shape: BoxShape.circle,
                                 ),
-                                child: FittedBox(
-                                  fit: BoxFit.scaleDown,
-                                  child: Text(
-                                    isBreak
-                                        ? 'End Break'
-                                        : 'Break (${session.breaksTotal - session.breaksTaken})',
-                                    style: AppTypography.button(
-                                      color: isBreak || session.canTakeBreak
-                                          ? ThemeTokens.accent
-                                          : ThemeTokens.textMuted,
-                                    ),
-                                  ),
+                                alignment: Alignment.center,
+                                child: Icon(
+                                  isPaused ? Icons.play_arrow : Icons.pause,
+                                  color: ThemeTokens.background,
+                                  size: 26,
                                 ),
                               ),
                             ),
-                          ),
-
-                          const SizedBox(width: AppSpacing.s),
-
-                          // 3. Pause / Play Circle Button
-                          InkWell(
-                            key: const Key('focus_pause_play_button'),
-                            onTap: () {
-                              if (isPaused) {
-                                ref
-                                    .read(focusSessionProvider.notifier)
-                                    .resumeSession();
-                              } else {
-                                ref
-                                    .read(focusSessionProvider.notifier)
-                                    .pauseSession();
-                              }
-                            },
-                            borderRadius:
-                                BorderRadius.circular(ThemeTokens.radiusPill),
-                            child: Container(
-                              width: 52,
-                              height: 52,
-                              decoration: const BoxDecoration(
-                                color: ThemeTokens.primary,
-                                shape: BoxShape.circle,
-                              ),
-                              alignment: Alignment.center,
-                              child: Icon(
-                                isPaused ? Icons.play_arrow : Icons.pause,
-                                color: ThemeTokens.background,
-                                size: 26,
-                              ),
-                            ),
-                          ),
+                          ],
                         ],
                       ),
 
@@ -392,6 +437,7 @@ class _FocusSessionScreenState extends ConsumerState<FocusSessionScreen> {
     String unit, {
     required Color digitColor,
     bool isCompact = false,
+    bool isBreak = false,
   }) {
     final double cardWidth = isCompact ? 140 : 180;
     final double cardHeight = isCompact ? 84 : 110;
@@ -405,7 +451,10 @@ class _FocusSessionScreenState extends ConsumerState<FocusSessionScreen> {
       decoration: BoxDecoration(
         color: ThemeTokens.surface,
         borderRadius: BorderRadius.circular(AppRadius.card),
-        border: Border.all(color: ThemeTokens.border, width: 1),
+        border: Border.all(
+          color: isBreak ? ThemeTokens.accent : ThemeTokens.border,
+          width: 1,
+        ),
       ),
       child: Stack(
         alignment: Alignment.center,
@@ -458,14 +507,14 @@ class _FocusSessionScreenState extends ConsumerState<FocusSessionScreen> {
             ),
           ),
 
-          // Mechanical Split Seam Line in ThemeTokens.primary (#CA9C68)
+          // Mechanical Split Seam Line
           Positioned(
             left: 0,
             right: 0,
             top: seamTop,
             child: Container(
               height: 1.5,
-              color: ThemeTokens.primary,
+              color: isBreak ? ThemeTokens.accent : ThemeTokens.primary,
             ),
           ),
 
