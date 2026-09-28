@@ -16,46 +16,49 @@ class UsageStatsScreen extends StatelessWidget {
         automaticallyImplyLeading: false,
       ),
       body: SafeArea(
-        child: Padding(
+        child: SingleChildScrollView(
           padding: const EdgeInsets.symmetric(horizontal: AppSpacing.m),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              const SizedBox(height: AppSpacing.s),
-              // Time Range Tabs
-              Container(
-                height: 40,
-                decoration: BoxDecoration(
-                  color: ThemeTokens.surface,
-                  borderRadius: BorderRadius.circular(ThemeTokens.radiusPill),
-                  border: Border.all(color: ThemeTokens.border, width: 1),
+          child: ResponsiveContent(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                const SizedBox(height: AppSpacing.s),
+                // Time Range Tabs
+                Container(
+                  height: 40,
+                  decoration: BoxDecoration(
+                    color: ThemeTokens.surface,
+                    borderRadius: BorderRadius.circular(ThemeTokens.radiusPill),
+                    border: Border.all(color: ThemeTokens.border, width: 1),
+                  ),
+                  child: Row(
+                    children: [
+                      _buildTabPill('Today', isActive: true),
+                      _buildTabPill('Daily', isActive: false),
+                      _buildTabPill('Weekly', isActive: false),
+                    ],
+                  ),
                 ),
-                child: Row(
-                  children: [
-                    _buildTabPill('Today', isActive: true),
-                    _buildTabPill('Daily', isActive: false),
-                    _buildTabPill('Weekly', isActive: false),
-                  ],
+                const SizedBox(height: AppSpacing.l),
+                // Area Chart Placeholder
+                Container(
+                  height: 200,
+                  width: double.infinity,
+                  padding: const EdgeInsets.all(AppSpacing.m),
+                  decoration: BoxDecoration(
+                    color: ThemeTokens.surface,
+                    borderRadius: BorderRadius.circular(ThemeTokens.radiusLg),
+                    border: Border.all(color: ThemeTokens.border, width: 1),
+                  ),
+                  alignment: Alignment.center,
+                  child: Text(
+                    'Bézier Stacked Area Chart',
+                    style: AppTypography.body(color: ThemeTokens.textMuted),
+                  ),
                 ),
-              ),
-              const SizedBox(height: AppSpacing.l),
-              // Area Chart Placeholder
-              Container(
-                height: 200,
-                width: double.infinity,
-                padding: const EdgeInsets.all(AppSpacing.m),
-                decoration: BoxDecoration(
-                  color: ThemeTokens.surface,
-                  borderRadius: BorderRadius.circular(ThemeTokens.radiusLg),
-                  border: Border.all(color: ThemeTokens.border, width: 1),
-                ),
-                alignment: Alignment.center,
-                child: Text(
-                  'Bézier Stacked Area Chart',
-                  style: AppTypography.body(color: ThemeTokens.textMuted),
-                ),
-              ),
-            ],
+                const SizedBox(height: 100), // Spacing for floating bottom bar
+              ],
+            ),
           ),
         ),
       ),

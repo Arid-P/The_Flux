@@ -158,11 +158,12 @@ class _PresetCreateScreenState extends ConsumerState<PresetCreateScreen> {
         ],
       ),
       body: SafeArea(
-        child: Column(
-          children: [
-            Expanded(
-              child: SingleChildScrollView(
-                padding: const EdgeInsets.symmetric(horizontal: 20),
+        child: ResponsiveContent(
+          child: Column(
+            children: [
+              Expanded(
+                child: SingleChildScrollView(
+                  padding: const EdgeInsets.symmetric(horizontal: 20),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
@@ -376,7 +377,8 @@ class _PresetCreateScreenState extends ConsumerState<PresetCreateScreen> {
           ],
         ),
       ),
-    );
+    ),
+  );
   }
 
   Widget _buildStepperCard({
@@ -392,7 +394,7 @@ class _PresetCreateScreenState extends ConsumerState<PresetCreateScreen> {
     required VoidCallback onIncrement,
   }) {
     return Container(
-      padding: const EdgeInsets.all(16),
+      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 12),
       decoration: BoxDecoration(
         color: ThemeTokens.surface,
         borderRadius: BorderRadius.circular(AppRadius.card),
@@ -401,30 +403,46 @@ class _PresetCreateScreenState extends ConsumerState<PresetCreateScreen> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text(title, style: AppTypography.micro()),
-          const SizedBox(height: AppSpacing.m),
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              IconButton(
-                key: decKey,
-                icon: const Icon(Icons.remove, size: 18),
-                color: canDecrement ? ThemeTokens.primary : ThemeTokens.border,
-                onPressed: canDecrement ? onDecrement : null,
-              ),
-              Column(
-                children: [
-                  Text(valueText, key: valueKey, style: AppTypography.heading2()),
-                  Text(unitText, style: AppTypography.micro()),
-                ],
-              ),
-              IconButton(
-                key: incKey,
-                icon: const Icon(Icons.add, size: 18),
-                color: canIncrement ? ThemeTokens.primary : ThemeTokens.border,
-                onPressed: canIncrement ? onIncrement : null,
-              ),
-            ],
+          FittedBox(
+            fit: BoxFit.scaleDown,
+            child: Text(title, style: AppTypography.micro()),
+          ),
+          const SizedBox(height: AppSpacing.s),
+          FittedBox(
+            fit: BoxFit.scaleDown,
+            child: Row(
+              mainAxisSize: MainAxisSize.min,
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                IconButton(
+                  key: decKey,
+                  padding: EdgeInsets.zero,
+                  visualDensity: VisualDensity.compact,
+                  constraints: const BoxConstraints(minWidth: 28, minHeight: 28),
+                  icon: const Icon(Icons.remove, size: 18),
+                  color: canDecrement ? ThemeTokens.primary : ThemeTokens.border,
+                  onPressed: canDecrement ? onDecrement : null,
+                ),
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 4),
+                  child: Column(
+                    children: [
+                      Text(valueText, key: valueKey, style: AppTypography.heading2()),
+                      Text(unitText, style: AppTypography.micro()),
+                    ],
+                  ),
+                ),
+                IconButton(
+                  key: incKey,
+                  padding: EdgeInsets.zero,
+                  visualDensity: VisualDensity.compact,
+                  constraints: const BoxConstraints(minWidth: 28, minHeight: 28),
+                  icon: const Icon(Icons.add, size: 18),
+                  color: canIncrement ? ThemeTokens.primary : ThemeTokens.border,
+                  onPressed: canIncrement ? onIncrement : null,
+                ),
+              ],
+            ),
           ),
         ],
       ),
@@ -518,8 +536,14 @@ class _PresetCreateScreenState extends ConsumerState<PresetCreateScreen> {
                     ),
                   ),
                   const SizedBox(width: AppSpacing.s),
-                  Text(category, style: AppTypography.body(weight: FontWeight.w600)),
-                  const Spacer(),
+                  Expanded(
+                    child: Text(
+                      category,
+                      style: AppTypography.body(weight: FontWeight.w600),
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                  ),
+                  const SizedBox(width: 8),
                   Text(
                     '$blockedCount blocked',
                     key: Key('blocked_count_$category'),

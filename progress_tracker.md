@@ -16,7 +16,9 @@
 | **Phase 1-A Step 2: Database & Hive Persistence** | Completed | SQLite tables (`presets`, `preset_app_restrictions`, `focus_sessions`, `app_limits`, `streak_records`, `study_channels`) with cascade foreign keys & indexes; Hive boxes (`preferences`, `app_categories`, `app_metadata`); 11 unit tests passing, 0 lints. |
 | **Phase 1-A Step 3: Navigation Shell** | Completed | `go_router` declarative routes per TRD Section 6; 5-tab floating pill bar per `ui_navigation.md` with [Usage+Focus] and [Planner+Block] group pills; full-screen takeover hide logic; 10 unit/widget tests passing, 0 lints. |
 | **Phase 1-A Step 4: Permissions Onboarding Flow** | Completed | 4-step wizard per TRD Section 7 (`POST_NOTIFICATIONS`, `PACKAGE_USAGE_STATS`, `SYSTEM_ALERT_WINDOW`, `ACCESSIBILITY_SERVICE`) with progress bar, privacy assurance, skip/back/continue, standalone redirect screens, 13 automated tests passing, 0 lints. |
-| **Phase 1-B Step 5: Preset System** | In Progress | Presets SQLite CRUD, creation screen per `ui_preset.md`, break steppers, emoji bottom sheet, category app restrictions, YouTube 3-way radio, and automated field tests. |
+| **Phase 1-B Step 5: Preset System** | Completed | Presets SQLite CRUD, creation screen per `ui_preset.md`, break steppers, emoji bottom sheet, category app restrictions, YouTube 3-way radio, and automated field tests (all 7/7 tests passing with fake repo fix, 51/51 total suite tests passing, 0 lints). |
+| **Phase 1-B Step 6: Focus Timer + Foreground Service** | Queued / Pending Start | Countdown, Stopwatch, Open-Ended modes, mechanical split-line FlipClock, Hive focus_session_state persistence, flutter_foreground_task service, FocusSessionScreen. |
+| **Responsive Scaling & Orientation (Phase 1-A & Phase 1-B Step 5)** | Completed | Reusable `ResponsiveLayout` utilities (`AppBreakpoints`, `ResponsiveContent`, `AdaptiveScrollBody`), adaptive flip-clock orientation, flexible headers/cards, 48/48 responsive test assertions passing, 93/93 total Flutter tests passing, 0 lints. |
 | **Remaining UI and Backend Implementation** | Backlog | Complete UI screens, Riverpod state management, Background services, and MethodChannel IPC bridge. |
 
 ---
@@ -37,6 +39,8 @@
 - [x] Planner Screen UI Mockup completed and served with 10 automated assertion gates (served by `Code2` on port 8089).
 - [x] Usage Stats Screen UI Mockup completed and served with 10 automated assertion gates, Today Bézier chart, Daily 7-day interactive bar chart, Weekly summary card, and searchable app list (served by `Code2` on port 8090).
 - [x] Phase 1-A Step 4 completed: 4-step sequential permissions onboarding wizard (`POST_NOTIFICATIONS`, `PACKAGE_USAGE_STATS`, `SYSTEM_ALERT_WINDOW`, `ACCESSIBILITY_SERVICE`), permission services, Riverpod notifier, and 13 automated tests passing, 0 lints.
+- [x] Phase 1-B Step 5 completed: Preset data models, SQLite CRUD repository, Riverpod providers, interactive PresetCreateScreen per `ui_preset.md`, emoji picker bottom sheet, break steppers, YouTube 3-way radio, and automated tests (5 unit tests + 7 widget tests, Test 7 async teardown resolved with `_FakePresetsRepository`, 51/51 suite tests passing, 0 lints).
+- [x] Responsive Scaling & Orientation Support (Phase 1-A & Phase 1-B Step 5) completed: Adaptive layouts across Narrow Phone Portrait (320x568), Standard Phone Portrait (390x844), Landscape Compact Phone (640x360), Landscape Standard Phone (844x390), Tablet Portrait (768x1024), and Tablet Landscape (1024x768) with 48 responsive tests passing and 0 analyzer issues.
 
 ---
 

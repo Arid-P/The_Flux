@@ -25,22 +25,26 @@ class FloatingBottomNavBar extends StatelessWidget {
   Widget build(BuildContext context) {
     return SafeArea(
       top: false,
-      child: Padding(
-        padding: const EdgeInsets.only(left: 16, right: 16, bottom: 16),
-        child: Container(
-          height: 72,
-          padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 6),
-          decoration: BoxDecoration(
-            color: ThemeTokens.surface,
-            borderRadius: BorderRadius.circular(ThemeTokens.radiusXl),
-            border: Border.all(
-              color: ThemeTokens.border,
-              width: 1,
-            ),
-          ),
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-            children: [
+      child: Center(
+        heightFactor: 1.0,
+        child: ConstrainedBox(
+          constraints: const BoxConstraints(maxWidth: 600),
+          child: Padding(
+            padding: const EdgeInsets.only(left: 16, right: 16, bottom: 16),
+            child: Container(
+              height: 72,
+              padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 6),
+              decoration: BoxDecoration(
+                color: ThemeTokens.surface,
+                borderRadius: BorderRadius.circular(ThemeTokens.radiusXl),
+                border: Border.all(
+                  color: ThemeTokens.border,
+                  width: 1,
+                ),
+              ),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                children: [
               // 1. Home Standalone Tab
               Expanded(
                 flex: 10,
@@ -134,7 +138,9 @@ class FloatingBottomNavBar extends StatelessWidget {
           ),
         ),
       ),
-    );
+    ),
+  ),
+);
   }
 
   Widget _buildTabItem({
@@ -160,14 +166,17 @@ class FloatingBottomNavBar extends StatelessWidget {
           children: [
             iconBuilder(itemColor),
             const SizedBox(height: 3),
-            Text(
-              label,
-              maxLines: 1,
-              overflow: TextOverflow.ellipsis,
-              style: AppTypography.caption(
-                color: itemColor,
-                weight: fontWeight,
-              ).copyWith(fontSize: 12),
+            FittedBox(
+              fit: BoxFit.scaleDown,
+              child: Text(
+                label,
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+                style: AppTypography.caption(
+                  color: itemColor,
+                  weight: fontWeight,
+                ).copyWith(fontSize: 12),
+              ),
             ),
           ],
         ),

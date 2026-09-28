@@ -119,153 +119,162 @@ class _PermissionsOnboardingFlowScreenState
         ],
       ),
       body: SafeArea(
-        child: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: AppSpacing.m),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.center,
-            children: [
-              const SizedBox(height: AppSpacing.s),
-              // Multi-segment progress bar
-              Row(
-                key: const Key('step_progress_indicator'),
-                children: List.generate(_steps.length, (index) {
-                  final active = index <= _currentStep;
-                  return Expanded(
-                    child: Container(
-                      height: 4,
-                      margin: const EdgeInsets.symmetric(horizontal: 2),
-                      decoration: BoxDecoration(
-                        color: active ? ThemeTokens.primary : ThemeTokens.surfaceElevated,
-                        borderRadius: BorderRadius.circular(2),
-                      ),
+        child: ResponsiveContent(
+          child: Padding(
+            padding: const EdgeInsets.symmetric(horizontal: AppSpacing.m),
+            child: AdaptiveScrollBody(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.center,
+                children: [
+                  const SizedBox(height: AppSpacing.s),
+                  // Multi-segment progress bar
+                  Row(
+                    key: const Key('step_progress_indicator'),
+                    children: List.generate(_steps.length, (index) {
+                      final active = index <= _currentStep;
+                      return Expanded(
+                        child: Container(
+                          height: 4,
+                          margin: const EdgeInsets.symmetric(horizontal: 2),
+                          decoration: BoxDecoration(
+                            color: active ? ThemeTokens.primary : ThemeTokens.surfaceElevated,
+                            borderRadius: BorderRadius.circular(2),
+                          ),
+                        ),
+                      );
+                    }),
+                  ),
+
+                  const Spacer(flex: 1),
+                  const SizedBox(height: AppSpacing.m),
+
+                  // Icon Card
+                  Container(
+                    width: 80,
+                    height: 80,
+                    decoration: BoxDecoration(
+                      color: ThemeTokens.surface,
+                      borderRadius: BorderRadius.circular(ThemeTokens.radiusLg),
+                      border: Border.all(color: ThemeTokens.border, width: 1),
                     ),
-                  );
-                }),
-              ),
-
-              const Spacer(flex: 1),
-
-              // Icon Card
-              Container(
-                width: 80,
-                height: 80,
-                decoration: BoxDecoration(
-                  color: ThemeTokens.surface,
-                  borderRadius: BorderRadius.circular(ThemeTokens.radiusLg),
-                  border: Border.all(color: ThemeTokens.border, width: 1),
-                ),
-                child: Icon(
-                  details.icon,
-                  size: 40,
-                  color: isGranted ? ThemeTokens.success : ThemeTokens.primary,
-                ),
-              ),
-
-              const SizedBox(height: AppSpacing.m),
-
-              // Title
-              Text(
-                details.title,
-                key: const Key('permission_title'),
-                textAlign: TextAlign.center,
-                style: AppTypography.heading1(),
-              ),
-
-              const SizedBox(height: AppSpacing.xs),
-
-              // Purpose Pill
-              Container(
-                padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
-                decoration: BoxDecoration(
-                  color: ThemeTokens.surfaceElevated,
-                  borderRadius: BorderRadius.circular(ThemeTokens.radiusPill),
-                  border: Border.all(color: ThemeTokens.border, width: 1),
-                ),
-                child: Text(
-                  details.purpose,
-                  style: AppTypography.caption(color: ThemeTokens.accent, weight: FontWeight.w600),
-                ),
-              ),
-
-              const SizedBox(height: AppSpacing.l),
-
-              // Plain-Language Explanation Card
-              Container(
-                width: double.infinity,
-                padding: const EdgeInsets.all(AppSpacing.m),
-                decoration: BoxDecoration(
-                  color: ThemeTokens.surface,
-                  borderRadius: BorderRadius.circular(ThemeTokens.radiusLg),
-                  border: Border.all(color: ThemeTokens.border, width: 1),
-                ),
-                child: Column(
-                  children: [
-                    Text(
-                      details.plainLanguageExplanation,
-                      key: const Key('permission_explanation'),
-                      style: AppTypography.body(color: ThemeTokens.textPrimary),
-                      textAlign: TextAlign.center,
+                    child: Icon(
+                      details.icon,
+                      size: 40,
+                      color: isGranted ? ThemeTokens.success : ThemeTokens.primary,
                     ),
-                    const SizedBox(height: AppSpacing.m),
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
+                  ),
+
+                  const SizedBox(height: AppSpacing.m),
+
+                  // Title
+                  Text(
+                    details.title,
+                    key: const Key('permission_title'),
+                    textAlign: TextAlign.center,
+                    style: AppTypography.heading1(),
+                  ),
+
+                  const SizedBox(height: AppSpacing.xs),
+
+                  // Purpose Pill
+                  Container(
+                    padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
+                    decoration: BoxDecoration(
+                      color: ThemeTokens.surfaceElevated,
+                      borderRadius: BorderRadius.circular(ThemeTokens.radiusPill),
+                      border: Border.all(color: ThemeTokens.border, width: 1),
+                    ),
+                    child: Text(
+                      details.purpose,
+                      style: AppTypography.caption(color: ThemeTokens.accent, weight: FontWeight.w600),
+                    ),
+                  ),
+
+                  const SizedBox(height: AppSpacing.l),
+
+                  // Plain-Language Explanation Card
+                  Container(
+                    width: double.infinity,
+                    padding: const EdgeInsets.all(AppSpacing.m),
+                    decoration: BoxDecoration(
+                      color: ThemeTokens.surface,
+                      borderRadius: BorderRadius.circular(ThemeTokens.radiusLg),
+                      border: Border.all(color: ThemeTokens.border, width: 1),
+                    ),
+                    child: Column(
                       children: [
-                        const Icon(Icons.lock_outline, size: 16, color: ThemeTokens.textMuted),
-                        const SizedBox(width: 6),
                         Text(
-                          '100% on-device. No data leaves your phone.',
-                          style: AppTypography.micro(color: ThemeTokens.textMuted),
+                          details.plainLanguageExplanation,
+                          key: const Key('permission_explanation'),
+                          style: AppTypography.body(color: ThemeTokens.textPrimary),
+                          textAlign: TextAlign.center,
+                        ),
+                        const SizedBox(height: AppSpacing.m),
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            const Icon(Icons.lock_outline, size: 16, color: ThemeTokens.textMuted),
+                            const SizedBox(width: 6),
+                            Flexible(
+                              child: Text(
+                                '100% on-device. No data leaves your phone.',
+                                style: AppTypography.micro(color: ThemeTokens.textMuted),
+                                overflow: TextOverflow.ellipsis,
+                              ),
+                            ),
+                          ],
                         ),
                       ],
                     ),
-                  ],
-                ),
-              ),
+                  ),
 
-              const Spacer(flex: 2),
+                  const Spacer(flex: 2),
+                  const SizedBox(height: AppSpacing.m),
 
-              // Primary Action Button
-              SizedBox(
-                width: double.infinity,
-                height: 48,
-                child: ElevatedButton(
-                  key: const Key('permission_primary_button'),
-                  onPressed: () => _handleAction(currentPermission),
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: isGranted ? ThemeTokens.success : ThemeTokens.primary,
-                    foregroundColor: ThemeTokens.background,
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(ThemeTokens.radiusPill),
+                  // Primary Action Button
+                  SizedBox(
+                    width: double.infinity,
+                    height: 48,
+                    child: ElevatedButton(
+                      key: const Key('permission_primary_button'),
+                      onPressed: () => _handleAction(currentPermission),
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: isGranted ? ThemeTokens.success : ThemeTokens.primary,
+                        foregroundColor: ThemeTokens.background,
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(ThemeTokens.radiusPill),
+                        ),
+                        elevation: 0,
+                      ),
+                      child: Text(
+                        isGranted
+                            ? 'Granted · Next'
+                            : 'Enable ${details.shortName}',
+                        style: AppTypography.button(color: ThemeTokens.background),
+                      ),
                     ),
-                    elevation: 0,
                   ),
-                  child: Text(
-                    isGranted
-                        ? 'Granted · Next'
-                        : 'Enable ${details.shortName}',
-                    style: AppTypography.button(color: ThemeTokens.background),
+
+                  const SizedBox(height: AppSpacing.s),
+
+                  // Secondary Skip Button
+                  SizedBox(
+                    width: double.infinity,
+                    height: 44,
+                    child: TextButton(
+                      key: const Key('permission_secondary_button'),
+                      onPressed: _nextStep,
+                      child: Text(
+                        isLastStep ? 'Finish Setup' : 'Skip for now',
+                        style: AppTypography.caption(color: ThemeTokens.textMuted),
+                      ),
+                    ),
                   ),
-                ),
+
+                  const SizedBox(height: AppSpacing.m),
+                ],
               ),
-
-              const SizedBox(height: AppSpacing.s),
-
-              // Secondary Skip Button
-              SizedBox(
-                width: double.infinity,
-                height: 44,
-                child: TextButton(
-                  key: const Key('permission_secondary_button'),
-                  onPressed: _nextStep,
-                  child: Text(
-                    isLastStep ? 'Finish Setup' : 'Skip for now',
-                    style: AppTypography.caption(color: ThemeTokens.textMuted),
-                  ),
-                ),
-              ),
-
-              const SizedBox(height: AppSpacing.m),
-            ],
+            ),
           ),
         ),
       ),
@@ -284,59 +293,65 @@ class UsageStatsPermissionScreen extends ConsumerWidget {
     return Scaffold(
       backgroundColor: ThemeTokens.background,
       body: SafeArea(
-        child: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: AppSpacing.m),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.center,
-            children: [
-              const Spacer(),
-              Container(
-                width: 72,
-                height: 72,
-                decoration: BoxDecoration(
-                  color: ThemeTokens.surface,
-                  borderRadius: BorderRadius.circular(ThemeTokens.radiusLg),
-                  border: Border.all(color: ThemeTokens.border, width: 1),
-                ),
-                child: const Icon(Icons.bar_chart, size: 36, color: ThemeTokens.primary),
-              ),
-              const SizedBox(height: AppSpacing.l),
-              Text(
-                details.title,
-                style: AppTypography.heading1(),
-                textAlign: TextAlign.center,
-              ),
-              const SizedBox(height: AppSpacing.m),
-              Text(
-                details.plainLanguageExplanation,
-                style: AppTypography.body(color: ThemeTokens.textMuted),
-                textAlign: TextAlign.center,
-              ),
-              const Spacer(),
-              SizedBox(
-                width: double.infinity,
-                height: 48,
-                child: ElevatedButton(
-                  key: const Key('grant_usage_stats_permission_button'),
-                  onPressed: () async {
-                    await ref.read(permissionServiceProvider).request(AppPermission.usageStats);
-                    if (context.mounted) {
-                      context.go(AppRoutes.home);
-                    }
-                  },
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: ThemeTokens.primary,
-                    foregroundColor: ThemeTokens.background,
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(ThemeTokens.radiusPill),
+        child: ResponsiveContent(
+          child: Padding(
+            padding: const EdgeInsets.symmetric(horizontal: AppSpacing.m),
+            child: AdaptiveScrollBody(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.center,
+                children: [
+                  const Spacer(),
+                  const SizedBox(height: AppSpacing.l),
+                  Container(
+                    width: 72,
+                    height: 72,
+                    decoration: BoxDecoration(
+                      color: ThemeTokens.surface,
+                      borderRadius: BorderRadius.circular(ThemeTokens.radiusLg),
+                      border: Border.all(color: ThemeTokens.border, width: 1),
                     ),
-                    elevation: 0,
+                    child: const Icon(Icons.bar_chart, size: 36, color: ThemeTokens.primary),
                   ),
-                  child: Text('Enable Usage Stats', style: AppTypography.button(color: ThemeTokens.background)),
-                ),
+                  const SizedBox(height: AppSpacing.l),
+                  Text(
+                    details.title,
+                    style: AppTypography.heading1(),
+                    textAlign: TextAlign.center,
+                  ),
+                  const SizedBox(height: AppSpacing.m),
+                  Text(
+                    details.plainLanguageExplanation,
+                    style: AppTypography.body(color: ThemeTokens.textMuted),
+                    textAlign: TextAlign.center,
+                  ),
+                  const Spacer(),
+                  const SizedBox(height: AppSpacing.l),
+                  SizedBox(
+                    width: double.infinity,
+                    height: 48,
+                    child: ElevatedButton(
+                      key: const Key('grant_usage_stats_permission_button'),
+                      onPressed: () async {
+                        await ref.read(permissionServiceProvider).request(AppPermission.usageStats);
+                        if (context.mounted) {
+                          context.go(AppRoutes.home);
+                        }
+                      },
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: ThemeTokens.primary,
+                        foregroundColor: ThemeTokens.background,
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(ThemeTokens.radiusPill),
+                        ),
+                        elevation: 0,
+                      ),
+                      child: Text('Enable Usage Stats', style: AppTypography.button(color: ThemeTokens.background)),
+                    ),
+                  ),
+                  const SizedBox(height: AppSpacing.l),
+                ],
               ),
-              const SizedBox(height: AppSpacing.l),
-            ],
+            ),
           ),
         ),
       ),
@@ -355,59 +370,65 @@ class AccessibilityPermissionScreen extends ConsumerWidget {
     return Scaffold(
       backgroundColor: ThemeTokens.background,
       body: SafeArea(
-        child: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: AppSpacing.m),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.center,
-            children: [
-              const Spacer(),
-              Container(
-                width: 72,
-                height: 72,
-                decoration: BoxDecoration(
-                  color: ThemeTokens.surface,
-                  borderRadius: BorderRadius.circular(ThemeTokens.radiusLg),
-                  border: Border.all(color: ThemeTokens.border, width: 1),
-                ),
-                child: const Icon(Icons.accessibility_new, size: 36, color: ThemeTokens.accent),
-              ),
-              const SizedBox(height: AppSpacing.l),
-              Text(
-                details.title,
-                style: AppTypography.heading1(),
-                textAlign: TextAlign.center,
-              ),
-              const SizedBox(height: AppSpacing.m),
-              Text(
-                details.plainLanguageExplanation,
-                style: AppTypography.body(color: ThemeTokens.textMuted),
-                textAlign: TextAlign.center,
-              ),
-              const Spacer(),
-              SizedBox(
-                width: double.infinity,
-                height: 48,
-                child: ElevatedButton(
-                  key: const Key('grant_accessibility_permission_button'),
-                  onPressed: () async {
-                    await ref.read(permissionServiceProvider).request(AppPermission.accessibilityService);
-                    if (context.mounted) {
-                      context.go(AppRoutes.home);
-                    }
-                  },
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: ThemeTokens.primary,
-                    foregroundColor: ThemeTokens.background,
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(ThemeTokens.radiusPill),
+        child: ResponsiveContent(
+          child: Padding(
+            padding: const EdgeInsets.symmetric(horizontal: AppSpacing.m),
+            child: AdaptiveScrollBody(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.center,
+                children: [
+                  const Spacer(),
+                  const SizedBox(height: AppSpacing.l),
+                  Container(
+                    width: 72,
+                    height: 72,
+                    decoration: BoxDecoration(
+                      color: ThemeTokens.surface,
+                      borderRadius: BorderRadius.circular(ThemeTokens.radiusLg),
+                      border: Border.all(color: ThemeTokens.border, width: 1),
                     ),
-                    elevation: 0,
+                    child: const Icon(Icons.accessibility_new, size: 36, color: ThemeTokens.accent),
                   ),
-                  child: Text('Enable Accessibility', style: AppTypography.button(color: ThemeTokens.background)),
-                ),
+                  const SizedBox(height: AppSpacing.l),
+                  Text(
+                    details.title,
+                    style: AppTypography.heading1(),
+                    textAlign: TextAlign.center,
+                  ),
+                  const SizedBox(height: AppSpacing.m),
+                  Text(
+                    details.plainLanguageExplanation,
+                    style: AppTypography.body(color: ThemeTokens.textMuted),
+                    textAlign: TextAlign.center,
+                  ),
+                  const Spacer(),
+                  const SizedBox(height: AppSpacing.l),
+                  SizedBox(
+                    width: double.infinity,
+                    height: 48,
+                    child: ElevatedButton(
+                      key: const Key('grant_accessibility_permission_button'),
+                      onPressed: () async {
+                        await ref.read(permissionServiceProvider).request(AppPermission.accessibilityService);
+                        if (context.mounted) {
+                          context.go(AppRoutes.home);
+                        }
+                      },
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: ThemeTokens.primary,
+                        foregroundColor: ThemeTokens.background,
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(ThemeTokens.radiusPill),
+                        ),
+                        elevation: 0,
+                      ),
+                      child: Text('Enable Accessibility', style: AppTypography.button(color: ThemeTokens.background)),
+                    ),
+                  ),
+                  const SizedBox(height: AppSpacing.l),
+                ],
               ),
-              const SizedBox(height: AppSpacing.l),
-            ],
+            ),
           ),
         ),
       ),

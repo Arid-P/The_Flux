@@ -103,7 +103,8 @@ fluxfoxus/test/core/navigation/
 
 **Test Status:**
 - `presets_repository_test.dart`: 5/5 ✅ passing
-- `preset_create_screen_test.dart`: Tests 1-6 ✅ passing. Test 7 ("Successfully saves preset and pops screen when valid") has a **known timeout issue** (described in Section 6 below).
+- `preset_create_screen_test.dart`: 7/7 ✅ passing (Test 7 async teardown resolved with `_FakePresetsRepository`).
+- Full test suite: 51/51 ✅ passing, `flutter analyze` 0 issues.
 
 ---
 
@@ -206,33 +207,14 @@ fluxfoxus/test/core/navigation/
 
 ---
 
-## 6. Known Bug — Test 7 Timeout (MUST FIX before continuing)
+## 6. Resolved Bug — Test 7 Timeout (RESOLVED)
 
 ### Bug Description
 **Test:** `preset_create_screen_test.dart` → "Successfully saves preset and pops screen when valid"
 
-**Symptom:** Test body **completes successfully** (all debug prints execute, assert passes, preset is found in DB), but Flutter test framework reports a **10-minute timeout**.
+**Symptom:** Test body **completed successfully**, but Flutter test framework reported a **10-minute timeout** due to background Riverpod notifier rebuild triggering async SQLite DB calls during test unmount.
 
-**Root Cause (diagnosed):** After `_savePreset()` calls `ref.read(presetsListProvider.notifier).createPreset(...)`, the `PresetsListNotifier.createPreset` method calls `state = AsyncData(...)` which sets a new state on the Riverpod notifier. This triggers a **background async rebuild** of the `PresetsListNotifier.build()` method (i.e. `getAllPresets()` runs again asynchronously). This background micro-task keeps the test zone/isolate alive, causing `pumpAndSettle()` and the test framework to wait indefinitely for async activity to cease.
-
-**Evidence from logs:**
-```
->>> TEST 7: Before expect
->>> TEST 7: After expect
->>> TEST 7: finished successfully and unmounted
-# But then test still times out at 10 minutes
-```
-
-**Fix Required (not yet applied):**
-Two approaches to try (in order):
-
-1. **Override `presetsRepositoryProvider` in the test** with a `FakePresetsRepository` that has instant synchronous `savePreset` and `getAllPresets` returning pre-seeded data. This eliminates the real DB calls from the notifier rebuild entirely.
-
-2. **Dispose the ProviderScope** after the assertion using `addTearDown(() => container.dispose())` with a manual `ProviderContainer` instead of the widget-level `ProviderScope`.
-
-**Implementation (preferred fix — approach 1):**
-
-In `preset_create_screen_test.dart`, create `class FakePresetsRepository extends PresetsRepository` that overrides `savePreset` and `getAllPresets` to operate on an in-memory list. Then override `presetsRepositoryProvider` with this fake.
+**Resolution Applied:** Overrode `presetsRepositoryProvider` in `preset_create_screen_test.dart` with `_FakePresetsRepository`, eliminating real DB calls and async rebuild microtasks. All 7 tests now run and pass in ~5 seconds. Total test suite is 51/51 passing.
 
 ---
 

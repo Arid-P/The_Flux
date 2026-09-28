@@ -18,70 +18,74 @@ class PlannerScreen extends StatelessWidget {
         automaticallyImplyLeading: false,
       ),
       body: SafeArea(
-        child: Padding(
+        child: SingleChildScrollView(
           padding: const EdgeInsets.symmetric(horizontal: AppSpacing.m),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              const SizedBox(height: AppSpacing.s),
-              // Day Strip
-              Container(
-                height: 60,
-                decoration: BoxDecoration(
-                  color: ThemeTokens.surface,
-                  borderRadius: BorderRadius.circular(ThemeTokens.radiusLg),
-                  border: Border.all(color: ThemeTokens.border, width: 1),
+          child: ResponsiveContent(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                const SizedBox(height: AppSpacing.s),
+                // Day Strip
+                Container(
+                  height: 60,
+                  decoration: BoxDecoration(
+                    color: ThemeTokens.surface,
+                    borderRadius: BorderRadius.circular(ThemeTokens.radiusLg),
+                    border: Border.all(color: ThemeTokens.border, width: 1),
+                  ),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                    children: [
+                      _buildDayItem('M', '23', isSelected: false),
+                      _buildDayItem('T', '24', isSelected: true),
+                      _buildDayItem('W', '25', isSelected: false),
+                      _buildDayItem('T', '26', isSelected: false),
+                      _buildDayItem('F', '27', isSelected: false),
+                      _buildDayItem('S', '28', isSelected: false),
+                      _buildDayItem('S', '29', isSelected: false),
+                    ],
+                  ),
                 ),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                  children: [
-                    _buildDayItem('M', '23', isSelected: false),
-                    _buildDayItem('T', '24', isSelected: true),
-                    _buildDayItem('W', '25', isSelected: false),
-                    _buildDayItem('T', '26', isSelected: false),
-                    _buildDayItem('F', '27', isSelected: false),
-                    _buildDayItem('S', '28', isSelected: false),
-                    _buildDayItem('S', '29', isSelected: false),
-                  ],
-                ),
-              ),
 
-              const SizedBox(height: AppSpacing.l),
+                const SizedBox(height: AppSpacing.l),
 
-              Text('Today\'s Schedule', style: AppTypography.heading2()),
-              const SizedBox(height: AppSpacing.m),
+                Text('Today\'s Schedule', style: AppTypography.heading2()),
+                const SizedBox(height: AppSpacing.m),
 
-              // Sample Session Card
-              Container(
-                width: double.infinity,
-                padding: const EdgeInsets.all(AppSpacing.m),
-                decoration: BoxDecoration(
-                  color: ThemeTokens.surface,
-                  borderRadius: BorderRadius.circular(ThemeTokens.radiusLg),
-                  border: Border.all(color: ThemeTokens.border, width: 1),
-                ),
-                child: Row(
-                  children: [
-                    const Text('🎯', style: TextStyle(fontSize: 24)),
-                    const SizedBox(width: AppSpacing.m),
-                    Expanded(
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text('Deep Work', style: AppTypography.body(weight: FontWeight.w600)),
-                          const SizedBox(height: 2),
-                          Text('09:00 AM – 09:50 AM · FF Source', style: AppTypography.caption(color: ThemeTokens.textMuted)),
-                        ],
+                // Sample Session Card
+                Container(
+                  width: double.infinity,
+                  padding: const EdgeInsets.all(AppSpacing.m),
+                  decoration: BoxDecoration(
+                    color: ThemeTokens.surface,
+                    borderRadius: BorderRadius.circular(ThemeTokens.radiusLg),
+                    border: Border.all(color: ThemeTokens.border, width: 1),
+                  ),
+                  child: Row(
+                    children: [
+                      const Text('🎯', style: TextStyle(fontSize: 24)),
+                      const SizedBox(width: AppSpacing.m),
+                      Expanded(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text('Deep Work', style: AppTypography.body(weight: FontWeight.w600)),
+                            const SizedBox(height: 2),
+                            Text('09:00 AM – 09:50 AM · FF Source', style: AppTypography.caption(color: ThemeTokens.textMuted)),
+                          ],
+                        ),
                       ),
-                    ),
-                    IconButton(
-                      icon: const Icon(Icons.edit_outlined, color: ThemeTokens.textMuted, size: 20),
-                      onPressed: () => context.push(AppRoutes.presetEditPath('preset-100')),
-                    ),
-                  ],
+                      IconButton(
+                        icon: const Icon(Icons.edit_outlined, color: ThemeTokens.textMuted, size: 20),
+                        onPressed: () => context.push(AppRoutes.presetEditPath('preset-100')),
+                      ),
+                    ],
+                  ),
                 ),
-              ),
-            ],
+
+                const SizedBox(height: 100), // Spacing for floating bottom bar and FAB
+              ],
+            ),
           ),
         ),
       ),
@@ -100,31 +104,33 @@ class PlannerScreen extends StatelessWidget {
   }
 
   Widget _buildDayItem(String day, String date, {required bool isSelected}) {
-    return Container(
-      width: 40,
-      padding: const EdgeInsets.symmetric(vertical: 6),
-      decoration: BoxDecoration(
-        color: isSelected ? ThemeTokens.primary : Colors.transparent,
-        borderRadius: BorderRadius.circular(ThemeTokens.radiusMd),
-      ),
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          Text(
-            day,
-            style: AppTypography.micro(
-              color: isSelected ? ThemeTokens.background : ThemeTokens.textMuted,
+    return Expanded(
+      child: Container(
+        margin: const EdgeInsets.symmetric(horizontal: 2, vertical: 4),
+        padding: const EdgeInsets.symmetric(vertical: 4),
+        decoration: BoxDecoration(
+          color: isSelected ? ThemeTokens.primary : Colors.transparent,
+          borderRadius: BorderRadius.circular(ThemeTokens.radiusMd),
+        ),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Text(
+              day,
+              style: AppTypography.micro(
+                color: isSelected ? ThemeTokens.background : ThemeTokens.textMuted,
+              ),
             ),
-          ),
-          const SizedBox(height: 2),
-          Text(
-            date,
-            style: AppTypography.caption(
-              color: isSelected ? ThemeTokens.background : ThemeTokens.textPrimary,
-              weight: FontWeight.w600,
+            const SizedBox(height: 2),
+            Text(
+              date,
+              style: AppTypography.caption(
+                color: isSelected ? ThemeTokens.background : ThemeTokens.textPrimary,
+                weight: FontWeight.w600,
+              ),
             ),
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }

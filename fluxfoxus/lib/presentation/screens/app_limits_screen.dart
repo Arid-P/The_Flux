@@ -35,25 +35,32 @@ class AppLimitsScreen extends StatelessWidget {
       body: SafeArea(
         child: SingleChildScrollView(
           padding: const EdgeInsets.symmetric(horizontal: AppSpacing.m),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              const SizedBox(height: AppSpacing.s),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  Text('App Limits', style: AppTypography.heading2()),
-                  TextButton.icon(
-                    onPressed: () {},
-                    icon: const Icon(Icons.add, size: 18, color: ThemeTokens.accent),
-                    label: Text(
-                      'Add App',
-                      style: AppTypography.button(color: ThemeTokens.accent),
+          child: ResponsiveContent(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                const SizedBox(height: AppSpacing.s),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Flexible(
+                      child: Text(
+                        'App Limits',
+                        style: AppTypography.heading2(),
+                        overflow: TextOverflow.ellipsis,
+                      ),
                     ),
-                  ),
-                ],
-              ),
-              const SizedBox(height: AppSpacing.m),
+                    TextButton.icon(
+                      onPressed: () {},
+                      icon: const Icon(Icons.add, size: 18, color: ThemeTokens.accent),
+                      label: Text(
+                        'Add App',
+                        style: AppTypography.button(color: ThemeTokens.accent),
+                      ),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: AppSpacing.m),
 
               // Category Group: Distracting
               _buildCategoryHeader('Distracting', '3 apps'),
@@ -77,7 +84,8 @@ class AppLimitsScreen extends StatelessWidget {
           ),
         ),
       ),
-    );
+    ),
+  );
   }
 
   Widget _buildCategoryHeader(String category, String count) {

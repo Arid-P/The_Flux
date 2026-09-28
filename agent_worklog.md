@@ -9,8 +9,8 @@ This registry coordinates concurrent/subsequent AI coding agents working in this
 
 | Agent Name | Role / Specialty | Status | Branch | Current Task / Active Scope | Reserved / Active Files | Port(s) Used |
 |---|---|---|---|---|---|---|
-| **Code1** | Lead UI Designer | **ACTIVE** | `ff` | Phase 1-B Step 5: Preset System (Presets CRUD in SQLite, interactive creation screen with steppers, emoji selector, category app restrictions, YouTube 3-way radio, and automated field tests per `ui_preset.md`). | `fluxfoxus/lib/features/presets/`, `fluxfoxus/lib/presentation/screens/preset_create_screen.dart`, `progress_tracker.md`, `agent_worklog.md` | `8085` |
-| **Code2** | Companion UI Designer | **ACTIVE** | `ff` | Phase 1-A UI: Usage Stats visual refinement — vivid chart colors (Today Bézier strokes, Daily bar vividness, Weekly 7-bar horizon). All 10 automated test gates passing. | `ui_mockups/usage_stats.html`, `ui_mockups/planner.html`, `ui_mockups/home_screen.html`, `ui_mockups/app_limits.html`, `progress_tracker.md`, `agent_worklog.md` | `8086`, `8088`, `8089`, `8090` |
+| **Code1** | Lead UI Designer | **ACTIVE** | `ff` | Phase 1-B Step 5 COMPLETED (Presets SQLite CRUD, interactive creation screen, emoji picker, break steppers, app restrictions, YouTube mode, Test 7 resolved with fake repo, 51/51 tests passing, 0 lints). Awaiting user command to start Phase 1-B Step 6. | `fluxfoxus/lib/features/presets/`, `fluxfoxus/lib/presentation/screens/preset_create_screen.dart`, `progress_tracker.md`, `agent_worklog.md` | `8085` |
+| **Code2** | Companion UI Designer / Responsive Architect | **IDLE** | `ff` | Responsive Scaling & Adaptive Layouts (Phase 1-A & Phase 1-B Step 5) COMPLETED: Full adaptive scaling across all aspect ratios (320px to 1024px) and orientations (portrait & landscape); 48/48 responsive test assertions passing, 93/93 total Flutter tests passing, 0 lints. | `fluxfoxus/lib/core/theme/responsive_layout.dart`, `fluxfoxus/lib/presentation/screens/`, `fluxfoxus/lib/core/navigation/`, `progress_tracker.md`, `agent_worklog.md` | `8086`, `8088`, `8089`, `8090` |
 
 ---
 
@@ -20,7 +20,7 @@ This registry coordinates concurrent/subsequent AI coding agents working in this
 * **Assigned Identity:** `Code1`
 * **Role:** Lead UI Designer
 * **Current Working Branch:** `ff` (Strict branch lock — DO NOT SWITCH BRANCHES)
-* **Status:** `ACTIVE` (In-progress)
+* **Status:** `ACTIVE` (Step 5 Completed; Awaiting Phase 1-B Step 6 trigger)
 * **Completed:**
   - Built static HTML/Tailwind preview of the **Active Focus Session Screen** (`ui_mockups/active_focus_session.html`) with split-line mechanical flip-clock, bottom controls, and Rustic Medley palette override.
   - Preview reviewed and approved by user.
@@ -56,15 +56,23 @@ This registry coordinates concurrent/subsequent AI coding agents working in this
     - Standalone redirect screens (`UsageStatsPermissionScreen`, `AccessibilityPermissionScreen`) with direct action triggers.
     - 13 automated unit & widget tests in `permission_service_test.dart` and `onboarding_screens_test.dart` (39 tests total passing across all suites).
     - Static analysis: `flutter analyze` 100% clean with 0 issues.
+  - Implemented Phase 1-B Step 5: Preset System:
+    - Preset data models (`Preset`, `PresetAppRestriction`, `YouTubeMode`) with SQLite serialization/deserialization.
+    - `PresetsRepository` with SQLite CRUD operations on `presets` and `preset_app_restrictions`.
+    - Riverpod providers (`presetsListProvider`, `currentPresetProvider`, `presetsRepositoryProvider`).
+    - Full Preset Creation screen per `ui_preset.md` (Name input, Emoji selector bottom sheet, Break steppers 0-6 breaks & 1-15m duration, App restrictions with 4 categories, YouTube 3-way radio).
+    - Fixed Test 7 Riverpod async teardown timeout in `preset_create_screen_test.dart` using hermetic in-memory `_FakePresetsRepository`.
+    - 12 automated unit & widget tests (5 repository tests + 7 widget tests) passing (51/51 total test suite passing, `flutter analyze` 0 issues).
 * **What `Code1` is doing right now:**
-  - Implementing Phase 1-B Step 5: Preset System:
-    - Creating Preset data models (`Preset`, `PresetAppRestriction`, `YouTubeMode`) with SQLite serialization/deserialization.
-    - Implementing `PresetsRepository` (CRUD operations on `presets` and `preset_app_restrictions` tables).
-    - Implementing Riverpod providers (`presetsListProvider`, `currentPresetProvider`, `presetControllerProvider`).
-    - Building full Preset Creation screen per `ui_preset.md` (Name input, Emoji selector bottom sheet, Break steppers 0-6 breaks & 1-15m duration, App restrictions with 4 categories, YouTube 3-way radio).
-    - Writing comprehensive automated tests for every field, stepper, and repository operation.
+  - Phase 1-B Step 5 is fully verified and completed.
+  - Standing by awaiting user instruction to begin Phase 1-B Step 6 (Focus Timer + Foreground Service).
 * **Next Steps for `Code1`:**
-  - Proceed with Phase 1-B Step 6: Focus Timer + Foreground Service.
+  - Once user triggers Step 1B.6:
+    - Implement foreground timer service (`flutter_foreground_task`).
+    - Implement `FocusSessionNotifier` state machine (Countdown, Stopwatch, Open-Ended).
+    - Implement mechanical split-line `FlipClock` widget.
+    - Implement Hive `focus_session_state` persistence.
+    - Complete `FocusSessionScreen` and comprehensive widget tests.
 * **Exclusive Resources / Do Not Overwrite:**
   - `fluxfoxus/lib/features/presets/`
   - `fluxfoxus/lib/presentation/screens/preset_create_screen.dart`
@@ -105,8 +113,15 @@ This registry coordinates concurrent/subsequent AI coding agents working in this
     - Local preview served on port `8090`.
   - Built standalone verification test scripts (`test_usage_stats.js`, `test_code2_screens.js`) passing 100% of DOM, color tokens, and state assertions across all screens.
 * **What `Code2` is doing right now:**
-  - `IDLE` / Awaiting user review on Usage Stats screen preview (`ui_mockups/usage_stats.html` on port 8090) or instructions for the next task (e.g., 2/5/10/20 Distraction Intervention screens).
+  - `IDLE` / All Responsive Scaling & Adaptive Layout tasks completed and verified:
+    - Built reusable `ResponsiveLayout` utilities (`AppBreakpoints`, `ResponsiveContent`, `AdaptiveScrollBody`).
+    - Fixed horizontal overflows on narrow devices (320px) in `HomeScreen`, `FocusSessionScreen`, `AppLimitsScreen`, and `PresetCreateScreen`.
+    - Fixed vertical overflows on low-height landscape orientations (360px–390px) in `PermissionsOnboardingFlowScreen`, `FocusSessionScreen`, `PlannerScreen`, and `UsageStatsScreen`.
+    - Constrained tablet & desktop presentations (`ResponsiveContent` max-width 600px centered).
+    - 48 responsive tests passing in `test/responsive_test.dart` and 93/93 total Flutter tests passing with 0 analyzer lints.
 * **Exclusive Resources / Do Not Overwrite:**
+  - `fluxfoxus/lib/core/theme/responsive_layout.dart`
+  - `fluxfoxus/test/responsive_test.dart`
   - `ui_mockups/usage_stats.html` (Code2 screen)
   - `ui_mockups/planner.html` (Code2 screen)
   - `ui_mockups/home_screen.html` (Code2 screen)

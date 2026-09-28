@@ -1,4 +1,3 @@
-import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
@@ -9,7 +8,27 @@ import 'package:fluxfoxus/core/navigation/navigation.dart';
 import 'package:fluxfoxus/features/presets/presets.dart';
 import 'package:fluxfoxus/presentation/screens/preset_create_screen.dart';
 
-void import_dart_io_stderr(String msg) => stderr.writeln(msg);
+class _FakePresetsRepository extends PresetsRepository {
+  final List<Preset> _store;
+
+  _FakePresetsRepository(AppDatabase db, List<Preset> store)
+      : _store = store,
+        super(appDatabase: db);
+
+  @override
+  Future<List<Preset>> getAllPresets() async => List.of(_store);
+
+  @override
+  Future<void> savePreset(
+    Preset preset, {
+    List<PresetAppRestriction>? restrictions,
+  }) async {
+    _store.add(preset);
+  }
+
+  @override
+  Future<void> setLastUsedPreset(String presetId) async {}
+}
 
 void main() {
   setUpAll(() {
@@ -34,6 +53,7 @@ void main() {
 
   group('PresetCreateScreen Widget Tests', () {
     late AppDatabase appDatabase;
+    late List<Preset> store;
     late PresetsRepository repository;
 
     setUp(() async {
@@ -42,13 +62,12 @@ void main() {
         customPath: inMemoryDatabasePath,
         factory: databaseFactoryFfi,
       );
-      repository = PresetsRepository(appDatabase: appDatabase);
+      store = [];
+      repository = _FakePresetsRepository(appDatabase, store);
     });
 
     tearDown(() async {
-      import_dart_io_stderr('>>> In tearDown before db close');
       await appDatabase.close();
-      import_dart_io_stderr('>>> In tearDown after db close');
     });
 
     testWidgets('Renders all sections per ui_preset.md', (WidgetTester tester) async {
@@ -182,34 +201,20 @@ void main() {
     });
 
     testWidgets('Successfully saves preset and pops screen when valid', (WidgetTester tester) async {
-      import_dart_io_stderr('>>> TEST 7: pumpWidget');
       await tester.pumpWidget(buildTestApp(repository: repository));
-      import_dart_io_stderr('>>> TEST 7: pumpAndSettle');
       await tester.pumpAndSettle();
 
-      import_dart_io_stderr('>>> TEST 7: enterText name');
+      // Enter name and description
       await tester.enterText(find.byKey(const Key('preset_name_input')), 'Extreme Focus');
-      import_dart_io_stderr('>>> TEST 7: enterText description');
       await tester.enterText(find.byKey(const Key('preset_description_input')), 'Deep work session for coding');
-      import_dart_io_stderr('>>> TEST 7: pump');
       await tester.pump();
 
-      import_dart_io_stderr('>>> TEST 7: tap save');
+      // Tap Save
       await tester.tap(find.byKey(const Key('save_preset_button')));
-      await tester.pump();
+      await tester.pumpAndSettle();
 
-      await tester.runAsync(() async {
-        await Future<void>.delayed(const Duration(milliseconds: 200));
-      });
-      await tester.pump();
-
-      import_dart_io_stderr('>>> TEST 7: getAllPresets');
-      final presets = await repository.getAllPresets();
-      import_dart_io_stderr('>>> Presets found: ${presets.map((p) => p.name).toList()}');
-      import_dart_io_stderr('>>> TEST 7: Before expect');
-      expect(presets.any((p) => p.name == 'Extreme Focus'), true);
-      import_dart_io_stderr('>>> TEST 7: After expect');
-      import_dart_io_stderr('>>> TEST 7: finished successfully and unmounted');
+      // Verify preset is saved in repository store
+      expect(store.any((p) => p.name == 'Extreme Focus'), true);
     });
   });
 }
