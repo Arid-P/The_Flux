@@ -72,7 +72,8 @@ All spec docs are in `/workspaces/The_Flux/prompts_docx/`. The most critical one
 | Phase 1-B Step 5: Preset System | `7ab48a2` | Presets SQLite CRUD, interactive creation screen, emoji picker, break steppers, app restrictions, YouTube mode, fake repo fix, 51/51 tests passing |
 | Phase 1-B Step 6: Focus Timer + Foreground Service | `529fbd9` | Focus timer domain models, Hive focus_session_state 5s persistence, SQLite logging, ForegroundTimerService, FocusSessionNotifier, mechanical FlipClock, FocusSessionScreen, 123/123 tests passing, 0 lints |
 | Phase 1-B Step 7: Break System | `e0e8d02` | Break countdown in `#906D4B`, break count decrement, greyscale disabled state on break exhaustion, 0-breaks configured removal, End Break Early button, haptic feedback, 128/128 tests passing, 0 lints |
-| Phase 1-B Step 8 & 9: Stop Focusing Modal & Session Completion | Current | StopFocusingModal, wait time formula (15-25s), live inline counter, streak reset flow, blurred backdrop, countdown auto-completion (00:00) with vibration and auto-nav to Home, 140/140 tests passing, 0 lints |
+| Phase 1-B Step 8 & 9: Stop Focusing Modal & Session Completion | `67e6c90` | StopFocusingModal, wait time formula (15-25s), live inline counter, streak reset flow, blurred backdrop, countdown auto-completion (00:00) with vibration and auto-nav to Home, 140/140 tests passing, 0 lints |
+| Phase 1-B Step 10: Streaks System & Daily Evaluation | Current | StreakRecord domain model, StreakRepository CRUD & longest streak tracking, neutral days (minimumSessionsPerDay=0), FocusSessionRepository date queries, StreakEvaluationService per TRD §5.3.1, WorkManager background scheduler, 155/155 tests passing, 0 lints |
 
 ### Phase 1-B Step 5 (Latest — Commit `7ab48a2`)
 
@@ -225,36 +226,40 @@ fluxfoxus/test/core/navigation/
 
 ## 7. Next Immediate Task
 
-### Task: Phase 1-B Step 10 — Streaks System & Daily Evaluation
+### Task: Phase 1-C Step 11 — Accessibility Service + App Detection
 
 **Reference Docs:**
-- `prompts_docx/C1/GMP_FF_BUILD.md` → Phase 1-B Step 10
-- `prompts_docx/FLUXFOXUS/Phase 1/FF_TRD_v1.0.md` → Section 4.5 (`streak_records` table) & Section 5.3 (Streak Evaluation Logic)
-- `prompts_docx/FLUXFOXUS/Phase 1/FF_PRD_v1.0.md` → Section 4.2 (Daily Streak Evaluation & Minimum Sessions)
+- `prompts_docx/C1/GMP_FF_BUILD.md` → Phase 1-C Step 11
+- `prompts_docx/FLUXFOXUS/Phase 1/FF_TRD_v1.0.md` → Section 5.2 (App Blocking & Accessibility Service)
+- `prompts_docx/FLUXFOXUS/Phase 1/FF_PRD_v1.0.md` → Section 4.3 (Critical Android Permissions & Blocking)
 - `ff_design_override.md` → Rustic Medley Palette
 
 **What to build:**
-1. **Streak Domain Models & State Management:**
-   - `StreakRecord` domain entity matching SQLite `streak_records` schema.
-   - Streak evaluation service calculating whether today's session goals were met (minimum sessions per day).
-2. **WorkManager Daily Evaluation Task:**
-   - Background periodic worker scheduled daily at 11:59 PM to evaluate streak continuation, neutral day preservation, or streak break.
-3. **Streak Neutral Days & Recovery:**
-   - Neutral days logic (minimum sessions = 0 allowed without breaking streak).
-4. **Integration with Active Sessions:**
-   - `StreakRepository` integration with `FocusSessionNotifier` on successful completion (increments/evaluates streak).
-5. **Automated Unit Tests:**
-   - Hermetic test suite for streak evaluation, neutral days, streak preservation, and SQLite persistence.
+1. **Kotlin Accessibility Service (`FluxFoxusAccessibilityService`):**
+   - In `android/app/src/main/kotlin/com/fluxfoxus/FluxFoxusAccessibilityService.kt`:
+   - Monitor `AccessibilityEvent.TYPE_WINDOW_STATE_CHANGED`.
+   - Extract `packageName` from events safely.
+   - Filter out system UI (`com.android.systemui`, launcher packages).
+2. **MethodChannel Bridge (`com.fluxfoxus/accessibility_service`):**
+   - Communication channel between native Android accessibility service and Flutter Dart runtime.
+   - Stream events: `onAppChanged(packageName)`.
+   - Redirect logic: `redirectToApp(packageName)` triggering FF front-page bring-up when distracting app is opened during active session.
+3. **Dart Service Layer:**
+   - `AppDetectionService` abstraction and `MethodChannelAppDetectionService`.
+   - Event listening for foreground package changes during active focus sessions.
+4. **Hermetic Automated Tests:**
+   - Unit tests with mock platform channel verifying app detection, filtering, and redirect triggers.
 
-**Key File Paths for Step 10:**
+**Key File Paths for Step 11:**
 ```
-fluxfoxus/lib/features/focus/
-  domain/streak_record.dart            # StreakRecord model
-  services/streak_evaluation_service.dart # Daily evaluation logic
-  data/streak_repository.dart          # Already initialized in Step 8
+android/app/src/main/kotlin/com/fluxfoxus/
+  FluxFoxusAccessibilityService.kt   # Native Android AccessibilityService
 
-fluxfoxus/test/features/focus/
-  streak_evaluation_service_test.dart  # Unit tests for streak evaluation
+fluxfoxus/lib/features/blocking/
+  services/app_detection_service.dart # Dart MethodChannel bridge & stream
+
+fluxfoxus/test/features/blocking/
+  app_detection_service_test.dart    # Platform channel tests
 ```
 
 
@@ -328,7 +333,7 @@ When resuming as Code1:
 
 1. **Read** `agent_worklog.md` to check Code2's current files
 2. **Read** this `code1.md` fully
-3. **Phase 1-B Steps 5, 6, 7, 8, and 9** are ✅ Completed with 140/140 tests passing and 0 analyzer lints.
+3. **Phase 1-B Steps 5 through 10** are ✅ Fully Completed with 155/155 tests passing and 0 analyzer lints.
 4. **All preview servers** and unused ports are cleanly shut down (port 8080 unified review hub active).
-5. **Next Step:** Phase 1-B Step 10 (Streaks System & Daily Evaluation).
+5. **Next Step:** Phase 1-C Step 11 (Accessibility Service + App Detection).
 

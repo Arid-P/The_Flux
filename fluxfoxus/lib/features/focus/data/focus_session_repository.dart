@@ -4,6 +4,7 @@ import '../../../core/database/database_tables.dart';
 import '../../../core/storage/hive_storage_service.dart';
 import '../../presets/presentation/presets_provider.dart';
 import '../domain/focus_session.dart';
+import '../domain/session_status.dart';
 
 /// Repository managing FocusSession persistence in SQLite and Hive.
 class FocusSessionRepository {
@@ -84,12 +85,47 @@ class FocusSessionRepository {
       orderBy: '${DatabaseTables.colSessionCreatedAt} DESC',
     );
   }
+
+  /// Retrieves completed focus sessions for the given date.
+  Future<List<Map<String, dynamic>>> getCompletedForDate(DateTime date) async {
+    final startOfDay =
+        DateTime(date.year, date.month, date.day).millisecondsSinceEpoch;
+    final endOfDay = DateTime(date.year, date.month, date.day, 23, 59, 59, 999)
+        .millisecondsSinceEpoch;
+
+    final db = await appDatabase.database;
+    return await db.query(
+      DatabaseTables.focusSessions,
+      where:
+          '${DatabaseTables.colSessionStatus} = ? AND ((${DatabaseTables.colSessionActualEnd} >= ? AND ${DatabaseTables.colSessionActualEnd} <= ?) OR (${DatabaseTables.colSessionActualStart} >= ? AND ${DatabaseTables.colSessionActualStart} <= ?))',
+      whereArgs: ['completed', startOfDay, endOfDay, startOfDay, endOfDay],
+      orderBy: '${DatabaseTables.colSessionActualEnd} DESC',
+    );
+  }
+
+  /// Retrieves scheduled focus sessions for the given date.
+  Future<List<Map<String, dynamic>>> getScheduledForDate(DateTime date) async {
+    final startOfDay =
+        DateTime(date.year, date.month, date.day).millisecondsSinceEpoch;
+    final endOfDay = DateTime(date.year, date.month, date.day, 23, 59, 59, 999)
+        .millisecondsSinceEpoch;
+
+    final db = await appDatabase.database;
+    return await db.query(
+      DatabaseTables.focusSessions,
+      where:
+          '${DatabaseTables.colSessionScheduledStart} >= ? AND ${DatabaseTables.colSessionScheduledStart} <= ?',
+      whereArgs: [startOfDay, endOfDay],
+      orderBy: '${DatabaseTables.colSessionScheduledStart} ASC',
+    );
+  }
 }
 
 /// Fake implementation of [FocusSessionRepository] for hermetic testing.
 class FakeFocusSessionRepository implements FocusSessionRepository {
   FocusSession? active;
   final List<FocusSession> finished = [];
+  final List<FocusSession> scheduled = [];
 
   @override
   AppDatabase get appDatabase => AppDatabase();
@@ -117,6 +153,41 @@ class FakeFocusSessionRepository implements FocusSessionRepository {
 
   @override
   Future<List<Map<String, dynamic>>> getHistory() async => [];
+
+  @override
+  Future<List<Map<String, dynamic>>> getCompletedForDate(DateTime date) async {
+    final startOfDay =
+        DateTime(date.year, date.month, date.day).millisecondsSinceEpoch;
+    final endOfDay = DateTime(date.year, date.month, date.day, 23, 59, 59, 999)
+        .millisecondsSinceEpoch;
+
+    return finished
+        .where((s) {
+          final completedTime =
+              (s.completedAt ?? s.startedAt).millisecondsSinceEpoch;
+          return s.status == SessionStatus.completed &&
+              completedTime >= startOfDay &&
+              completedTime <= endOfDay;
+        })
+        .map((s) => s.toMap())
+        .toList();
+  }
+
+  @override
+  Future<List<Map<String, dynamic>>> getScheduledForDate(DateTime date) async {
+    final startOfDay =
+        DateTime(date.year, date.month, date.day).millisecondsSinceEpoch;
+    final endOfDay = DateTime(date.year, date.month, date.day, 23, 59, 59, 999)
+        .millisecondsSinceEpoch;
+
+    return scheduled
+        .where((s) {
+          final startTime = s.startedAt.millisecondsSinceEpoch;
+          return startTime >= startOfDay && startTime <= endOfDay;
+        })
+        .map((s) => s.toMap())
+        .toList();
+  }
 }
 
 /// Provider for FocusSessionRepository.

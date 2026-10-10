@@ -21,11 +21,13 @@
 | **Phase 1-B Step 7: Break System** | Completed | Break countdown in #906D4B palette, break count decrement, greyscale disabled state on break exhaustion, 0-breaks configured removal, End Break Early prominent button, haptic feedback & auto-return to focus session on countdown zero; 5/5 new tests (128/128 total suite tests passing, 48/48 responsive layout tests, 0 lints). |
 | **Phase 1-B Step 8: Stop Focusing Modal (Discipline Friction)** | Completed | Formula-driven delay (15–25s clamped), live inline counter, streak reset flow, blurred backdrop, 11 unit & widget tests passing, 0 lints. |
 | **Phase 1-B Step 9: Focus Session Screen Polish & Completion** | Completed | Full-screen takeover, mechanical flip clock, status bar, controls, and countdown auto-completion (00:00) with vibration, notification, and auto-navigation to Home; 140/140 total suite tests passing, 0 lints. |
-| **Phase 1-B Step 10: Streaks System & Daily Evaluation** | In Progress / Next | StreakRecord entity, daily 11:59 PM evaluation, neutral days logic, WorkManager background scheduler. |
+| **Phase 1-B Step 10: Streaks System & Daily Evaluation** | Completed | StreakRecord domain model, StreakRepository CRUD & longest streak tracking, neutral days (minimumSessionsPerDay=0), FocusSessionRepository date queries, StreakEvaluationService per TRD §5.3.1, WorkManager background scheduler, 15 unit tests passing (155/155 total suite tests passing, 0 lints). |
+| **Phase 1-C Step 11: Accessibility Service + App Detection** | In Progress | Kotlin-side FluxFoxusAccessibilityService, MethodChannel com.fluxfoxus/accessibility_service, AppDetectionService bridge, session blocking enforcement, and automated tests. |
 | **User Review Backlog** | Queued for User | Comprehensive interactive & code review checklist compiled in `review_backlog.md` (all 6 screens previewable on Port 8080 review hub or direct ports 8085-8090). |
 | **Responsive Scaling & Orientation (Phase 1-A & Phase 1-B Step 5)** | Completed | Reusable `ResponsiveLayout` utilities (`AppBreakpoints`, `ResponsiveContent`, `AdaptiveScrollBody`), adaptive flip-clock orientation, flexible headers/cards, 48/48 responsive test assertions passing, 140/140 total Flutter tests passing, 0 lints. |
 | **DOM Responsiveness & Island Navigation Synchronization** | Completed | Fixed bottom island mobile revert issue: implemented `navigateTo()` bridge across all 6 mockups with review hub iframe synchronization, timestamp cache-busting, `box-sizing: content-box` for 768px tablet mode, and auto tab sync on iframe load. 100% tests passing. |
-| **Remaining UI and Backend Implementation** | Backlog | Complete UI screens, Riverpod state management, Background services, and MethodChannel IPC bridge. |
+| **Distraction Intervention & Study Mode UI (`ui_distracted_intervention.md`)** | Completed | 2/5/10/20 time window overlay, cooldown wait countdown (5s/10s/15s), YouTube Study Mode card, edge grabber, non-whitelisted video interception, and friction typing confirmation in `ui_mockups/distraction_intervention.html`. 100% tests passing. |
+| **Remaining UI and Backend Implementation** | Backlog | Home Widget mockup (`ui_widget.md`), Riverpod state management, Background services, and MethodChannel IPC bridge. |
 
 ---
 
@@ -52,6 +54,8 @@
 - [x] Phase 1-B Step 7 completed: Break system implementation with countdown in Tanned Wood (`#906D4B`), break count decrement, exhaustion state with greyscale/0.4 opacity, 0-breaks configured removal, End Break Early prominent button, haptic feedback, auto-break expiry resumption to focus session, and dedicated test suite (5 new unit & widget tests, 128/128 total suite tests passing, 48/48 responsive layout tests, 0 lints).
 - [x] Phase 1-B Step 8 completed: Stop Focusing modal discipline friction card with 15–25s formula-driven delay (`wait_time_calculator.dart`), live inline countdown ("Quit Session (18s)"), streak reset integration (`streak_repository.dart`), blurred backdrop, and automated tests (134/134 total suite tests passing, 0 lints).
 - [x] Phase 1-B Step 9 completed: Focus Session full screen completion handling, auto-navigation on countdown expiry to Home screen restoring navigation shell, and widget tests (140/140 total suite tests passing, 0 lints).
+- [x] Distraction Intervention UI Prototype completed: High-fidelity interactive 2/5/10/20 time window overlay, cooldown wait friction countdown (5s/10s/15s), YouTube Study Mode card & edge grabber, non-whitelisted video interception, and friction typing confirmation in `ui_mockups/distraction_intervention.html`. 100% tests passing.
+- [x] Phase 1-B Step 10 completed: Streaks system and daily evaluation (`StreakRecord` domain entity, `StreakRepository` CRUD with atomic increments and longest streak tracking, neutral days `minimumSessionsPerDay=0`, `FocusSessionRepository` daily date queries, `StreakEvaluationService` per TRD §5.3.1, WorkManager background task scheduler, 15 new unit tests, 155/155 total suite tests passing, 0 lints).
 
 ---
 
@@ -135,13 +139,31 @@
 ---
 
 ## 4. Backlog
-- [ ] Remaining UI screens generation (2/5/10/20 Distraction Intervention, Home Widget).
-- [ ] Database schema & Hive box implementations (`lib/core/database/`).
-- [ ] Riverpod state management providers and navigation shell (`go_router`).
-- [ ] Foreground timer service and background workers (`flutter_foreground_task`, `workmanager`).
-- [ ] MethodChannel IPC bridge (`com.fluxfoxus/fd_integration`).
+- [ ] Remaining UI screens generation:
+  - [x] 2/5/10/20 Distraction Intervention (`ui_distracted_intervention.md`) -> **COMPLETED by Code2**
+  - [ ] Home Widget (`ui_widget.md`)
+- [ ] Remaining Flutter Phase 2, 3, and 4 feature implementations.
 
-
+#### Completed Task for C2 (Distraction Intervention & Study Mode Mockup)
+```text
+Task: Build high-fidelity interactive Distraction Intervention prototype (ui_mockups/distraction_intervention.html).
+Status: COMPLETED & VERIFIED (100% tests passing)
+Specification: prompts_docx/FLUXFOXUS/Phase 1/ui_distracted_intervention.md & ff_design_override.md
+Components:
+- 2/5/10/20 time window overlay over blurred simulated background
+- App Info & Streak Counter
+- Spent vs Limit Progress Bar (Rustic Medley palette)
+- YouTube Study Mode Card ("Watch only Study channels on YouTube")
+- 2x2 Time Selection Grid (2m, 5m, 10m, 20m)
+- Dynamic "Exit [App]" action
+- Post-duration cooldown wait countdown logic (5s, 10s, 15s)
+- Collapsible & expandable YouTube Study Mode Edge Grabber
+- Non-whitelisted channel interception sheet ("Got it" vs "Add to Study List")
+- Random sentence typing confirmation sheet with exact-match verification
+- Embedded #auto-test-modal assertion runner (10/10 gates passing)
+- Review hub integration on Port 8080 (Shield tab)
+- 100% automated test coverage in test_intervention_screen.js and test_code2_screens.js
+```
 
 #### Completed Task for C2 (Island Navigation Synchronization & Viewport Preservation)
 ```text

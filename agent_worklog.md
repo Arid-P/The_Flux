@@ -9,8 +9,8 @@ This registry coordinates concurrent/subsequent AI coding agents working in this
 
 | Agent Name | Role / Specialty | Status | Branch | Current Task / Active Scope | Reserved / Active Files | Port(s) Used |
 |---|---|---|---|---|---|---|
-| **Code1** | Lead UI Designer | **ACTIVE** | `ff` | Phase 1-B Step 8 & 9 COMPLETED (Stop Focusing friction modal with 15-25s formula wait, live inline counter, streak reset flow, blurred backdrop; FocusSessionScreen countdown completion auto-nav to Home; 140/140 tests passing, 0 lints). Next: Phase 1-B Step 10 (Streaks & Daily Evaluation). | `fluxfoxus/lib/features/focus/`, `fluxfoxus/lib/presentation/widgets/`, `fluxfoxus/lib/presentation/screens/focus_session_screen.dart`, `progress_tracker.md`, `agent_worklog.md` | None (all quiet) |
-| **Code2** | Companion UI Designer / Responsive Architect | **IDLE** | `ff` | COMPLETED: Bottom Island Navigation Synchronization & Viewport Preservation. Fixed mobile revert issue by bridging iframe island clicks to parent `selectScreen` with timestamp cache-busting, `box-sizing: content-box` on bezel, and iframe `load` listener tab sync. | `ui_mockups/` | `8080` (Unified Review Hub) |
+| **Code1** | Lead UI Designer | **ACTIVE** | `ff` | Phase 1-B Completed (155/155 tests passing, 0 lints). Starting Phase 1-C Step 11: Accessibility Service + App Detection (`FluxFoxusAccessibilityService.kt`, MethodChannel `com.fluxfoxus/accessibility_service`, `AppDetectionService`, automated tests). | `fluxfoxus/lib/features/blocking/`, `fluxfoxus/android/app/src/main/`, `progress_tracker.md`, `agent_worklog.md` | None (all quiet) |
+| **Code2** | Companion UI Designer / Responsive Architect | **IDLE** | `ff` | COMPLETED & VERIFIED: Phase 1 UI Mockup — Distraction Intervention (`ui_mockups/distraction_intervention.html`) with 2/5/10/20 time window, cooldown friction wait, YouTube Study Mode, Edge Grabber, and Channel Whitelist typing verification. 100% tests passing. | `ui_mockups/distraction_intervention.html`, `ui_mockups/index.html`, `test_intervention_screen.js` | `8080` (Unified Hub) |
 | **Code3** | Context & Documentation Manager | **IDLE** | `ff` | Completed: (1) Updated code3.md role. (2) Created 13 context/memory files in `.c3_context/`. (3) Generated comprehensive `README.md`. (4) Expanded root `.gitignore` for full Flutter/Android/Python/Node stack. | `.c3_context/` (exclusive), `README.md`, `code3.md`, `.gitignore` | None |
 
 ---
@@ -82,18 +82,27 @@ This registry coordinates concurrent/subsequent AI coding agents working in this
     - `StopFocusingModal`: Friction card with 12px radius, blurred backdrop, mechanical bell icon (`#CA9C68`), "Finish the goal?" heading, streak display (`[Amber dot] X days -> [Grey dot] 0 days`), 15–25s locked buttons with inline countdown counter `Quit Session (18s)`, "Keep Going" resuming session, and "Quit Session" resetting streak to 0.
     - `StreakRepository`: SQLite CRUD operations on `streak_records` table (`getCurrentStreak`, `resetStreak`, `updateStreak`) + hermetic `FakeStreakRepository` for testing.
     - `FocusSessionScreen`: Seamless integration with `StopFocusingModal`, pausing session while modal is shown, resetting streak and stopping session on confirm, or resuming on cancel; plus automated navigation listener `ref.listen` routing to Home upon session completion (00:00).
-    - Test suites: `wait_time_calculator_test.dart` (4 tests), `stop_focusing_modal_test.dart` (6 tests), updated `focus_session_screen_test.dart` (6 tests). Total codebase suite: 140/140 passing, 0 analyzer issues.
+  - Implemented Phase 1-B Step 10: Streaks System & Daily Evaluation:
+    - `StreakRecord`: Domain entity matching SQLite `streak_records` table (`id`, `current_streak`, `longest_streak`, `minimum_sessions_per_day`, `last_streak_date`, `updated_at`).
+    - `StreakRepository`: CRUD operations, atomic increments, longest streak tracking, and streak date timestamps + hermetic `FakeStreakRepository`.
+    - `FocusSessionRepository`: Date query helpers (`getCompletedForDate`, `getScheduledForDate`).
+    - `StreakEvaluationService`: Daily evaluation algorithm per TRD §5.3.1 (neutral days where minimum=0, scaled requirements, duplicate increment prevention, silent non-increment without break).
+    - `StreakBackgroundWorker`: WorkManager daily background task scheduler (`com.fluxfoxus.task.evaluate_daily_streak`) at 11:59 PM.
+    - Test suites: 15 unit tests across `streak_repository_test.dart` and `streak_evaluation_service_test.dart`. Total codebase suite: 155/155 passing, 0 analyzer issues.
 * **What `Code1` is doing right now:**
-  - Prepared and ready to execute Phase 1-B Step 10: Streaks System & Daily Evaluation per TRD §4.5 & §5.3.
+  - Actively implementing Phase 1-C Step 11: Accessibility Service + App Detection:
+    - Creating `FluxFoxusAccessibilityService.kt` to monitor `AccessibilityEvent.TYPE_WINDOW_STATE_CHANGED`.
+    - Implementing MethodChannel bridge `com.fluxfoxus/accessibility_service`.
+    - Creating `AppDetectionService` & `MethodChannelAppDetectionService` in Flutter/Dart.
+    - Implementing session blocking redirect enforcement when distracting apps are opened.
+    - Writing comprehensive unit tests with platform channel mocking.
 * **Next Steps for `Code1`:**
-  - Implement `StreakRecord` entity and streak evaluation service for daily checks (minimum sessions per day).
-  - Configure WorkManager background daily job at 11:59 PM.
-  - Wire streak evaluation tests and integration with completed sessions.
+  - Complete Step 11 tests and static analysis.
+  - Advance to Phase 1-C Step 12: UsageStats Integration.
 * **Exclusive Resources / Do Not Overwrite:**
+  - `fluxfoxus/lib/features/blocking/`
+  - `fluxfoxus/android/app/src/main/kotlin/com/fluxfoxus/`
   - `fluxfoxus/lib/features/focus/`
-  - `fluxfoxus/lib/presentation/widgets/flip_clock.dart`
-  - `fluxfoxus/lib/presentation/widgets/stop_focusing_modal.dart`
-  - `fluxfoxus/lib/presentation/screens/focus_session_screen.dart`
   - `progress_tracker.md` (Update collaboratively)
   - `agent_worklog.md` (Update collaboratively)
 
@@ -132,21 +141,27 @@ This registry coordinates concurrent/subsequent AI coding agents working in this
   - Refactored HTML mockups (`home_screen.html`, `active_focus_session.html`, `planner.html`, `preset_creation.html`, `app_limits.html`, `usage_stats.html`, `index.html`) so internal screens adapt responsively to viewport simulator dimensions (320px, 390px, 640px, 768px, 1024px, 100% full window), utilizing full width/height with dynamic grid layouts (`md:grid-cols-2`, `lg:grid-cols-3`), responsive flip-clock orientation (horizontal split seam cards), and centered navigation/floating action buttons.
 * **What `Code2` is doing right now:**
   - `IDLE` / Standing by for user feedback.
-  - Successfully resolved the bottom island navigation issue:
-    - Iframe island clicks and in-screen navigations now communicate seamlessly with the parent review hub (`window.parent.selectScreen`), preserving the active viewport dimension, scale, and orientation.
-    - Synchronized top header screen tabs and standalone link on any iframe navigation via both cross-frame bridge and automatic iframe `load` listener.
-    - Added timestamp cache busting (`?t=Date.now()`) to prevent stale mobile container caching.
-    - Sized device bezel with `box-sizing: content-box` so 768px tablet mode delivers exact 768px inner width and triggers Tailwind `md:` breakpoint.
-    - Removed redundant `min-h-screen` container constraints across mockups.
-    - All 6 sections of `test_code2_screens.js` pass 100%. All Flutter responsive tests pass 100%.
+  - Completed **Phase 1 UI Mockup: Distraction Intervention** (`ui_mockups/distraction_intervention.html`):
+    - 2/5/10/20 time window overlay with blurred app backdrop.
+    - App info (app icon, daily limit, flame streak counter).
+    - Progress bar (spent today vs limit left) with Rustic Medley gradient.
+    - YouTube Study Mode card ("Watch only Study channels on YouTube") activating whitelist mode.
+    - Interactive 2x2 time option grid (2m, 5m, 10m, 20m) with unselected/selected states.
+    - Dynamic Exit button ("Exit [App Name]").
+    - Cooldown countdown wait period logic (5s for 2m, 10s for 5m/10m, 15s for 20m) on overlay return with disabled buttons and progress timer.
+    - Collapsible & expandable YouTube Study Mode Edge Grabber (~32px x 80px vertical pill with FF aperture icon).
+    - Non-whitelisted channel interception banner with "Got it" vs "Add to Study List".
+    - Channel whitelist confirmation sentence typing flow with exact-match validation.
+    - In-browser `#auto-test-modal` test runner (10/10 gates passing) and integrated into Port 8080 unified review hub (`ui_mockups/index.html`).
+    - Dedicated test runner `test_intervention_screen.js` and Section 7 in `test_code2_screens.js` passing 100%.
 * **Exclusive Resources / Do Not Overwrite:**
-  - `fluxfoxus/lib/core/theme/responsive_layout.dart`
-  - `fluxfoxus/test/responsive_test.dart`
+  - `ui_mockups/distraction_intervention.html` (Code2 screen)
+  - `test_intervention_screen.js` (Code2 test runner)
+  - `ui_mockups/index.html` (Simulator Hub)
   - `ui_mockups/usage_stats.html` (Code2 screen)
   - `ui_mockups/planner.html` (Code2 screen)
   - `ui_mockups/home_screen.html` (Code2 screen)
   - `ui_mockups/app_limits.html` (Code2 screen)
-  - `ui_mockups/index.html` (Simulator Hub)
 
 ### Agent: `Code3`
 * **Assigned Identity:** `Code3`
