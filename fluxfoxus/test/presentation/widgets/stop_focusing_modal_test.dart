@@ -58,19 +58,20 @@ void main() {
       expect(find.byKey(const Key('modal_quit_session_button')), findsOneWidget);
     });
 
-    testWidgets('Buttons are locked/disabled during countdown and show timer text', (tester) async {
+    testWidgets('Quit button is locked during countdown while Keep Going remains immediately active', (tester) async {
       await tester.pumpWidget(buildModalTestApp(countdownOverride: 18));
       await tester.pump();
 
       // Check inline countdown timer in button
       expect(find.text('Quit Session (18s)'), findsOneWidget);
 
-      // Buttons are disabled
+      // Keep Going button is immediately enabled so user can resume focus
       final keepGoingButton = tester.widget<ElevatedButton>(
         find.byKey(const Key('modal_keep_going_button')),
       );
-      expect(keepGoingButton.onPressed, isNull);
+      expect(keepGoingButton.onPressed, isNotNull);
 
+      // Quit button is disabled during countdown
       final quitButton = tester.widget<OutlinedButton>(
         find.byKey(const Key('modal_quit_session_button')),
       );

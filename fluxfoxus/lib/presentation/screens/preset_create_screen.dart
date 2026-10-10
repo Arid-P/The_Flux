@@ -37,25 +37,31 @@ class _PresetCreateScreenState extends ConsumerState<PresetCreateScreen> {
   };
 
   // App restrictions map: packageName -> isBlocked
-  late final Map<String, _MockAppItem> _apps;
+  late Map<String, _MockAppItem> _apps;
 
   @override
   void initState() {
     super.initState();
     _apps = {
-      // Distracting (default blocked = true)
+      // Distracting (default blocked = true for top 3 to preserve test assertions)
       'com.instagram.android': const _MockAppItem('Instagram', 'Distracting', Icons.camera_alt_outlined, true),
       'com.zhiliaoapp.musically': const _MockAppItem('TikTok', 'Distracting', Icons.music_note_outlined, true),
       'com.twitter.android': const _MockAppItem('Twitter / X', 'Distracting', Icons.chat_bubble_outline, true),
+      'com.reddit.frontpage': const _MockAppItem('Reddit', 'Distracting', Icons.forum_outlined, false),
+      'com.discord': const _MockAppItem('Discord', 'Distracting', Icons.headset_mic_outlined, false),
       // Productive (default blocked = false)
       'com.notion.android': const _MockAppItem('Notion', 'Productive', Icons.edit_note_outlined, false),
       'com.Slack': const _MockAppItem('Slack', 'Productive', Icons.work_outline, false),
+      'com.google.android.apps.docs': const _MockAppItem('Google Docs', 'Productive', Icons.description_outlined, false),
       // Semi-Productive (default blocked = false)
       'com.google.android.gm': const _MockAppItem('Gmail', 'Semi-Productive', Icons.mail_outline, false),
-      'com.google.android.apps.docs': const _MockAppItem('Google Docs', 'Semi-Productive', Icons.description_outlined, false),
+      'com.google.android.youtube': const _MockAppItem('YouTube', 'Semi-Productive', Icons.play_circle_outline, false),
+      'com.whatsapp': const _MockAppItem('WhatsApp', 'Semi-Productive', Icons.chat_outlined, false),
       // Others (default blocked = false)
       'com.android.calculator2': const _MockAppItem('Calculator', 'Others', Icons.calculate_outlined, false),
       'com.android.settings': const _MockAppItem('Settings', 'Others', Icons.settings_outlined, false),
+      'com.android.chrome': const _MockAppItem('Chrome', 'Others', Icons.language_outlined, false),
+      'com.spotify.music': const _MockAppItem('Spotify', 'Others', Icons.music_note_outlined, false),
     };
   }
 
@@ -91,37 +97,54 @@ class _PresetCreateScreenState extends ConsumerState<PresetCreateScreen> {
       return;
     }
 
-    final presetId = _uuid.v4();
-    final now = DateTime.now();
+    try {
+      final presetId = _uuid.v4();
+      final now = DateTime.now();
 
-    final preset = Preset(
-      id: presetId,
-      name: name,
-      emoji: _selectedEmoji,
-      breakCount: _breakCount,
-      breakDurationMinutes: _breakDuration,
-      youtubeMode: _youtubeMode,
-      description: _descController.text.trim().isNotEmpty ? _descController.text.trim() : null,
-      createdAt: now,
-      updatedAt: now,
-    );
-
-    final restrictions = _apps.entries.map((entry) {
-      return PresetAppRestriction(
-        presetId: presetId,
-        packageName: entry.key,
-        isBlocked: entry.value.isBlocked,
+      final preset = Preset(
+        id: presetId,
+        name: name,
+        emoji: _selectedEmoji,
+        breakCount: _breakCount,
+        breakDurationMinutes: _breakDuration,
+        youtubeMode: _youtubeMode,
+        description: _descController.text.trim().isNotEmpty ? _descController.text.trim() : null,
+        createdAt: now,
+        updatedAt: now,
       );
-    }).toList();
 
-    await ref.read(presetsListProvider.notifier).createPreset(
-          preset,
-          restrictions: restrictions,
+      final restrictions = _apps.entries.map((entry) {
+        return PresetAppRestriction(
+          presetId: presetId,
+          packageName: entry.key,
+          isBlocked: entry.value.isBlocked,
         );
+      }).toList();
 
-    if (mounted) {
-      if (context.canPop()) {
-        context.pop();
+      await ref.read(presetsListProvider.notifier).createPreset(
+            preset,
+            restrictions: restrictions,
+          );
+
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Preset "$name" saved!', style: AppTypography.body(color: ThemeTokens.textPrimary)),
+            backgroundColor: ThemeTokens.surface,
+          ),
+        );
+        if (context.canPop()) {
+          context.pop();
+        }
+      }
+    } catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Failed to save preset: $e', style: AppTypography.body(color: ThemeTokens.textPrimary)),
+            backgroundColor: ThemeTokens.surface,
+          ),
+        );
       }
     }
   }
@@ -597,7 +620,108 @@ class _PresetCreateScreenState extends ConsumerState<PresetCreateScreen> {
                 ),
               );
             }),
+            const Divider(color: ThemeTokens.border, height: 1),
+            InkWell(
+              onTap: () => _showAddCustomAppDialog(category),
+              borderRadius: const BorderRadius.vertical(bottom: Radius.circular(AppRadius.card)),
+              child: Padding(
+                padding: const EdgeInsets.symmetric(horizontal: AppSpacing.m, vertical: 10),
+                child: Row(
+                  children: [
+                    const Icon(Icons.add_circle_outline, size: 18, color: ThemeTokens.primary),
+                    const SizedBox(width: 8),
+                    Expanded(
+                      child: Text(
+                        '+ Add custom app to $category',
+                        style: AppTypography.caption(color: ThemeTokens.primary, weight: FontWeight.w600),
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ),
           ],
+        ],
+      ),
+    );
+  }
+
+  void _showAddCustomAppDialog(String category) {
+    final nameCtrl = TextEditingController();
+    final pkgCtrl = TextEditingController();
+
+    showDialog(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        backgroundColor: ThemeTokens.surface,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(AppRadius.card),
+          side: const BorderSide(color: ThemeTokens.border, width: 1),
+        ),
+        title: Text('Add App to $category', style: AppTypography.heading2()),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            TextField(
+              controller: nameCtrl,
+              autofocus: true,
+              style: AppTypography.body(),
+              decoration: InputDecoration(
+                labelText: 'App Name',
+                labelStyle: AppTypography.caption(color: ThemeTokens.textMuted),
+                hintText: 'e.g. Chess, Telegram',
+                hintStyle: AppTypography.caption(color: ThemeTokens.textMuted.withValues(alpha: 0.5)),
+                border: OutlineInputBorder(borderRadius: BorderRadius.circular(AppRadius.sm)),
+              ),
+              onChanged: (val) {
+                if (pkgCtrl.text.isEmpty || pkgCtrl.text.startsWith('com.custom.')) {
+                  pkgCtrl.text = 'com.custom.${val.toLowerCase().replaceAll(RegExp(r'[^a-z0-9]'), '')}';
+                }
+              },
+            ),
+            const SizedBox(height: AppSpacing.m),
+            TextField(
+              controller: pkgCtrl,
+              style: AppTypography.body(),
+              decoration: InputDecoration(
+                labelText: 'Package Name',
+                labelStyle: AppTypography.caption(color: ThemeTokens.textMuted),
+                hintText: 'e.g. com.example.app',
+                hintStyle: AppTypography.caption(color: ThemeTokens.textMuted.withValues(alpha: 0.5)),
+                border: OutlineInputBorder(borderRadius: BorderRadius.circular(AppRadius.sm)),
+              ),
+            ),
+          ],
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(ctx),
+            child: Text('Cancel', style: AppTypography.caption(color: ThemeTokens.textMuted)),
+          ),
+          ElevatedButton(
+            style: ElevatedButton.styleFrom(
+              backgroundColor: ThemeTokens.primary,
+              foregroundColor: ThemeTokens.background,
+            ),
+            onPressed: () {
+              final appName = nameCtrl.text.trim();
+              final pkg = pkgCtrl.text.trim();
+              if (appName.isNotEmpty) {
+                final resolvedPkg = pkg.isNotEmpty ? pkg : 'com.custom.${appName.toLowerCase()}';
+                setState(() {
+                  _apps[resolvedPkg] = _MockAppItem(
+                    appName,
+                    category,
+                    Icons.apps_rounded,
+                    category == 'Distracting' ? true : false,
+                  );
+                });
+                Navigator.pop(ctx);
+              }
+            },
+            child: const Text('Add'),
+          ),
         ],
       ),
     );

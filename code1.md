@@ -73,10 +73,8 @@ All spec docs are in `/workspaces/The_Flux/prompts_docx/`. The most critical one
 | Phase 1-B Step 6: Focus Timer + Foreground Service | `529fbd9` | Focus timer domain models, Hive focus_session_state 5s persistence, SQLite logging, ForegroundTimerService, FocusSessionNotifier, mechanical FlipClock, FocusSessionScreen, 123/123 tests passing, 0 lints |
 | Phase 1-B Step 7: Break System | `e0e8d02` | Break countdown in `#906D4B`, break count decrement, greyscale disabled state on break exhaustion, 0-breaks configured removal, End Break Early button, haptic feedback, 128/128 tests passing, 0 lints |
 | Phase 1-B Step 8 & 9: Stop Focusing Modal & Session Completion | `67e6c90` | StopFocusingModal, wait time formula (15-25s), live inline counter, streak reset flow, blurred backdrop, countdown auto-completion (00:00) with vibration and auto-nav to Home, 140/140 tests passing, 0 lints |
-| Phase 1-B Step 10: Streaks System & Daily Evaluation | `43e6f2a` | StreakRecord domain model, StreakRepository CRUD & longest streak tracking, neutral days (minimumSessionsPerDay=0), FocusSessionRepository date queries, StreakEvaluationService per TRD §5.3.1, WorkManager background scheduler, 155/155 tests passing, 0 lints |
-| Phase 1-C Step 11: Accessibility Service + App Detection | Current | Native FluxFoxusAccessibilityService.kt, MethodChannel com.fluxfoxus/accessibility_service, AppDetectionService bridge, SessionBlockingEnforcer session redirect logic, 12 unit & platform tests, 167/167 tests passing, 0 lints |
-
-### Phase 1-B Step 5 (Latest — Commit `7ab48a2`)
+| Phase 1-C Step 11: Accessibility Service + App Detection | Prior | Native FluxFoxusAccessibilityService.kt, MethodChannel com.fluxfoxus/accessibility_service, AppDetectionService bridge, SessionBlockingEnforcer session redirect logic, 12 unit & platform tests, 167/167 tests passing, 0 lints |
+| Phase 1 Disparity Resolution & Flutter Port | Current | Ported all HTML mockups to Flutter: HomeScreen (Bézier stacked area chart, 2x2 legend), UsageStatsScreen (3 tabs, 7-day bar chart, weekly trends, app search), PlannerScreen (calendar strip, streak bar, stats row), PresetCreateScreen (custom app adding dialog, save crash fix), StopFocusingModal (Keep Going always unlocked), Startup permissions routing, 48/48 responsive test assertions, git apk purge, 167/167 tests passing, 0 lints |
 
 **Files Created/Modified:**
 

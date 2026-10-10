@@ -119,7 +119,6 @@ class _StopFocusingModalState extends State<StopFocusingModal> {
   }
 
   void _handleKeepGoing() {
-    if (_remainingSeconds > 0) return;
     widget.onKeepGoing?.call();
     Navigator.of(context).pop(false);
   }
@@ -274,16 +273,14 @@ class _StopFocusingModalState extends State<StopFocusingModal> {
                 // Action Buttons Row (Side by side)
                 Row(
                   children: [
-                    // Keep Going (Primary)
+                    // Keep Going (Primary — Always active so user can resume focus immediately)
                     Expanded(
                       child: SizedBox(
                         height: 48,
-                        child: Opacity(
-                          opacity: isUnlocked ? 1.0 : 0.35,
-                          child: ElevatedButton(
-                            key: const Key('modal_keep_going_button'),
-                            onPressed: isUnlocked ? _handleKeepGoing : null,
-                            style: ElevatedButton.styleFrom(
+                        child: ElevatedButton(
+                          key: const Key('modal_keep_going_button'),
+                          onPressed: _handleKeepGoing,
+                          style: ElevatedButton.styleFrom(
                               backgroundColor: ThemeTokens.primary,
                               foregroundColor: ThemeTokens.background,
                               shape: RoundedRectangleBorder(
@@ -306,7 +303,6 @@ class _StopFocusingModalState extends State<StopFocusingModal> {
                           ),
                         ),
                       ),
-                    ),
                     const SizedBox(width: AppSpacing.m),
 
                     // Quit Session (Secondary)

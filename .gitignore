@@ -52,6 +52,9 @@ coverage/
 **/android/gradlew.bat
 **/android/local.properties
 **/android/**/build/
+*.apk
+*.aab
+
 
 # iOS / macOS
 .DS_Store

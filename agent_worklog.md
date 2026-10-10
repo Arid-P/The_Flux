@@ -9,8 +9,8 @@ This registry coordinates concurrent/subsequent AI coding agents working in this
 
 | Agent Name | Role / Specialty | Status | Branch | Current Task / Active Scope | Reserved / Active Files | Port(s) Used |
 |---|---|---|---|---|---|---|
-| **Code1** | Lead UI Designer | **ACTIVE** | `ff` | Phase 1-C Step 11 Completed (167/167 tests passing, 0 lints). Starting Phase 1-C Step 12: UsageStats Integration (`UsageStatsManager` Kotlin bridge, `com.fluxfoxus/usage_stats` MethodChannel, 7-day rolling average calculation in Hive, default categorization). | `fluxfoxus/lib/features/usage_stats/`, `fluxfoxus/android/app/src/main/`, `progress_tracker.md`, `agent_worklog.md` | None (all quiet) |
-| **Code2** | Companion UI Designer / Responsive Architect | **IDLE** | `ff` | Completed: Phase 1 UI Mockup Home Screen Widget (`ui_mockups/widget.html`) per `ui_widget.md` (4x2 donut ring widget, glance time, category legend, live focus state, no-data state, Android launcher preview, 10/10 auto-tests passing, unified hub integrated). Headless tests pass 100%. | None | `8080` (Unified Hub) |
+| **Code1** | Lead UI / Flutter Architect | **ACTIVE** | `ff` | Actively porting Phase 1 UI screens from Code2's HTML mockups into native Flutter screens (`fluxfoxus/lib/presentation/screens/`) using `fl_chart`, Riverpod, and Rustic Medley ThemeTokens (HomeScreen, UsageStatsScreen, PlannerScreen). | `fluxfoxus/lib/presentation/screens/`, `fluxfoxus/lib/features/`, `progress_tracker.md`, `agent_worklog.md` | None (all quiet) |
+| **Code2** | Companion UI Designer / Responsive Architect | **ACTIVE** | `ff` | Providing design verification, token auditing, and exact math/chart specifications (Bézier splines, category colors, radii, spacing, icon mappings) for Code1's native Flutter port. | `agent_worklog.md`, `code2.md`, `ui_mockups/` (read/audit) | `8080` (Unified Hub) |
 | **Code3** | Context & Documentation Manager | **IDLE** | `ff` | Completed: (1) Updated code3.md role. (2) Created 13 context/memory files in `.c3_context/`. (3) Generated comprehensive `README.md`. (4) Expanded root `.gitignore` for full Flutter/Android/Python/Node stack. | `.c3_context/` (exclusive), `README.md`, `code3.md`, `.gitignore` | None |
 
 ---
@@ -97,22 +97,25 @@ This registry coordinates concurrent/subsequent AI coding agents working in this
     - `SessionBlockingEnforcer`: Focus session app blocking coordination, preset-specific restriction resolution, default distracting packages fallback, and auto-redirect handling.
     - Riverpod Providers: `appDetectionServiceProvider`, `sessionBlockingEnforcerProvider` wired to listen to `focusSessionProvider`.
     - Test Suites: 12 unit and platform channel tests in `app_detection_service_test.dart` and `session_blocking_enforcer_test.dart`. Total codebase suite: 167/167 passing, 0 analyzer issues.
+  - Completed Full Prototype-to-Flutter Port & Disparity Resolution:
+    - `HomeScreen`: Full dashboard with Aperture logo, dual stacked averages, upcoming session banner, 24h Bézier stacked area momentum chart (`BezierMomentumChart`), 2x2 legend grid, and interactive Session Card with preset details and start/resume button.
+    - `UsageStatsScreen`: 3-tab switcher (Today, Daily, Weekly), Today Bézier chart, Daily 7-day interactive stacked bar chart, Weekly 7-week trend + Sunday report card, 2x2 category legend, and searchable application usage breakdown.
+    - `PlannerScreen`: 7-day calendar strip, streak bar, daily stats comparison (Focus vs Usage), scheduled session cards with source tags, and "+ New Preset" floating button.
+    - `PresetCreateScreen`: Fixed Hive initialization crash on physical devices, dynamic custom app addition dialog per category, expanded default apps list, and save confirmation SnackBars.
+    - `StopFocusingModal`: Unlocked "Keep Going" button for immediate access at all times (no cooldown wait); "Quit Session" remains safely protected behind 15–25s live countdown.
+    - Startup & Permissions Routing: Pre-initialized SQLite and Hive in `main.dart`; auto-routes first-launch / un-permissioned users to `AppRoutes.permissionsOnboarding`.
+    - Responsive Scaling: Resolved RenderFlex overflows across all 6 viewports (320x568 to 1024x768). 48/48 responsive test assertions passing.
+    - Git & Disk Cleanup: Reclaimed disk space by removing APK binary from git history (`.git` pruned from 138MB to 2.3MB) and ignored `*.apk` & `*.aab` in root `.gitignore`.
+    - Quality Gates: 167/167 tests passing (100%), `flutter analyze` 0 issues.
 * **What `Code1` is doing right now:**
-  - Actively implementing Phase 1-C Step 12: UsageStats Integration:
-    - Implementing Kotlin-side `UsageStatsManager` bridge in `MainActivity.kt` via MethodChannel `com.fluxfoxus/usage_stats`.
-    - Implementing `getUsageStats(startTime, endTime)` returning per-app usage in milliseconds.
-    - Building `UsageStatsService` & `MethodChannelUsageStatsService` in Dart.
-    - Computing 7-day rolling average per app and persisting to Hive (`preferences` box).
-    - Implementing predefined app categorization mapping (`AppCategory`).
-    - Writing comprehensive unit and platform channel tests.
+  - Packaging latest verified build for user ADB physical device testing on `7P5SU4ZSFQV8DIDU`.
+  - Coordinating with Agent Code2 for ongoing design consistency.
 * **Next Steps for `Code1`:**
-  - Complete Step 12 tests and static analysis.
-  - Advance to Phase 1-C Step 13: App Limits (Blocks Tab — SCR-05).
+  - Proceed with Phase 1-C Step 12: Native Android `UsageStatsManager` platform bridge and 7-day rolling metrics sync.
 * **Exclusive Resources / Do Not Overwrite:**
-  - `fluxfoxus/lib/features/usage_stats/`
-  - `fluxfoxus/lib/features/blocking/`
+  - `fluxfoxus/lib/features/`
+  - `fluxfoxus/lib/presentation/`
   - `fluxfoxus/android/app/src/main/kotlin/com/fluxfoxus/`
-  - `fluxfoxus/lib/features/focus/`
   - `progress_tracker.md` (Update collaboratively)
   - `agent_worklog.md` (Update collaboratively)
 
@@ -150,17 +153,13 @@ This registry coordinates concurrent/subsequent AI coding agents working in this
   - Built standalone verification test scripts (`test_usage_stats.js`, `test_code2_screens.js`) passing 100% of DOM, color tokens, and state assertions across all screens.
   - Refactored HTML mockups (`home_screen.html`, `active_focus_session.html`, `planner.html`, `preset_creation.html`, `app_limits.html`, `usage_stats.html`, `index.html`) so internal screens adapt responsively to viewport simulator dimensions (320px, 390px, 640px, 768px, 1024px, 100% full window), utilizing full width/height with dynamic grid layouts (`md:grid-cols-2`, `lg:grid-cols-3`), responsive flip-clock orientation (horizontal split seam cards), and centered navigation/floating action buttons.
 * **What `Code2` is doing right now:**
-  - `IDLE` / Standing by for user feedback.
-  - Completed **Phase 1 UI Mockup: Android Home Screen Widget (4×2)** (`ui_mockups/widget.html`):
-    - Standard 4×2 container with Rustic Medley `#2B2F2E` surface, `#594C3D` 1px border, 16px corner radius, flat 2D zero-elevation.
-    - Left Zone: Glance usage time (`3h 9m`), "Today's usage" caption, pulsing Amber Autumn (`#CA9C68`) live dot + "Live" badge when Focus is active.
-    - Center Zone: 4-segment SVG donut ring (clockwise: Productive `#4E7D56`, Semi `#906D4B`, Distracting `#38332B`, Others `#94A3B8`) with 2px gaps.
-    - Right Zone: 4-row category legend with formatted usage times and 1px border safeguard on charcoal distracting dot.
-    - Bottom-Right: Subtle FF camera aperture emblem watermark (opacity 0.4).
-    - Simulated Android launcher environment with wallpaper, status bar, Google search pill, and app dock.
-    - Switchable widget states: Normal State, Live Focus Active, Empty / First Launch (`--`).
-    - In-browser `#auto-test-modal` test runner (10/10 gates passing) and integrated into Port 8080 unified review hub (`ui_mockups/index.html`).
-    - Dedicated test runner `test_widget_screen.js` and Section 8 in `test_code2_screens.js` passing 100%.
+  - `ACTIVE` / Collaborating directly with `Code1`.
+  - Providing exact design specification extract and auditing for Code1's Flutter port:
+    - Extracted exact coordinates, Bézier control points, and X/Y axes intervals for HomeScreen and UsageStatsScreen (`fl_chart` LineChart & BarChart configurations).
+    - Verified category color tokens: Productive `#4E7D56` (or vivid `#58A366` for charts), Semi `#906D4B`, Distracting `#38332B` (chart `#C27838`), Others `#94A3B8`.
+    - Documented layout specs: 16px padding, 12px card radii, 28px bottom pill radius, 1.5–2px borders with `#594C3D`, Inter typography mappings.
+    - Verified session card state machine (completed checkmark + 0.6 opacity, live pulsing Amber Autumn `#CA9C68` tag + ticking timer, scheduled neutral state, FD `↻` sync icon).
+    - Auditing Code1's upcoming Flutter widget implementations against the approved web prototypes.
 * **Exclusive Resources / Do Not Overwrite:**
   - `ui_mockups/widget.html` (Code2 screen)
   - `test_widget_screen.js` (Code2 test runner)

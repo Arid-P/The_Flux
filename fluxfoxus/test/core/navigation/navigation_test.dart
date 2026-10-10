@@ -101,6 +101,7 @@ void main() {
       expect(find.byType(FloatingBottomNavBar), findsOneWidget);
 
       // Tap 'Start Focusing' on Home screen
+      await tester.ensureVisible(find.byKey(const Key('home_start_focusing_button')));
       await tester.tap(find.byKey(const Key('home_start_focusing_button')));
       await tester.pumpAndSettle();
 

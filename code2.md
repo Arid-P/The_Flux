@@ -104,24 +104,20 @@ All screens live in `ui_mockups/` and are served via background Python HTTP serv
 
 ## 5. Next Task to Execute (Queued Task)
 
-* **Status:** `IDLE` (All Phase 1 UI Mockups completed & verified).
-* **Completed Tasks:**
-  1. **Distraction Intervention & YouTube Study Mode UI Mockup** (`ui_mockups/distraction_intervention.html`):
-     - Created and refined per `ui_distracted_intervention.md` and user feedback.
-     - 5/10/20/40 time options, 5s auto-vanishing active countdown banner, YouTube Study Mode grabber with off-toggle dismissal, cooldown wait (10s/15s/20s), channel whitelist typing confirmation, and 10 assertion gates (100% pass).
-  2. **Android Home Screen Widget (4×2) UI Mockup** (`ui_mockups/widget.html`):
-     - Created per `prompts_docx/FLUXFOXUS/Phase 1/ui_widget.md` and `ff_design_override.md`.
-     - Standard 4×2 container with Rustic Medley `#2B2F2E` surface, `#594C3D` border, 16px corner radius, and flat 2D zero elevation.
-     - Left Zone: Glance usage time (`3h 9m`), "Today's usage" caption, pulsing Amber Autumn (`#CA9C68`) live dot + "Live" badge when Focus is active.
-     - Center Zone: 4-segment SVG donut ring (clockwise: Productive `#4E7D56`, Semi `#906D4B`, Distracting `#38332B`, Others `#94A3B8`) with 2px gaps.
-     - Right Zone: 4-row category legend with formatted usage times and 1px border safeguard on charcoal distracting dot.
-     - Bottom-Right: Subtle FF camera aperture emblem watermark (opacity 0.4).
-     - Switchable widget states: Normal State, Live Focus Active, Empty / First Launch (`--`).
-     - In-browser `#auto-test-modal` test runner (10/10 gates passing) and integrated into Port 8080 unified review hub (`ui_mockups/index.html`).
-     - Dedicated test runner `test_widget_screen.js` and Section 8 in `test_code2_screens.js` passing 100%.
-* **Subsequent Backlog Tasks:**
-  - Standby for user design feedback on Home Screen Widget or Distraction Intervention.
-  - Coordinate with `Code1` when transitioning to native Flutter implementation of remaining Phase 1 screens.
+* **Status:** `ACTIVE` (Collaborating with `Code1` on Flutter screen porting & token auditing).
+* **Current Active Scope:**
+  - Auditing Flutter screen implementations against approved HTML prototypes (`home_screen.html`, `usage_stats.html`, `planner.html`, `distraction_intervention.html`, `widget.html`).
+  - Providing exact Bézier spline coordinates, X/Y axis data points, category color mappings, and widget geometry specifications to `Code1`.
+  - Verifying visual parity, responsiveness, and ThemeToken consistency across mobile and tablet form factors.
+* **Completed HTML Mockup Milestones:**
+  1. Distraction Intervention (`ui_mockups/distraction_intervention.html`) — 100% tests passing.
+  2. Android Home Screen Widget 4×2 (`ui_mockups/widget.html`) — 100% tests passing.
+  3. Home Screen (`ui_mockups/home_screen.html`) — 100% tests passing.
+  4. App Limits (`ui_mockups/app_limits.html`) — 100% tests passing.
+  5. Planner Screen (`ui_mockups/planner.html`) — 100% tests passing.
+  6. Usage Stats Screen (`ui_mockups/usage_stats.html`) — 100% tests passing.
+  7. Preset System (`ui_mockups/preset_creation.html`) & Active Focus (`ui_mockups/active_focus_session.html`).
+  8. Unified Responsive Simulator Hub (`ui_mockups/index.html`) on Port 8080.
 
 ---
 

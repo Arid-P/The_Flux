@@ -17,9 +17,13 @@ import 'scaffold_with_nav_bar.dart';
 final GlobalKey<NavigatorState> rootNavigatorKey =
     GlobalKey<NavigatorState>(debugLabel: 'root');
 
+/// Provider for initial route path. Defaults to [AppRoutes.home] so tests run hermetically.
+final initialLocationProvider = Provider<String>((ref) => AppRoutes.home);
+
 /// Provider for GoRouter instance used across the app.
 final routerProvider = Provider<GoRouter>((ref) {
-  return createAppRouter();
+  final initialLocation = ref.watch(initialLocationProvider);
+  return createAppRouter(initialLocation: initialLocation);
 });
 
 /// Creates a GoRouter instance implementing TRD Section 6 routes and

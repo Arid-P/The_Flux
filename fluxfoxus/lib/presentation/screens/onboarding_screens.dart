@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import '../../core/navigation/app_routes.dart';
 import '../../core/permissions/permissions.dart';
+import '../../core/storage/hive_storage_service.dart';
 import '../../core/theme/theme.dart';
 
 /// PermissionsOnboardingFlowScreen presents the 4-step first-launch permissions wizard
@@ -61,6 +62,9 @@ class _PermissionsOnboardingFlowScreenState
         _currentStep++;
       });
     } else {
+      try {
+        HiveStorageService().preferencesBox.put('hasCompletedOnboarding', true);
+      } catch (_) {}
       context.go(AppRoutes.home);
     }
   }
@@ -110,7 +114,12 @@ class _PermissionsOnboardingFlowScreenState
         actions: [
           TextButton(
             key: const Key('permission_skip_all_button'),
-            onPressed: () => context.go(AppRoutes.home),
+            onPressed: () {
+              try {
+                HiveStorageService().preferencesBox.put('hasCompletedOnboarding', true);
+              } catch (_) {}
+              context.go(AppRoutes.home);
+            },
             child: Text(
               'Skip All',
               style: AppTypography.caption(color: ThemeTokens.textMuted),
