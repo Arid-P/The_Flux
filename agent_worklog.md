@@ -9,7 +9,7 @@ This registry coordinates concurrent/subsequent AI coding agents working in this
 
 | Agent Name | Role / Specialty | Status | Branch | Current Task / Active Scope | Reserved / Active Files | Port(s) Used |
 |---|---|---|---|---|---|---|
-| **Code1** | Lead UI Designer | **ACTIVE** | `ff` | Phase 1-B Completed (155/155 tests passing, 0 lints). Starting Phase 1-C Step 11: Accessibility Service + App Detection (`FluxFoxusAccessibilityService.kt`, MethodChannel `com.fluxfoxus/accessibility_service`, `AppDetectionService`, automated tests). | `fluxfoxus/lib/features/blocking/`, `fluxfoxus/android/app/src/main/`, `progress_tracker.md`, `agent_worklog.md` | None (all quiet) |
+| **Code1** | Lead UI Designer | **ACTIVE** | `ff` | Phase 1-C Step 11 Completed (167/167 tests passing, 0 lints). Starting Phase 1-C Step 12: UsageStats Integration (`UsageStatsManager` Kotlin bridge, `com.fluxfoxus/usage_stats` MethodChannel, 7-day rolling average calculation in Hive, default categorization). | `fluxfoxus/lib/features/usage_stats/`, `fluxfoxus/android/app/src/main/`, `progress_tracker.md`, `agent_worklog.md` | None (all quiet) |
 | **Code2** | Companion UI Designer / Responsive Architect | **IDLE** | `ff` | COMPLETED & VERIFIED: Phase 1 UI Mockup — Distraction Intervention (`ui_mockups/distraction_intervention.html`) with 2/5/10/20 time window, cooldown friction wait, YouTube Study Mode, Edge Grabber, and Channel Whitelist typing verification. 100% tests passing. | `ui_mockups/distraction_intervention.html`, `ui_mockups/index.html`, `test_intervention_screen.js` | `8080` (Unified Hub) |
 | **Code3** | Context & Documentation Manager | **IDLE** | `ff` | Completed: (1) Updated code3.md role. (2) Created 13 context/memory files in `.c3_context/`. (3) Generated comprehensive `README.md`. (4) Expanded root `.gitignore` for full Flutter/Android/Python/Node stack. | `.c3_context/` (exclusive), `README.md`, `code3.md`, `.gitignore` | None |
 
@@ -89,17 +89,27 @@ This registry coordinates concurrent/subsequent AI coding agents working in this
     - `StreakEvaluationService`: Daily evaluation algorithm per TRD §5.3.1 (neutral days where minimum=0, scaled requirements, duplicate increment prevention, silent non-increment without break).
     - `StreakBackgroundWorker`: WorkManager daily background task scheduler (`com.fluxfoxus.task.evaluate_daily_streak`) at 11:59 PM.
     - Test suites: 15 unit tests across `streak_repository_test.dart` and `streak_evaluation_service_test.dart`. Total codebase suite: 155/155 passing, 0 analyzer issues.
+  - Implemented Phase 1-C Step 11: Accessibility Service + App Detection:
+    - `FluxFoxusAccessibilityService.kt`: Native Android accessibility service monitoring `TYPE_WINDOW_STATE_CHANGED`, filtering system UI, and instant native-level redirect to FluxFoxus.
+    - Android Manifest & Config: Added `accessibility_service_config.xml`, `BIND_ACCESSIBILITY_SERVICE` service declaration, and required permissions.
+    - MethodChannel Bridge: `com.fluxfoxus/accessibility_service` in `MainActivity.kt` handling `isAccessibilityServiceEnabled`, `setSessionActive`, `updateBlockedPackages`, and `redirectToApp`.
+    - Dart Service Layer: `AppDetectionService` interface, `MethodChannelAppDetectionService`, and hermetic `FakeAppDetectionService`.
+    - `SessionBlockingEnforcer`: Focus session app blocking coordination, preset-specific restriction resolution, default distracting packages fallback, and auto-redirect handling.
+    - Riverpod Providers: `appDetectionServiceProvider`, `sessionBlockingEnforcerProvider` wired to listen to `focusSessionProvider`.
+    - Test Suites: 12 unit and platform channel tests in `app_detection_service_test.dart` and `session_blocking_enforcer_test.dart`. Total codebase suite: 167/167 passing, 0 analyzer issues.
 * **What `Code1` is doing right now:**
-  - Actively implementing Phase 1-C Step 11: Accessibility Service + App Detection:
-    - Creating `FluxFoxusAccessibilityService.kt` to monitor `AccessibilityEvent.TYPE_WINDOW_STATE_CHANGED`.
-    - Implementing MethodChannel bridge `com.fluxfoxus/accessibility_service`.
-    - Creating `AppDetectionService` & `MethodChannelAppDetectionService` in Flutter/Dart.
-    - Implementing session blocking redirect enforcement when distracting apps are opened.
-    - Writing comprehensive unit tests with platform channel mocking.
+  - Actively implementing Phase 1-C Step 12: UsageStats Integration:
+    - Implementing Kotlin-side `UsageStatsManager` bridge in `MainActivity.kt` via MethodChannel `com.fluxfoxus/usage_stats`.
+    - Implementing `getUsageStats(startTime, endTime)` returning per-app usage in milliseconds.
+    - Building `UsageStatsService` & `MethodChannelUsageStatsService` in Dart.
+    - Computing 7-day rolling average per app and persisting to Hive (`preferences` box).
+    - Implementing predefined app categorization mapping (`AppCategory`).
+    - Writing comprehensive unit and platform channel tests.
 * **Next Steps for `Code1`:**
-  - Complete Step 11 tests and static analysis.
-  - Advance to Phase 1-C Step 12: UsageStats Integration.
+  - Complete Step 12 tests and static analysis.
+  - Advance to Phase 1-C Step 13: App Limits (Blocks Tab — SCR-05).
 * **Exclusive Resources / Do Not Overwrite:**
+  - `fluxfoxus/lib/features/usage_stats/`
   - `fluxfoxus/lib/features/blocking/`
   - `fluxfoxus/android/app/src/main/kotlin/com/fluxfoxus/`
   - `fluxfoxus/lib/features/focus/`

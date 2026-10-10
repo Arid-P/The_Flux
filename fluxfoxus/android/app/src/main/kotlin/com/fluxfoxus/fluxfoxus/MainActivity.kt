@@ -1,5 +1,92 @@
 package com.fluxfoxus.fluxfoxus
 
+import android.content.Context
+import android.content.Intent
+import android.provider.Settings
+import android.text.TextUtils
 import io.flutter.embedding.android.FlutterActivity
+import io.flutter.embedding.engine.FlutterEngine
+import io.flutter.plugin.common.MethodChannel
 
-class MainActivity : FlutterActivity()
+class MainActivity : FlutterActivity() {
+    private val channelName = "com.fluxfoxus/accessibility_service"
+
+    override fun configureFlutterEngine(flutterEngine: FlutterEngine) {
+        super.configureFlutterEngine(flutterEngine)
+
+        val channel = MethodChannel(flutterEngine.dartExecutor.binaryMessenger, channelName)
+        FluxFoxusAccessibilityService.methodChannel = channel
+
+        channel.setMethodCallHandler { call, result ->
+            when (call.method) {
+                "isAccessibilityServiceEnabled" -> {
+                    result.success(isAccessibilityServiceEnabled(context))
+                }
+                "setSessionActive" -> {
+                    val active = call.argument<Boolean>("isActive") ?: false
+                    FluxFoxusAccessibilityService.isSessionActive = active
+                    result.success(true)
+                }
+                "updateBlockedPackages" -> {
+                    val packages = call.argument<List<String>>("packages") ?: emptyList()
+                    FluxFoxusAccessibilityService.blockedPackages = packages.toSet()
+                    result.success(true)
+                }
+                "redirectToApp" -> {
+                    val pkg = call.argument<String>("packageName")
+                    if (pkg.isNullOrEmpty() || pkg == context.packageName) {
+                        bringAppToFront()
+                    } else {
+                        val launchIntent = packageManager.getLaunchIntentForPackage(pkg)?.apply {
+                            addFlags(Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_REORDER_TO_FRONT)
+                        }
+                        if (launchIntent != null) {
+                            startActivity(launchIntent)
+                        }
+                    }
+                    result.success(true)
+                }
+                else -> {
+                    result.notImplemented()
+                }
+            }
+        }
+    }
+
+    override fun cleanUpFlutterEngine(flutterEngine: FlutterEngine) {
+        FluxFoxusAccessibilityService.methodChannel = null
+        super.cleanUpFlutterEngine(flutterEngine)
+    }
+
+    private fun bringAppToFront() {
+        val intent = Intent(context, MainActivity::class.java).apply {
+            addFlags(
+                Intent.FLAG_ACTIVITY_NEW_TASK or
+                Intent.FLAG_ACTIVITY_REORDER_TO_FRONT or
+                Intent.FLAG_ACTIVITY_SINGLE_TOP
+            )
+        }
+        startActivity(intent)
+    }
+
+    private fun isAccessibilityServiceEnabled(context: Context): Boolean {
+        if (FluxFoxusAccessibilityService.isRunning()) {
+            return true
+        }
+        val expectedComponentName = "${context.packageName}/${FluxFoxusAccessibilityService::class.java.canonicalName}"
+        val enabledServices = Settings.Secure.getString(
+            context.contentResolver,
+            Settings.Secure.ENABLED_ACCESSIBILITY_SERVICES
+        ) ?: return false
+
+        val colonSplitter = TextUtils.SimpleStringSplitter(':')
+        colonSplitter.setString(enabledServices)
+        while (colonSplitter.hasNext()) {
+            val componentName = colonSplitter.next()
+            if (componentName.equals(expectedComponentName, ignoreCase = true)) {
+                return true
+            }
+        }
+        return false
+    }
+}

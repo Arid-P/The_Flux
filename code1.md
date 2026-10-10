@@ -73,7 +73,8 @@ All spec docs are in `/workspaces/The_Flux/prompts_docx/`. The most critical one
 | Phase 1-B Step 6: Focus Timer + Foreground Service | `529fbd9` | Focus timer domain models, Hive focus_session_state 5s persistence, SQLite logging, ForegroundTimerService, FocusSessionNotifier, mechanical FlipClock, FocusSessionScreen, 123/123 tests passing, 0 lints |
 | Phase 1-B Step 7: Break System | `e0e8d02` | Break countdown in `#906D4B`, break count decrement, greyscale disabled state on break exhaustion, 0-breaks configured removal, End Break Early button, haptic feedback, 128/128 tests passing, 0 lints |
 | Phase 1-B Step 8 & 9: Stop Focusing Modal & Session Completion | `67e6c90` | StopFocusingModal, wait time formula (15-25s), live inline counter, streak reset flow, blurred backdrop, countdown auto-completion (00:00) with vibration and auto-nav to Home, 140/140 tests passing, 0 lints |
-| Phase 1-B Step 10: Streaks System & Daily Evaluation | Current | StreakRecord domain model, StreakRepository CRUD & longest streak tracking, neutral days (minimumSessionsPerDay=0), FocusSessionRepository date queries, StreakEvaluationService per TRD §5.3.1, WorkManager background scheduler, 155/155 tests passing, 0 lints |
+| Phase 1-B Step 10: Streaks System & Daily Evaluation | `43e6f2a` | StreakRecord domain model, StreakRepository CRUD & longest streak tracking, neutral days (minimumSessionsPerDay=0), FocusSessionRepository date queries, StreakEvaluationService per TRD §5.3.1, WorkManager background scheduler, 155/155 tests passing, 0 lints |
+| Phase 1-C Step 11: Accessibility Service + App Detection | Current | Native FluxFoxusAccessibilityService.kt, MethodChannel com.fluxfoxus/accessibility_service, AppDetectionService bridge, SessionBlockingEnforcer session redirect logic, 12 unit & platform tests, 167/167 tests passing, 0 lints |
 
 ### Phase 1-B Step 5 (Latest — Commit `7ab48a2`)
 
@@ -225,41 +226,43 @@ fluxfoxus/test/core/navigation/
 ---
 
 ## 7. Next Immediate Task
-
-### Task: Phase 1-C Step 11 — Accessibility Service + App Detection
-
+ 
+### Task: Phase 1-C Step 12 — UsageStats Integration
+ 
 **Reference Docs:**
-- `prompts_docx/C1/GMP_FF_BUILD.md` → Phase 1-C Step 11
-- `prompts_docx/FLUXFOXUS/Phase 1/FF_TRD_v1.0.md` → Section 5.2 (App Blocking & Accessibility Service)
-- `prompts_docx/FLUXFOXUS/Phase 1/FF_PRD_v1.0.md` → Section 4.3 (Critical Android Permissions & Blocking)
+- `prompts_docx/C1/GMP_FF_BUILD.md` → Phase 1-C Step 12
+- `prompts_docx/FLUXFOXUS/Phase 1/FF_TRD_v1.0.md` → Section 3.6 (AppUsageRecord) & Section 5.2
+- `prompts_docx/FLUXFOXUS/Phase 1/FF_PRD_v1.0.md` → Section 4.3 (UsageStats)
 - `ff_design_override.md` → Rustic Medley Palette
-
+ 
 **What to build:**
-1. **Kotlin Accessibility Service (`FluxFoxusAccessibilityService`):**
-   - In `android/app/src/main/kotlin/com/fluxfoxus/FluxFoxusAccessibilityService.kt`:
-   - Monitor `AccessibilityEvent.TYPE_WINDOW_STATE_CHANGED`.
-   - Extract `packageName` from events safely.
-   - Filter out system UI (`com.android.systemui`, launcher packages).
-2. **MethodChannel Bridge (`com.fluxfoxus/accessibility_service`):**
-   - Communication channel between native Android accessibility service and Flutter Dart runtime.
-   - Stream events: `onAppChanged(packageName)`.
-   - Redirect logic: `redirectToApp(packageName)` triggering FF front-page bring-up when distracting app is opened during active session.
-3. **Dart Service Layer:**
-   - `AppDetectionService` abstraction and `MethodChannelAppDetectionService`.
-   - Event listening for foreground package changes during active focus sessions.
-4. **Hermetic Automated Tests:**
-   - Unit tests with mock platform channel verifying app detection, filtering, and redirect triggers.
-
-**Key File Paths for Step 11:**
+1. **Kotlin UsageStats Bridge:**
+   - In `android/app/src/main/kotlin/com/fluxfoxus/fluxfoxus/MainActivity.kt`:
+   - MethodChannel: `com.fluxfoxus/usage_stats`.
+   - `getUsageStats(startTime, endTime)`: queries Android `UsageStatsManager.queryUsageStats()` and aggregates total time in foreground per package.
+   - `hasUsageStatsPermission()`: checks `AppOpsManager.MODE_ALLOWED`.
+2. **Dart Service Layer:**
+   - `UsageStatsService` abstraction and `MethodChannelUsageStatsService`.
+   - `getUsageStats(DateTime start, DateTime end)` returning map or records of package to duration.
+   - 7-day rolling average calculation per package, stored in Hive `preferences` or `app_metadata` box.
+3. **App Categorization:**
+   - Predefined categorization mapping for popular apps (Productive / Semi-Productive / Distracting / Others).
+   - Category lookup service.
+4. **Automated Tests:**
+   - Unit tests with mock platform channels verifying interval querying, rolling average calculations, and categorization logic.
+ 
+**Key File Paths for Step 12:**
 ```
-android/app/src/main/kotlin/com/fluxfoxus/
-  FluxFoxusAccessibilityService.kt   # Native Android AccessibilityService
+android/app/src/main/kotlin/com/fluxfoxus/fluxfoxus/
+  MainActivity.kt                    # Kotlin UsageStatsManager MethodChannel handler
 
-fluxfoxus/lib/features/blocking/
-  services/app_detection_service.dart # Dart MethodChannel bridge & stream
+fluxfoxus/lib/features/usage_stats/
+  services/usage_stats_service.dart  # Dart MethodChannel bridge & queries
+  services/app_categorizer.dart      # Category lookup & default mapping
+  presentation/usage_stats_providers.dart
 
-fluxfoxus/test/features/blocking/
-  app_detection_service_test.dart    # Platform channel tests
+fluxfoxus/test/features/usage_stats/
+  usage_stats_service_test.dart      # Platform channel & rolling avg tests
 ```
 
 
@@ -296,11 +299,11 @@ Code2 is working on separate HTML/CSS UI mockup screens. Code2's files:
 
 ```
 Branch: ff
-Latest commit: 7ab48a2
-Message: feat(presets): implement presets CRUD repository, creation screen, and automated tests (Phase 1-B Step 5)
+Latest commit: 43e6f2a
+Message: feat(streaks): implement streak records, daily evaluation service, and WorkManager scheduler (Phase 1-B Step 10)
 Pushed: YES — origin/ff updated
 Ahead of origin: 0 commits
-Working tree: CLEAN
+Working tree: CLEAN (uncommitted Step 11 files ready to commit)
 ```
 
 ---
