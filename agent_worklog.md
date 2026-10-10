@@ -11,6 +11,7 @@ This registry coordinates concurrent/subsequent AI coding agents working in this
 |---|---|---|---|---|---|---|
 | **Code1** | Lead UI Designer | **ACTIVE** | `ff` | Phase 1-B Step 7 COMPLETED (Break System: countdown in Tanned Wood #906D4B, decrement counter, exhaustion state with greyscale/0.4 opacity, 0-breaks configured absence, End Break Early button in Amber Autumn #CA9C68, auto-break expiry resumption, haptics, 5 dedicated tests). Now executing Phase 1-B Step 8: Stop Focusing Modal. | `fluxfoxus/lib/features/focus/`, `fluxfoxus/lib/presentation/widgets/`, `fluxfoxus/lib/presentation/screens/focus_session_screen.dart`, `progress_tracker.md`, `agent_worklog.md` | None (all quiet) |
 | **Code2** | Companion UI Designer / Responsive Architect | **ACTIVE** | `ff` | Completed Responsive Layouts: All 6 screens (Home, Focus, Planner, Preset, Limits, Usage) now utilize fluid `md:` and `lg:` grid container adaptations for tablet/desktop widths. Fixed iframe caching on port 8080. | `ui_mockups/` | `8080` (Unified Review Hub) |
+| **Code3** | Flutter Backend & Feature Engineer | **IDLE** | `ff` | Persona initialized. Awaiting first task assignment. | None yet — will claim when task is assigned. | None |
 
 ---
 
@@ -139,6 +140,21 @@ This registry coordinates concurrent/subsequent AI coding agents working in this
   - `ui_mockups/home_screen.html` (Code2 screen)
   - `ui_mockups/app_limits.html` (Code2 screen)
   - `ui_mockups/index.html` (Simulator Hub)
+
+### Agent: `Code3`
+* **Assigned Identity:** `Code3`
+* **Role:** Flutter Backend & Feature Engineer
+* **Current Working Branch:** `ff` (Strict branch lock — DO NOT SWITCH BRANCHES)
+* **Status:** `IDLE` (Persona just created — no task assigned yet)
+* **Specialty:**
+  - Riverpod state management and cross-provider composition.
+  - Background & platform services: foreground task services, MethodChannel IPC, `workmanager`.
+  - Flutter feature implementation from PRD/TRD specs.
+  - Integration work: wiring repositories to UI providers, connecting services to screens.
+  - Quality gates: `flutter test` 100% passing, `flutter analyze` 0 issues.
+* **Completed:** *(None yet — first activation)*
+* **What `Code3` is doing right now:** IDLE — awaiting first task assignment from user.
+* **Exclusive Resources / Do Not Overwrite:** *(None yet — will claim in this file when task begins)*
 
 ---
 
