@@ -151,15 +151,17 @@ This registry coordinates concurrent/subsequent AI coding agents working in this
   - Refactored HTML mockups (`home_screen.html`, `active_focus_session.html`, `planner.html`, `preset_creation.html`, `app_limits.html`, `usage_stats.html`, `index.html`) so internal screens adapt responsively to viewport simulator dimensions (320px, 390px, 640px, 768px, 1024px, 100% full window), utilizing full width/height with dynamic grid layouts (`md:grid-cols-2`, `lg:grid-cols-3`), responsive flip-clock orientation (horizontal split seam cards), and centered navigation/floating action buttons.
 * **What `Code2` is doing right now:**
   - `IDLE` / Standing by for user feedback.
-  - Completed **Phase 1 UI Mockup: Distraction Intervention** (`ui_mockups/distraction_intervention.html`):
-    - 2/5/10/20 time window overlay with blurred app backdrop.
+  - Completed & Refined **Phase 1 UI Mockup: Distraction Intervention** (`ui_mockups/distraction_intervention.html`):
+    - 5/10/20/40 time window overlay with blurred app backdrop.
+    - Active session island countdown banner auto-vanishes after 5 seconds per user feedback.
+    - YouTube Study Mode edge grabber tab is hidden by default and only visible while Study Mode is ON in YouTube; turning Study Mode off via toggle hides the tab completely and restores the intervention time selection screen.
+    - Fluid responsive viewport layout replacing narrow phone container constraints, allowing seamless multi-column expansion on tablet and desktop.
     - App info (app icon, daily limit, flame streak counter).
     - Progress bar (spent today vs limit left) with Rustic Medley gradient.
     - YouTube Study Mode card ("Watch only Study channels on YouTube") activating whitelist mode.
-    - Interactive 2x2 time option grid (2m, 5m, 10m, 20m) with unselected/selected states.
+    - Interactive 2x2 time option grid (5m, 10m, 20m, 40m) with unselected/selected states.
     - Dynamic Exit button ("Exit [App Name]").
-    - Cooldown countdown wait period logic (5s for 2m, 10s for 5m/10m, 15s for 20m) on overlay return with disabled buttons and progress timer.
-    - Collapsible & expandable YouTube Study Mode Edge Grabber (~32px x 80px vertical pill with FF aperture icon).
+    - Cooldown countdown wait period logic (10s, 15s, 20s) on overlay return with disabled buttons and progress timer.
     - Non-whitelisted channel interception banner with "Got it" vs "Add to Study List".
     - Channel whitelist confirmation sentence typing flow with exact-match validation.
     - In-browser `#auto-test-modal` test runner (10/10 gates passing) and integrated into Port 8080 unified review hub (`ui_mockups/index.html`).

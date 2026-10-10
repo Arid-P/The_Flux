@@ -106,14 +106,15 @@ All screens live in `ui_mockups/` and are served via background Python HTTP serv
 
 * **Status:** `IDLE` (Task completed & verified).
 * **Completed Task:** `Distraction Intervention & YouTube Study Mode UI Mockup`
-  - Created `ui_mockups/distraction_intervention.html` per `prompts_docx/FLUXFOXUS/Phase 1/ui_distracted_intervention.md` and `ff_design_override.md`.
-  - Implemented 2/5/10/20 bottom-sheet intervention overlay on top of blurred app content.
-  - Interactive state machine: App switching (Instagram, YouTube, Reddit), time option selection (2m, 5m, 10m, 20m), session countdown timer, post-duration cooldown lock (5s, 10s, 15s wait periods with disabled buttons).
-  - YouTube Study Mode Card & Edge Grabber (~32px x 80px vertical pill with aperture icon expanding into horizontal control panel).
+  - Created and refined `ui_mockups/distraction_intervention.html` per `prompts_docx/FLUXFOXUS/Phase 1/ui_distracted_intervention.md`, `ff_design_override.md`, and user feedback.
+  - Implemented 5/10/20/40 bottom-sheet intervention overlay on top of blurred app content.
+  - Active session island countdown banner auto-vanishes after 5 seconds.
+  - YouTube Study Mode edge grabber tab is hidden by default and only visible while Study Mode is ON in YouTube; turning Study Mode off via toggle hides the tab completely and restores the intervention time selection screen.
+  - Fluid responsive layout replacing narrow smartphone constraints, expanding across tablet, landscape, and desktop viewports.
   - Non-whitelisted channel interception banner with friction confirmation sentence typing flow.
   - In-browser `#auto-test-modal` assertion runner (10/10 gates passing).
   - Integrated into `ui_mockups/index.html` (port 8080 unified review hub) with 🛡️ Intervention tab.
-  - Test suites: `test_intervention_screen.js` (100% pass) and `test_code2_screens.js` (Section 7 added, 100% pass).
+  - Test suites: `test_intervention_screen.js` (100% pass) and `test_code2_screens.js` (Section 7, 100% pass).
 * **Subsequent Backlog Tasks:**
   - Home Widget mockup (`ui_widget.md` -> `ui_mockups/widget.html`).
   - Integration with native Flutter screens as directed by user.

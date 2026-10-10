@@ -3,6 +3,9 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+  <meta http-equiv="Pragma" content="no-cache">
+  <meta http-equiv="Expires" content="0">
   <title>FluxFoxus — Distraction Intervention UI Prototype</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <script>
@@ -38,7 +41,7 @@
     .custom-scrollbar::-webkit-scrollbar-thumb { background: #594C3D; border-radius: 4px; }
   </style>
 </head>
-<body class="bg-ff-bg text-ff-text min-h-screen flex flex-col justify-between selection:bg-ff-primary selection:text-ff-bg relative overflow-x-hidden">
+<body class="bg-ff-bg text-ff-text min-h-screen w-full flex flex-col justify-between selection:bg-ff-primary selection:text-ff-bg relative overflow-x-hidden">
 
   <!-- TOP DEMO CONTROL BAR -->
   <header class="w-full bg-ff-surface border-b border-ff-border px-4 py-2.5 sticky top-0 z-40 flex flex-wrap items-center justify-between gap-3 shadow-md">
@@ -49,9 +52,9 @@
       <div>
         <h1 class="text-xs font-bold text-ff-text flex items-center gap-1.5">
           Distraction Intervention
-          <span class="text-[10px] px-1.5 py-0.5 rounded bg-ff-primary/20 text-ff-primary border border-ff-primary/40 font-mono">2/5/10/20</span>
+          <span class="text-[10px] px-1.5 py-0.5 rounded bg-ff-primary/20 text-ff-primary border border-ff-primary/40 font-mono">5/10/20/40</span>
         </h1>
-        <p class="text-[10px] text-ff-muted">Friction Overlay • Cooldown Wait • YouTube Study Mode</p>
+        <p class="text-[10px] text-ff-muted">Adaptive Viewport • 5s Banner Dismiss • Dynamic Study Mode</p>
       </div>
     </div>
 
@@ -79,57 +82,74 @@
     </div>
   </header>
 
-  <!-- MAIN VIEWPORT CONTAINER -->
-  <main class="flex-1 w-full max-w-4xl mx-auto p-4 md:p-6 flex flex-col justify-center items-center relative">
+  <!-- MAIN FLUID VIEWPORT CONTAINER (Adapts to Mobile, Tablet, and Desktop) -->
+  <main class="flex-1 w-full max-w-5xl mx-auto p-2 sm:p-4 md:p-6 flex flex-col justify-between relative">
 
-    <!-- SIMULATED APP WINDOW (THE UNDERLYING APP BEING INTERCEPTED) -->
-    <div id="simulated-app-wrapper" class="w-full max-w-md h-[720px] rounded-[28px] border-2 border-ff-border bg-[#0B0F13] relative overflow-hidden shadow-2xl flex flex-col">
+    <!-- SIMULATED APP WINDOW (EXPANDS FLUIDLY TO FIT VIEWPORT) -->
+    <div id="simulated-app-wrapper" class="w-full flex-1 min-h-[560px] md:min-h-[640px] rounded-2xl md:rounded-3xl border border-ff-border bg-[#0B0F13] relative overflow-hidden shadow-2xl flex flex-col">
 
-      <!-- SIMULATED PHONE STATUS BAR -->
-      <div class="w-full px-5 pt-3 pb-2 flex items-center justify-between text-[11px] text-ff-muted select-none bg-black/40 z-10">
+      <!-- SIMULATED STATUS BAR -->
+      <div class="w-full px-5 pt-3 pb-2 flex items-center justify-between text-[11px] text-ff-muted select-none bg-black/40 z-10 shrink-0">
         <span class="font-semibold text-ff-text">9:41</span>
-        <div class="flex items-center space-x-1.5">
-          <span>5G</span>
-          <div class="w-5 h-2.5 border border-ff-muted rounded-sm p-0.5 flex items-center">
-            <div class="h-full w-3/4 bg-ff-muted rounded-[1px]"></div>
+        <div class="flex items-center space-x-2">
+          <span id="app-viewport-indicator" class="text-[10px] text-ff-accent font-mono">Simulated Target App</span>
+          <div class="flex items-center space-x-1.5">
+            <span>5G</span>
+            <div class="w-5 h-2.5 border border-ff-muted rounded-sm p-0.5 flex items-center">
+              <div class="h-full w-3/4 bg-ff-muted rounded-[1px]"></div>
+            </div>
           </div>
         </div>
       </div>
 
-      <!-- SIMULATED APP CONTENT (BEHIND BLURRED OVERLAY) -->
-      <div id="simulated-app-feed" class="flex-1 overflow-y-auto custom-scrollbar p-3 space-y-3 filter blur-[6px] opacity-40 transition duration-300">
-        <!-- Mock Video / Post Cards -->
-        <div class="w-full bg-[#1A1F26] rounded-xl overflow-hidden border border-ff-border/40">
-          <div class="h-36 bg-[#262C36] flex items-center justify-center text-ff-muted text-xs font-mono">
-            ▶ 10 Hours of Infinite Scrolling
+      <!-- SIMULATED APP CONTENT (BEHIND BLURRED OVERLAY — RESPONSIVE GRID) -->
+      <div id="simulated-app-feed" class="flex-1 overflow-y-auto custom-scrollbar p-3 md:p-5 filter blur-[6px] opacity-40 transition duration-300">
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3 md:gap-4">
+          <!-- Card 1 -->
+          <div class="w-full bg-[#1A1F26] rounded-xl overflow-hidden border border-ff-border/40 shadow-md">
+            <div class="h-36 bg-[#262C36] flex items-center justify-center text-ff-muted text-xs font-mono p-4 text-center">
+              ▶ 10 Hours of Infinite Scrolling Video Feed
+            </div>
+            <div class="p-3">
+              <div class="h-3 w-3/4 bg-ff-muted/30 rounded mb-1.5"></div>
+              <div class="h-2.5 w-1/2 bg-ff-muted/20 rounded"></div>
+            </div>
           </div>
-          <div class="p-3">
-            <div class="h-3 w-3/4 bg-ff-muted/30 rounded mb-1.5"></div>
-            <div class="h-2.5 w-1/2 bg-ff-muted/20 rounded"></div>
+          <!-- Card 2 -->
+          <div class="w-full bg-[#1A1F26] rounded-xl overflow-hidden border border-ff-border/40 shadow-md">
+            <div class="h-36 bg-[#232933] flex items-center justify-center text-ff-muted text-xs font-mono p-4 text-center">
+              Viral Trending Suggested Content
+            </div>
+            <div class="p-3">
+              <div class="h-3 w-2/3 bg-ff-muted/30 rounded mb-1.5"></div>
+              <div class="h-2.5 w-1/3 bg-ff-muted/20 rounded"></div>
+            </div>
           </div>
-        </div>
-        <div class="w-full bg-[#1A1F26] rounded-xl overflow-hidden border border-ff-border/40">
-          <div class="h-32 bg-[#232933] flex items-center justify-center text-ff-muted text-xs font-mono">
-            Trending Recommended Content
+          <!-- Card 3 -->
+          <div class="w-full bg-[#1A1F26] rounded-xl overflow-hidden border border-ff-border/40 shadow-md">
+            <div class="h-36 bg-[#20252E] flex items-center justify-center text-ff-muted text-xs font-mono p-4 text-center">
+              Interactive Feed Distraction Loop
+            </div>
+            <div class="p-3">
+              <div class="h-3 w-4/5 bg-ff-muted/30 rounded mb-1.5"></div>
+              <div class="h-2.5 w-2/5 bg-ff-muted/20 rounded"></div>
+            </div>
           </div>
-          <div class="p-3">
-            <div class="h-3 w-2/3 bg-ff-muted/30 rounded mb-1.5"></div>
-            <div class="h-2.5 w-1/3 bg-ff-muted/20 rounded"></div>
-          </div>
-        </div>
-        <div class="w-full bg-[#1A1F26] rounded-xl overflow-hidden border border-ff-border/40">
-          <div class="h-32 bg-[#20252E] flex items-center justify-center text-ff-muted text-xs font-mono">
-            Viral Feed Distraction Loop
-          </div>
-          <div class="p-3">
-            <div class="h-3 w-4/5 bg-ff-muted/30 rounded mb-1.5"></div>
-            <div class="h-2.5 w-2/5 bg-ff-muted/20 rounded"></div>
+          <!-- Card 4 (for wider viewports) -->
+          <div class="hidden md:block w-full bg-[#1A1F26] rounded-xl overflow-hidden border border-ff-border/40 shadow-md">
+            <div class="h-36 bg-[#282E38] flex items-center justify-center text-ff-muted text-xs font-mono p-4 text-center">
+              Algorithmic Entertainment Channel Stream
+            </div>
+            <div class="p-3">
+              <div class="h-3 w-3/5 bg-ff-muted/30 rounded mb-1.5"></div>
+              <div class="h-2.5 w-1/3 bg-ff-muted/20 rounded"></div>
+            </div>
           </div>
         </div>
       </div>
 
-      <!-- YOUTUBE STUDY MODE EDGE GRABBER -->
-      <div id="edge-grabber-container" class="absolute right-0 top-1/2 -translate-y-1/2 z-30 transition duration-200">
+      <!-- YOUTUBE STUDY MODE EDGE GRABBER (HIDDEN BY DEFAULT, SHOWN ONLY WHEN STUDY MODE IS ACTIVE IN YOUTUBE) -->
+      <div id="edge-grabber-container" class="hidden absolute right-0 top-1/2 -translate-y-1/2 z-30 transition duration-200">
         <!-- Collapsed Grabber Tab (Pill anchored to right edge) -->
         <button id="edge-grabber" onclick="toggleEdgePanel()" class="w-8 h-20 bg-ff-primary hover:bg-ff-primary-hover rounded-l-2xl shadow-xl flex flex-col items-center justify-center gap-1.5 text-ff-bg transition group" title="YouTube Study Mode Quick Controls">
           <!-- FF Aperture Icon -->
@@ -158,11 +178,25 @@
         </div>
       </div>
 
-      <!-- 2/5/10/20 INTERVENTION WINDOW (BOTTOM SHEET OVERLAY) -->
-      <div id="intervention-sheet" class="absolute inset-x-0 bottom-0 bg-ff-surface border-t-2 border-ff-border rounded-t-[24px] p-5 shadow-2xl z-20 flex flex-col gap-3.5 transition-transform duration-300 transform translate-y-0">
+      <!-- ACTIVE WINDOW SESSION BANNER (Auto-vanishes after 5 seconds) -->
+      <div id="active-session-banner" class="hidden absolute top-12 inset-x-4 md:max-w-md md:mx-auto bg-ff-surface/95 border border-ff-primary rounded-xl p-3 shadow-2xl z-30 flex items-center justify-between transition-opacity duration-500">
+        <div class="flex items-center space-x-2.5">
+          <div class="w-2.5 h-2.5 rounded-full bg-ff-primary animate-ping"></div>
+          <div>
+            <div class="text-xs font-bold text-ff-text">App Usage Session Active</div>
+            <div class="text-[10px] text-ff-muted">Window remaining: <span id="active-window-timer" class="text-ff-primary font-mono font-bold">05:00</span> (hides in 5s)</div>
+          </div>
+        </div>
+        <button onclick="expireSessionEarly()" class="px-2.5 py-1 text-[10px] font-bold rounded-lg bg-ff-bg border border-ff-border text-ff-muted hover:text-ff-text transition">
+          End Now
+        </button>
+      </div>
+
+      <!-- 5/10/20/40 INTERVENTION WINDOW (RESPONSIVE BOTTOM SHEET / MODAL) -->
+      <div id="intervention-sheet" class="absolute inset-x-0 bottom-0 md:max-w-xl md:mx-auto md:mb-4 bg-ff-surface border-t-2 md:border-2 border-ff-border rounded-t-[24px] md:rounded-[24px] p-5 shadow-2xl z-20 flex flex-col gap-3.5 transition-transform duration-300 transform translate-y-0">
 
         <!-- Top Drag Handle Notch -->
-        <div class="w-12 h-1 bg-ff-border rounded-full mx-auto -mt-1 mb-1"></div>
+        <div class="w-12 h-1 bg-ff-border rounded-full mx-auto -mt-1 mb-0.5"></div>
 
         <!-- ROW 1: APP INFO + STREAK -->
         <div class="flex items-center justify-between">
@@ -225,11 +259,8 @@
           </span>
         </div>
 
-        <!-- ROW 6: TIME OPTION GRID (2×2 Pill Buttons) -->
+        <!-- ROW 6: TIME OPTION GRID (5m, 10m, 20m, 40m Pill Buttons) -->
         <div id="time-options-grid" class="grid grid-cols-2 gap-2.5">
-          <button id="btn-opt-2m" onclick="selectTimeOption(2)" class="time-opt-btn py-2.5 px-4 rounded-full border border-ff-border bg-transparent text-ff-text text-xs font-semibold hover:border-ff-primary transition duration-150">
-            2 mins
-          </button>
           <button id="btn-opt-5m" onclick="selectTimeOption(5)" class="time-opt-btn py-2.5 px-4 rounded-full border border-ff-border bg-transparent text-ff-text text-xs font-semibold hover:border-ff-primary transition duration-150">
             5 mins
           </button>
@@ -238,6 +269,9 @@
           </button>
           <button id="btn-opt-20m" onclick="selectTimeOption(20)" class="time-opt-btn py-2.5 px-4 rounded-full border border-ff-border bg-transparent text-ff-text text-xs font-semibold hover:border-ff-primary transition duration-150">
             20 mins
+          </button>
+          <button id="btn-opt-40m" onclick="selectTimeOption(40)" class="time-opt-btn py-2.5 px-4 rounded-full border border-ff-border bg-transparent text-ff-text text-xs font-semibold hover:border-ff-primary transition duration-150">
+            40 mins
           </button>
         </div>
 
@@ -258,20 +292,6 @@
           <span id="exit-btn-text">Exit YouTube</span>
         </button>
 
-      </div>
-
-      <!-- ACTIVE WINDOW SESSION BANNER (Simulating temporary allowed use) -->
-      <div id="active-session-banner" class="hidden absolute top-12 inset-x-3 bg-ff-surface/95 border border-ff-primary rounded-xl p-3 shadow-2xl z-30 flex items-center justify-between">
-        <div class="flex items-center space-x-2">
-          <div class="w-2 h-2 rounded-full bg-ff-primary animate-ping"></div>
-          <div>
-            <div class="text-xs font-bold text-ff-text">App Usage Session Active</div>
-            <div class="text-[10px] text-ff-muted">Window remaining: <span id="active-window-timer" class="text-ff-primary font-mono font-bold">02:00</span></div>
-          </div>
-        </div>
-        <button onclick="expireSessionEarly()" class="px-2.5 py-1 text-[10px] font-bold rounded-lg bg-ff-bg border border-ff-border text-ff-muted hover:text-ff-text">
-          End Now
-        </button>
       </div>
 
       <!-- NON-WHITELISTED CHANNEL INTERCEPTION MODAL -->
@@ -304,8 +324,8 @@
       </div>
 
       <!-- CHANNEL WHITELIST FRICTION SENTENCE MODAL -->
-      <div id="whitelist-confirmation-sheet" class="hidden absolute inset-0 bg-black/85 backdrop-blur-md z-50 flex flex-col justify-end">
-        <div class="w-full bg-ff-surface border-t-2 border-ff-border rounded-t-2xl p-5 shadow-2xl space-y-3.5">
+      <div id="whitelist-confirmation-sheet" class="hidden absolute inset-0 bg-black/85 backdrop-blur-md z-50 flex flex-col justify-end md:justify-center md:items-center p-0 md:p-4">
+        <div class="w-full md:max-w-md bg-ff-surface border-t-2 md:border-2 border-ff-border rounded-t-2xl md:rounded-2xl p-5 shadow-2xl space-y-3.5">
           <div class="flex items-center justify-between">
             <h3 class="text-xs font-bold text-ff-text flex items-center gap-1.5">
               <span>✍️</span> Type Sentence to Whitelist
@@ -337,35 +357,37 @@
       </div>
 
       <!-- CELEBRATION TOAST -->
-      <div id="toast-notif" class="hidden absolute top-5 inset-x-6 bg-ff-productive border border-[#7CD088] text-ff-text px-4 py-2.5 rounded-xl text-xs font-semibold text-center shadow-xl z-50">
+      <div id="toast-notif" class="hidden absolute top-5 inset-x-6 md:max-w-sm md:mx-auto bg-ff-productive border border-[#7CD088] text-ff-text px-4 py-2.5 rounded-xl text-xs font-semibold text-center shadow-xl z-50">
         Channel added to Study Whitelist!
       </div>
 
     </div>
 
     <!-- FLOATING BOTTOM ISLAND NAVIGATION BAR (MULTI-SCREEN CROSS-LINK) -->
-    <nav id="bottom-island" class="mt-6 bg-ff-surface border border-ff-border rounded-full px-4 py-2 shadow-xl flex items-center space-x-4 text-xs z-30">
-      <a href="home_screen.html" onclick="navigateTo('home_screen.html', event)" class="p-2 text-ff-muted hover:text-ff-text transition flex items-center gap-1" title="Home">
-        <span>🏠</span>
-        <span class="hidden sm:inline">Home</span>
-      </a>
-      <a href="usage_stats.html" onclick="navigateTo('usage_stats.html', event)" class="p-2 text-ff-muted hover:text-ff-text transition flex items-center gap-1" title="Usage Stats">
-        <span>📊</span>
-        <span class="hidden sm:inline">Usage</span>
-      </a>
-      <a href="active_focus_session.html" onclick="navigateTo('active_focus_session.html', event)" class="p-2 text-ff-muted hover:text-ff-text transition flex items-center gap-1" title="Focus Session">
-        <span>⏱️</span>
-        <span class="hidden sm:inline">Focus</span>
-      </a>
-      <a href="planner.html" onclick="navigateTo('planner.html', event)" class="p-2 text-ff-muted hover:text-ff-text transition flex items-center gap-1" title="Planner">
-        <span>📅</span>
-        <span class="hidden sm:inline">Planner</span>
-      </a>
-      <a href="app_limits.html" onclick="navigateTo('app_limits.html', event)" class="p-2 text-ff-muted hover:text-ff-text transition flex items-center gap-1" title="App Limits">
-        <span>🚫</span>
-        <span class="hidden sm:inline">Limits</span>
-      </a>
-    </nav>
+    <div class="w-full flex justify-center mt-4">
+      <nav id="bottom-island" class="bg-ff-surface border border-ff-border rounded-full px-4 py-2 shadow-xl flex items-center space-x-3 sm:space-x-4 text-xs z-30">
+        <a href="home_screen.html" onclick="navigateTo('home_screen.html', event)" class="p-2 text-ff-muted hover:text-ff-text transition flex items-center gap-1" title="Home">
+          <span>🏠</span>
+          <span class="hidden sm:inline">Home</span>
+        </a>
+        <a href="usage_stats.html" onclick="navigateTo('usage_stats.html', event)" class="p-2 text-ff-muted hover:text-ff-text transition flex items-center gap-1" title="Usage Stats">
+          <span>📊</span>
+          <span class="hidden sm:inline">Usage</span>
+        </a>
+        <a href="active_focus_session.html" onclick="navigateTo('active_focus_session.html', event)" class="p-2 text-ff-muted hover:text-ff-text transition flex items-center gap-1" title="Focus Session">
+          <span>⏱️</span>
+          <span class="hidden sm:inline">Focus</span>
+        </a>
+        <a href="planner.html" onclick="navigateTo('planner.html', event)" class="p-2 text-ff-muted hover:text-ff-text transition flex items-center gap-1" title="Planner">
+          <span>📅</span>
+          <span class="hidden sm:inline">Planner</span>
+        </a>
+        <a href="app_limits.html" onclick="navigateTo('app_limits.html', event)" class="p-2 text-ff-muted hover:text-ff-text transition flex items-center gap-1" title="App Limits">
+          <span>🚫</span>
+          <span class="hidden sm:inline">Limits</span>
+        </a>
+      </nav>
+    </div>
   </main>
 
   <!-- AUTOMATED TEST MODAL RUNNER -->
@@ -440,6 +462,7 @@
     let isEdgePanelExpanded = false;
     let cooldownTimer = null;
     let sessionTimer = null;
+    let bannerHideTimeout = null;
 
     const confirmationSentencesPool = [
       "I am watching this specifically to learn and study.",
@@ -484,8 +507,11 @@
       const edgeGrabberContainer = document.getElementById('edge-grabber-container');
       if (config.hasStudyMode) {
         studyCard.classList.remove('hidden');
+        // Only show grabber if Study Mode is ACTIVE on YouTube!
         if (isStudyModeActive) {
           edgeGrabberContainer.classList.remove('hidden');
+        } else {
+          edgeGrabberContainer.classList.add('hidden');
         }
       } else {
         studyCard.classList.add('hidden');
@@ -505,10 +531,10 @@
       resetTimeOptionSelection();
     }
 
-    // Time Option Selection
+    // Time Option Selection (5, 10, 20, 40)
     function selectTimeOption(mins) {
       selectedMinutes = mins;
-      const options = [2, 5, 10, 20];
+      const options = [5, 10, 20, 40];
       options.forEach(m => {
         const btn = document.getElementById('btn-opt-' + m + 'm');
         if (btn) {
@@ -528,7 +554,7 @@
 
     function resetTimeOptionSelection() {
       selectedMinutes = null;
-      [2, 5, 10, 20].forEach(m => {
+      [5, 10, 20, 40].forEach(m => {
         const btn = document.getElementById('btn-opt-' + m + 'm');
         if (btn) {
           btn.className = 'time-opt-btn py-2.5 px-4 rounded-full border border-ff-border bg-transparent text-ff-text text-xs font-semibold hover:border-ff-primary transition duration-150';
@@ -537,7 +563,7 @@
       });
     }
 
-    // Simulated Active Session
+    // Simulated Active Session with 5s Auto-Vanishing Island Banner
     function startSimulatedSession(mins) {
       // Hide intervention sheet
       document.getElementById('intervention-sheet').classList.add('translate-y-full');
@@ -545,17 +571,27 @@
       const feed = document.getElementById('simulated-app-feed');
       feed.classList.remove('blur-[6px]', 'opacity-40');
 
-      // Show active session banner
+      // Show active session island banner
       const banner = document.getElementById('active-session-banner');
-      banner.classList.remove('hidden');
+      banner.classList.remove('hidden', 'opacity-0');
 
       let secondsLeft = mins * 60;
       updateWindowTimer(secondsLeft);
 
+      // Requirement: Island countdown banner wait time (till it vanishes) is 5 seconds
+      clearTimeout(bannerHideTimeout);
+      bannerHideTimeout = setTimeout(() => {
+        banner.classList.add('opacity-0');
+        setTimeout(() => {
+          banner.classList.add('hidden');
+          banner.classList.remove('opacity-0');
+        }, 500);
+      }, 5000);
+
       clearInterval(sessionTimer);
-      // Fast demo tick (1 second real = 10 simulated seconds)
+      // Fast demo tick (1 second real = 15 simulated seconds)
       sessionTimer = setInterval(() => {
-        secondsLeft -= 10;
+        secondsLeft -= 15;
         if (secondsLeft <= 0) {
           clearInterval(sessionTimer);
           expireSessionEarly();
@@ -574,6 +610,7 @@
 
     function expireSessionEarly() {
       clearInterval(sessionTimer);
+      clearTimeout(bannerHideTimeout);
       document.getElementById('active-session-banner').classList.add('hidden');
 
       // Re-blur feed
@@ -583,8 +620,8 @@
       // Slide back sheet
       document.getElementById('intervention-sheet').classList.remove('translate-y-full');
 
-      // Trigger cooldown wait based on selected option: 2m->5s, 5m->10s, 10m->10s, 20m->15s
-      const waitSeconds = selectedMinutes === 2 ? 5 : (selectedMinutes === 20 ? 15 : 10);
+      // Cooldown wait based on selected option: 5m->10s, 10m->10s, 20m->15s, 40m->20s
+      const waitSeconds = selectedMinutes === 5 ? 10 : (selectedMinutes === 40 ? 20 : (selectedMinutes === 20 ? 15 : 10));
       startCooldownWait(waitSeconds);
     }
 
@@ -640,7 +677,9 @@
       document.getElementById('intervention-sheet').classList.add('translate-y-full');
       const feed = document.getElementById('simulated-app-feed');
       feed.classList.remove('blur-[6px]', 'opacity-40');
+      // Edge grabber appears ONLY when Study Mode is active!
       document.getElementById('edge-grabber-container').classList.remove('hidden');
+      updateStudyModeToggleUI();
       showToast('YouTube Study Mode activated! Whitelist enforced.');
     }
 
@@ -660,21 +699,32 @@
 
     function toggleStudyModeState() {
       isStudyModeActive = !isStudyModeActive;
-      const toggle = document.getElementById('study-mode-toggle');
-      const circle = document.getElementById('toggle-circle');
+      updateStudyModeToggleUI();
 
       if (isStudyModeActive) {
-        toggle.className = 'w-11 h-6 rounded-full bg-ff-primary p-0.5 transition duration-200 focus:outline-none flex items-center';
-        circle.className = 'w-5 h-5 rounded-full bg-ff-bg shadow-md transform translate-x-5 transition duration-200';
         showToast('Study Mode: Active (Whitelist on)');
       } else {
-        toggle.className = 'w-11 h-6 rounded-full bg-ff-border p-0.5 transition duration-200 focus:outline-none flex items-center';
-        circle.className = 'w-5 h-5 rounded-full bg-ff-muted shadow-md transform translate-x-0 transition duration-200';
+        // Study mode turned off using toggle:
+        // 1. Hide the expanded edge panel
         toggleEdgePanel(false);
-        // Study mode turned off -> intervention window reappears
+        // 2. Hide the edge grabber button completely
+        document.getElementById('edge-grabber-container').classList.add('hidden');
+        // 3. Show intervening screen again to select time
         document.getElementById('intervention-sheet').classList.remove('translate-y-full');
         document.getElementById('simulated-app-feed').classList.add('blur-[6px]', 'opacity-40');
         showToast('Study Mode disabled. Intervention active.');
+      }
+    }
+
+    function updateStudyModeToggleUI() {
+      const toggle = document.getElementById('study-mode-toggle');
+      const circle = document.getElementById('toggle-circle');
+      if (isStudyModeActive) {
+        toggle.className = 'w-11 h-6 rounded-full bg-ff-primary p-0.5 transition duration-200 focus:outline-none flex items-center';
+        circle.className = 'w-5 h-5 rounded-full bg-ff-bg shadow-md transform translate-x-5 transition duration-200';
+      } else {
+        toggle.className = 'w-11 h-6 rounded-full bg-ff-border p-0.5 transition duration-200 focus:outline-none flex items-center';
+        circle.className = 'w-5 h-5 rounded-full bg-ff-muted shadow-md transform translate-x-0 transition duration-200';
       }
     }
 
@@ -682,6 +732,8 @@
     function triggerNonWhitelistedVideo() {
       switchApp('youtube');
       isStudyModeActive = true;
+      document.getElementById('edge-grabber-container').classList.remove('hidden');
+      updateStudyModeToggleUI();
       document.getElementById('non-whitelisted-modal').classList.remove('hidden');
     }
 
@@ -798,13 +850,13 @@
         },
         {
           id: 5,
-          name: 'Row 5 & 6 2×2 Time Selection Grid (2m, 5m, 10m, 20m)',
+          name: 'Row 5 & 6 2×2 Time Selection Grid (5m, 10m, 20m, 40m)',
           run: () => {
-            const b2 = document.getElementById('btn-opt-2m');
             const b5 = document.getElementById('btn-opt-5m');
             const b10 = document.getElementById('btn-opt-10m');
             const b20 = document.getElementById('btn-opt-20m');
-            return b2 && b5 && b10 && b20;
+            const b40 = document.getElementById('btn-opt-40m');
+            return b5 && b10 && b20 && b40;
           }
         },
         {
@@ -824,7 +876,7 @@
           run: () => {
             startCooldownWait(2);
             const notice = !document.getElementById('cooldown-notice').classList.contains('hidden');
-            const btnDisabled = document.getElementById('btn-opt-2m').disabled;
+            const btnDisabled = document.getElementById('btn-opt-5m').disabled;
             clearInterval(cooldownTimer);
             document.getElementById('cooldown-notice').classList.add('hidden');
             resetTimeOptionSelection();
@@ -833,13 +885,24 @@
         },
         {
           id: 8,
-          name: 'YouTube Study Mode Edge Grabber & Collapsed/Expanded Panel',
+          name: 'YouTube Study Mode Edge Grabber Visibility & Off Toggle Dismissal',
           run: () => {
-            toggleEdgePanel(true);
-            const open = !document.getElementById('edge-panel').classList.contains('hidden');
-            toggleEdgePanel(false);
-            const closed = document.getElementById('edge-panel').classList.contains('hidden');
-            return open && closed;
+            // Initially, edge grabber must be hidden
+            switchApp('youtube');
+            isStudyModeActive = false;
+            document.getElementById('edge-grabber-container').classList.add('hidden');
+            const initiallyHidden = document.getElementById('edge-grabber-container').classList.contains('hidden');
+
+            // Activated: edge grabber appears
+            activateStudyModeFromCard();
+            const visibleWhenActive = !document.getElementById('edge-grabber-container').classList.contains('hidden');
+
+            // Toggle OFF: edge grabber vanishes and intervention sheet reappears
+            toggleStudyModeState();
+            const hiddenAfterToggle = document.getElementById('edge-grabber-container').classList.contains('hidden');
+            const sheetRestored = !document.getElementById('intervention-sheet').classList.contains('translate-y-full');
+
+            return initiallyHidden && visibleWhenActive && hiddenAfterToggle && sheetRestored;
           }
         },
         {

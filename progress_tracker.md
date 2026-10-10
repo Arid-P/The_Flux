@@ -27,7 +27,7 @@
 | **User Review Backlog** | Queued for User | Comprehensive interactive & code review checklist compiled in `review_backlog.md` (all 6 screens previewable on Port 8080 review hub or direct ports 8085-8090). |
 | **Responsive Scaling & Orientation (Phase 1-A & Phase 1-B Step 5)** | Completed | Reusable `ResponsiveLayout` utilities (`AppBreakpoints`, `ResponsiveContent`, `AdaptiveScrollBody`), adaptive flip-clock orientation, flexible headers/cards, 48/48 responsive test assertions passing, 140/140 total Flutter tests passing, 0 lints. |
 | **DOM Responsiveness & Island Navigation Synchronization** | Completed | Fixed bottom island mobile revert issue: implemented `navigateTo()` bridge across all 6 mockups with review hub iframe synchronization, timestamp cache-busting, `box-sizing: content-box` for 768px tablet mode, and auto tab sync on iframe load. 100% tests passing. |
-| **Distraction Intervention & Study Mode UI (`ui_distracted_intervention.md`)** | Completed | 2/5/10/20 time window overlay, cooldown wait countdown (5s/10s/15s), YouTube Study Mode card, edge grabber, non-whitelisted video interception, and friction typing confirmation in `ui_mockups/distraction_intervention.html`. 100% tests passing. |
+| **Distraction Intervention & Study Mode UI (`ui_distracted_intervention.md`)** | Completed | 5/10/20/40 time window overlay, 5s auto-vanishing active countdown banner, YouTube Study Mode grabber with off-toggle dismissal, cooldown wait countdown (10s/15s/20s), non-whitelisted video interception, and friction typing confirmation in `ui_mockups/distraction_intervention.html`. Fluid tablet/desktop layout. 100% tests passing. |
 | **Remaining UI and Backend Implementation** | Backlog | Home Widget mockup (`ui_widget.md`), Riverpod state management, Background services, and MethodChannel IPC bridge. |
 
 ---
@@ -152,16 +152,18 @@ Task: Build high-fidelity interactive Distraction Intervention prototype (ui_moc
 Status: COMPLETED & VERIFIED (100% tests passing)
 Specification: prompts_docx/FLUXFOXUS/Phase 1/ui_distracted_intervention.md & ff_design_override.md
 Components:
-- 2/5/10/20 time window overlay over blurred simulated background
+- 5/10/20/40 time window overlay over blurred simulated background
+- 5-second auto-vanishing active session island countdown banner
 - App Info & Streak Counter
 - Spent vs Limit Progress Bar (Rustic Medley palette)
 - YouTube Study Mode Card ("Watch only Study channels on YouTube")
-- 2x2 Time Selection Grid (2m, 5m, 10m, 20m)
+- 2x2 Time Selection Grid (5m, 10m, 20m, 40m)
 - Dynamic "Exit [App]" action
-- Post-duration cooldown wait countdown logic (5s, 10s, 15s)
-- Collapsible & expandable YouTube Study Mode Edge Grabber
+- Post-duration cooldown wait countdown logic (10s, 15s, 20s)
+- Collapsible & expandable YouTube Study Mode Edge Grabber (hidden by default, shown only when Study Mode is ON; disappears when toggled off with intervention sheet restored)
 - Non-whitelisted channel interception sheet ("Got it" vs "Add to Study List")
 - Random sentence typing confirmation sheet with exact-match verification
+- Fluid responsive layout adapting across phone, tablet, and desktop viewports
 - Embedded #auto-test-modal assertion runner (10/10 gates passing)
 - Review hub integration on Port 8080 (Shield tab)
 - 100% automated test coverage in test_intervention_screen.js and test_code2_screens.js
