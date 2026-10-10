@@ -39,6 +39,31 @@
     body { font-family: 'Inter', sans-serif; }
     .custom-scrollbar::-webkit-scrollbar { width: 4px; height: 4px; }
     .custom-scrollbar::-webkit-scrollbar-thumb { background: #594C3D; border-radius: 4px; }
+
+    /* Widget Container Responsive Rules */
+    #widget-wrapper {
+      container-type: inline-size;
+      container-name: widget;
+    }
+
+    /* By default (narrow phone / compact widget, e.g. < 480px): Zone 3 Legend is hidden to prevent cramping */
+    #zone-right-legend {
+      display: none;
+    }
+
+    /* When widget container width >= 480px or viewport is tablet (sm/md breakpoint): reveal Zone 3 Legend */
+    @container widget (min-width: 460px) {
+      #zone-right-legend {
+        display: flex !important;
+      }
+    }
+
+    /* Fallback media query when container query is evaluated against window or tablet viewport */
+    @media (min-width: 640px) {
+      #zone-right-legend {
+        display: flex !important;
+      }
+    }
   </style>
 </head>
 <body class="bg-ff-bg text-ff-text min-h-screen w-full flex flex-col justify-between selection:bg-ff-primary selection:text-ff-bg relative overflow-x-hidden">
@@ -82,8 +107,8 @@
   <!-- MAIN VIEWPORT CONTAINER -->
   <main class="flex-1 w-full max-w-4xl mx-auto p-4 sm:p-6 md:p-8 flex flex-col items-center justify-center relative">
 
-    <!-- SIMULATED ANDROID LAUNCHER CANVAS -->
-    <div id="launcher-canvas" class="w-full max-w-md bg-gradient-to-b from-[#1E2631] via-[#141B24] to-[#0D1218] rounded-[32px] border-2 border-ff-border p-4 shadow-2xl relative overflow-hidden flex flex-col justify-between min-h-[640px]">
+    <!-- SIMULATED ANDROID LAUNCHER CANVAS (ADAPTS FLUIDLY ACROSS PHONE & TABLET) -->
+    <div id="launcher-canvas" class="w-full max-w-md md:max-w-xl lg:max-w-2xl bg-gradient-to-b from-[#1E2631] via-[#141B24] to-[#0D1218] rounded-[32px] border-2 border-ff-border p-4 sm:p-5 shadow-2xl relative overflow-hidden flex flex-col justify-between min-h-[580px] transition-all duration-300">
 
       <!-- Android Launcher Status Bar -->
       <div class="w-full flex items-center justify-between text-[11px] text-ff-muted font-medium pt-1 px-2 select-none">
@@ -110,14 +135,14 @@
       </div>
 
       <!-- THE 4×2 HOME SCREEN WIDGET (ACTUAL COMPONENT UNDER SPEC) -->
-      <div class="w-full my-auto py-2">
+      <div id="widget-wrapper" class="w-full my-auto py-2">
         <div id="widget-container" class="w-full bg-[#2B2F2E] border border-[#594C3D] rounded-2xl p-4 shadow-none relative flex flex-col justify-between transition-all duration-300">
 
-          <!-- 3-ZONE MAIN ROW: LEFT (GLANCE) + CENTER (DONUT) + RIGHT (LEGEND) -->
-          <div class="w-full flex items-center justify-between gap-3">
+          <!-- ADAPTIVE MAIN ROW: 2-ZONE ON MOBILE/COMPACT (<460px), 3-ZONE ON TABLET/WIDE (>=460px) -->
+          <div class="w-full flex items-center justify-between gap-4">
 
             <!-- ZONE 1: LEFT — GLANCE TIME -->
-            <div id="zone-left-glance" class="flex flex-col justify-center min-w-[90px]">
+            <div id="zone-left-glance" class="flex flex-col justify-center min-w-[90px] shrink-0">
               <!-- Optional Live Focus Indicator -->
               <div id="widget-live-indicator" class="hidden items-center space-x-1.5 mb-1">
                 <span class="w-2 h-2 rounded-full bg-ff-primary animate-ping"></span>
@@ -125,18 +150,18 @@
               </div>
 
               <!-- Main Value: Total Screen Time Today -->
-              <div id="glance-time-val" class="text-2xl sm:text-3xl font-bold text-ff-text tracking-tight font-mono">
+              <div id="glance-time-val" class="text-3xl sm:text-4xl font-bold text-ff-text tracking-tight font-mono">
                 3h 9m
               </div>
               <!-- Sub-label -->
-              <div id="glance-sub-label" class="text-[11px] text-ff-muted font-medium mt-0.5">
+              <div id="glance-sub-label" class="text-xs text-ff-muted font-medium mt-0.5">
                 Today's usage
               </div>
             </div>
 
-            <!-- ZONE 2: CENTER — 4-SEGMENT DONUT RING -->
+            <!-- ZONE 2: CENTER / RIGHT-ON-MOBILE — 4-SEGMENT DONUT RING -->
             <div id="zone-center-donut" class="flex items-center justify-center shrink-0">
-              <svg id="donut-svg" class="w-20 h-20 -rotate-90" viewBox="0 0 100 100">
+              <svg id="donut-svg" class="w-24 h-24 -rotate-90" viewBox="0 0 100 100">
                 <!-- Track / Empty Ring -->
                 <circle id="donut-empty-track" cx="50" cy="50" r="38" fill="none" stroke="#13191F" stroke-width="14" />
 
@@ -158,8 +183,8 @@
               </svg>
             </div>
 
-            <!-- ZONE 3: RIGHT — CATEGORY LEGEND (4 ROWS) -->
-            <div id="zone-right-legend" class="flex-1 flex flex-col justify-center space-y-1 text-xs pl-1">
+            <!-- ZONE 3: RIGHT — CATEGORY LEGEND (4 ROWS) (Hidden on mobile/narrow; revealed on tablet/wide) -->
+            <div id="zone-right-legend" class="flex-1 flex-col justify-center space-y-1 text-xs pl-2 border-l border-ff-border/30">
               <!-- Row 1: Productive -->
               <div class="flex items-center justify-between text-[11px]">
                 <div class="flex items-center space-x-1.5">
@@ -428,9 +453,9 @@
       const canvas = document.getElementById('launcher-canvas');
       isLauncherCanvasVisible = !isLauncherCanvasVisible;
       if (isLauncherCanvasVisible) {
-        canvas.className = 'w-full max-w-md bg-gradient-to-b from-[#1E2631] via-[#141B24] to-[#0D1218] rounded-[32px] border-2 border-ff-border p-4 shadow-2xl relative overflow-hidden flex flex-col justify-between min-h-[640px]';
+        canvas.className = 'w-full max-w-md md:max-w-xl lg:max-w-2xl bg-gradient-to-b from-[#1E2631] via-[#141B24] to-[#0D1218] rounded-[32px] border-2 border-ff-border p-4 sm:p-5 shadow-2xl relative overflow-hidden flex flex-col justify-between min-h-[580px] transition-all duration-300';
       } else {
-        canvas.className = 'w-full max-w-md bg-transparent border-none p-0 shadow-none flex flex-col justify-center';
+        canvas.className = 'w-full max-w-md md:max-w-xl lg:max-w-2xl bg-transparent border-none p-0 shadow-none flex flex-col justify-center transition-all duration-300';
       }
     }
 
