@@ -89,13 +89,25 @@ The preview server `serve_mockups.py` is running in your Codespace background. T
 * **URL:** `http://localhost:8080` (click 🛡️ **Intervention** tab) | **File:** [`ui_mockups/distraction_intervention.html`](file:///workspaces/The_Flux/ui_mockups/distraction_intervention.html)
 * **Owner:** Code2
 * **What to verify:**
-  - [ ] **2/5/10/20 Time Option Grid**: Tapping 2m, 5m, 10m, or 20m starts an active window with live ticking timer banner and unblurs the simulated app feed.
-  - [ ] **Cooldown Wait Friction Engine**: Upon window expiry (or tapping "End Now" / "⏳ Cooldown Wait"), overlay slides back up with disabled time buttons and a live countdown timer (`5s` for 2m, `10s` for 5m/10m, `15s` for 20m).
+  - [ ] **5/10/20/40 Time Option Grid**: Tapping 5m, 10m, 20m, or 40m starts an active window with a 5-second auto-vanishing banner and unblurs the simulated app feed.
+  - [ ] **Cooldown Wait Friction Engine**: Upon window expiry (or tapping "End Now" / "⏳ Cooldown Wait"), overlay slides back up with disabled time buttons and a live countdown timer (`10s` for 5m, `15s` for 10m/20m, `20s` for 40m).
   - [ ] **YouTube Study Mode Card**: On YouTube, tap "Watch only Study channels on YouTube" to activate Study Mode, unblur feed, and surface the FF aperture edge grabber on the right screen edge.
-  - [ ] **Edge Grabber & Control Panel**: Tap the edge grabber to expand the horizontal panel with "YouTube Study Mode" toggle switch and close button. Turning toggle OFF restores the intervention overlay.
+  - [ ] **Edge Grabber & Control Panel**: Tap the edge grabber to expand the horizontal panel with "YouTube Study Mode" toggle switch and close button. Turning toggle OFF removes the grabber completely and restores the intervention time selection sheet.
   - [ ] **Non-Whitelisted Video Interception**: Tap "🚫 Non-Study Video" to trigger the intervention dialog ("This channel is not on your study list"). Tap "Add to Study List" to open the friction sentence typing challenge.
   - [ ] **Friction Typing Verification**: Type the exact confirmation sentence into the input field. Submit button enables only on an exact match.
   - [ ] **In-Browser Auto-Test Runner**: Tap "🧪 Auto Tests" to run all 10 assertion gates in the test modal.
+
+#### H. Android Home Screen Widget (4×2) (`Port 8080`)
+* **URL:** `http://localhost:8080` (click 📱 **Widget (4×2)** tab) | **File:** [`ui_mockups/widget.html`](file:///workspaces/The_Flux/ui_mockups/widget.html)
+* **Owner:** Code2
+* **What to verify:**
+  - [ ] **Standard 4×2 Widget Surface**: `#2B2F2E` container with `#594C3D` 1px border, 16px corner radius, and flat 2D zero elevation on simulated launcher canvas.
+  - [ ] **Left Zone (Glance Time)**: Formatted usage time (`3h 9m`), "Today's usage" caption, and pulsing `#CA9C68` dot with "Live" badge when Focus is active.
+  - [ ] **Center Zone (4-Segment Donut Ring)**: SVG donut ring in clockwise order with 2px gaps: Productive (`#4E7D56`), Semi-Productive (`#906D4B`), Distracting (`#38332B`), Others (`#94A3B8`).
+  - [ ] **Right Zone (Category Legend)**: 4-row legend with category color indicators, labels, and formatted usage times (`1h 45m`, `32m`, `40m`, `12m`). Distracting dot features 1px `#594C3D` border.
+  - [ ] **FF Aperture Emblem Branding**: Subtle brand mark in bottom-right corner at 0.4 opacity.
+  - [ ] **Widget State Controls**: Switch between Normal State, Live Focus Active, and Empty / First Launch (`--`).
+  - [ ] **In-Browser Auto-Test Runner**: Tap "🧪 Auto Tests" to run all 10 widget test gates.
 
 ---
 

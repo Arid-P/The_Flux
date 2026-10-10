@@ -237,7 +237,8 @@ const allScreens = [
   'app_limits.html',
   'active_focus_session.html',
   'preset_creation.html',
-  'distraction_intervention.html'
+  'distraction_intervention.html',
+  'widget.html'
 ];
 
 allScreens.forEach(screenName => {
@@ -318,8 +319,58 @@ rusticColors.forEach(color => {
 });
 console.log('  ✓ Intervention Screen Rustic Medley color tokens verified');
 
+// 8. Testing widget.html (Android Home Screen Widget 4×2)
+console.log('\n--- 8. Testing widget.html (Android Home Screen Widget 4×2) ---');
+const widgetHtmlPath = path.join(__dirname, 'ui_mockups', 'widget.html');
+assert(fs.existsSync(widgetHtmlPath), 'widget.html must exist');
+const widgetHtml = fs.readFileSync(widgetHtmlPath, 'utf8');
+
+const requiredWidgetIds = [
+  'widget-container',
+  'zone-left-glance',
+  'widget-live-indicator',
+  'glance-time-val',
+  'glance-sub-label',
+  'zone-center-donut',
+  'donut-svg',
+  'donut-seg-productive',
+  'donut-seg-semi',
+  'donut-seg-distracting',
+  'donut-seg-others',
+  'zone-right-legend',
+  'leg-time-productive',
+  'leg-time-semi',
+  'leg-time-distracting',
+  'leg-time-others',
+  'widget-aperture-brand',
+  'auto-test-modal',
+  'test-results-list'
+];
+
+requiredWidgetIds.forEach(id => {
+  assert(widgetHtml.includes(`id="${id}"`), `Widget must contain #${id}`);
+  console.log(`  ✓ Widget ID present: #${id}`);
+});
+
+const widgetRusticColors = [
+  '#13191F',
+  '#2B2F2E',
+  '#594C3D',
+  '#906D4B',
+  '#CA9C68',
+  '#F8FAFC',
+  '#94A3B8',
+  '#4E7D56',
+  '#38332B'
+];
+
+widgetRusticColors.forEach(color => {
+  assert(widgetHtml.includes(color), `Widget must use Rustic Medley ${color}`);
+});
+console.log('  ✓ Home Screen Widget Rustic Medley color tokens verified');
+
 console.log('\n======================================================');
-console.log('🎉 ALL CODE2 SCREEN TESTS PASSED (Home, App Limits, Planner, Usage Stats, Hub Bridge, Intervention - 100%)');
+console.log('🎉 ALL CODE2 SCREEN TESTS PASSED (Home, App Limits, Planner, Usage Stats, Hub Bridge, Intervention, Widget - 100%)');
 console.log('======================================================\n');
 
 

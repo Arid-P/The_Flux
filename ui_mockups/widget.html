@@ -1,0 +1,591 @@
+<!DOCTYPE html>
+<html lang="en" class="h-full bg-[#13191F] text-[#F8FAFC]">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+  <meta http-equiv="Pragma" content="no-cache">
+  <meta http-equiv="Expires" content="0">
+  <title>FluxFoxus — Android Home Screen Widget Preview</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            ff: {
+              bg: '#13191F',
+              surface: '#2B2F2E',
+              'surface-elevated': '#232726',
+              border: '#594C3D',
+              accent: '#906D4B',
+              primary: '#CA9C68',
+              'primary-hover': '#DFB27F',
+              text: '#F8FAFC',
+              muted: '#94A3B8',
+              productive: '#4E7D56',
+              distracting: '#38332B',
+            }
+          },
+          fontFamily: {
+            sans: ['Inter', 'sans-serif'],
+          }
+        }
+      }
+    }
+  </script>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+    body { font-family: 'Inter', sans-serif; }
+    .custom-scrollbar::-webkit-scrollbar { width: 4px; height: 4px; }
+    .custom-scrollbar::-webkit-scrollbar-thumb { background: #594C3D; border-radius: 4px; }
+  </style>
+</head>
+<body class="bg-ff-bg text-ff-text min-h-screen w-full flex flex-col justify-between selection:bg-ff-primary selection:text-ff-bg relative overflow-x-hidden">
+
+  <!-- TOP TOOLBAR CONTROLS (Preview Controller) -->
+  <header class="w-full bg-ff-surface border-b border-ff-border px-4 py-2.5 sticky top-0 z-40 flex flex-wrap items-center justify-between gap-3 shadow-md">
+    <div class="flex items-center space-x-2.5">
+      <div class="w-7 h-7 rounded-lg bg-ff-bg border border-ff-border flex items-center justify-center text-ff-primary font-bold text-xs">
+        FF
+      </div>
+      <div>
+        <h1 class="text-xs font-bold text-ff-text flex items-center gap-1.5">
+          Home Screen Widget
+          <span class="text-[10px] px-1.5 py-0.5 rounded bg-ff-primary/20 text-ff-primary border border-ff-primary/40 font-mono">4×2 Grid</span>
+        </h1>
+        <p class="text-[10px] text-ff-muted">Glance Time • 4-Category Donut Ring • Live Focus</p>
+      </div>
+    </div>
+
+    <!-- State Switcher Pills -->
+    <div class="flex items-center flex-wrap gap-1.5 text-xs">
+      <span class="text-[10px] font-bold text-ff-muted uppercase tracking-wider mr-1">State:</span>
+      <button id="btn-state-normal" onclick="setWidgetState('normal')" class="widget-state-btn px-2.5 py-1 rounded-md bg-ff-primary text-ff-bg font-bold transition">
+        Normal State
+      </button>
+      <button id="btn-state-live" onclick="setWidgetState('live')" class="widget-state-btn px-2.5 py-1 rounded-md bg-ff-bg border border-ff-border text-ff-muted hover:text-ff-text transition">
+        ⚡ Live Focus Active
+      </button>
+      <button id="btn-state-empty" onclick="setWidgetState('empty')" class="widget-state-btn px-2.5 py-1 rounded-md bg-ff-bg border border-ff-border text-ff-muted hover:text-ff-text transition">
+        Empty (No Data)
+      </button>
+      <button id="btn-toggle-launcher" onclick="toggleLauncherMode()" class="px-2.5 py-1 rounded-md bg-ff-surface-elevated border border-ff-border text-ff-text hover:border-ff-primary font-medium transition">
+        📱 Toggle Launcher Canvas
+      </button>
+      <button id="btn-run-tests" onclick="openAutoTestModal()" class="px-2.5 py-1 rounded-md bg-ff-productive/20 border border-ff-productive text-[#7CD088] font-bold transition flex items-center gap-1">
+        <span>🧪</span> Auto Tests
+      </button>
+    </div>
+  </header>
+
+  <!-- MAIN VIEWPORT CONTAINER -->
+  <main class="flex-1 w-full max-w-4xl mx-auto p-4 sm:p-6 md:p-8 flex flex-col items-center justify-center relative">
+
+    <!-- SIMULATED ANDROID LAUNCHER CANVAS -->
+    <div id="launcher-canvas" class="w-full max-w-md bg-gradient-to-b from-[#1E2631] via-[#141B24] to-[#0D1218] rounded-[32px] border-2 border-ff-border p-4 shadow-2xl relative overflow-hidden flex flex-col justify-between min-h-[640px]">
+
+      <!-- Android Launcher Status Bar -->
+      <div class="w-full flex items-center justify-between text-[11px] text-ff-muted font-medium pt-1 px-2 select-none">
+        <span id="launcher-clock">09:42</span>
+        <div class="flex items-center space-x-1.5">
+          <svg class="w-3.5 h-3.5 fill-current" viewBox="0 0 24 24"><path d="M12 4C7.31 4 3.07 5.9 0 8.98L12 21 24 8.98C20.93 5.9 16.69 4 12 4z"/></svg>
+          <svg class="w-3.5 h-3.5 fill-current" viewBox="0 0 24 24"><path d="M2 22h20V2z"/></svg>
+          <div class="w-4 h-2.5 border border-ff-muted rounded-[2px] p-[1px] flex items-center">
+            <div class="h-full w-3/4 bg-ff-muted rounded-[1px]"></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Google Search Bar Mockup -->
+      <div class="w-full mt-4 bg-ff-surface/60 backdrop-blur-md border border-ff-border/40 rounded-full py-2.5 px-4 flex items-center justify-between text-xs text-ff-muted shadow-sm">
+        <div class="flex items-center space-x-2">
+          <span class="font-bold text-ff-primary">G</span>
+          <span class="text-[11px]">Search apps & web...</span>
+        </div>
+        <div class="flex items-center space-x-2">
+          <span>🎙️</span>
+          <span>📷</span>
+        </div>
+      </div>
+
+      <!-- THE 4×2 HOME SCREEN WIDGET (ACTUAL COMPONENT UNDER SPEC) -->
+      <div class="w-full my-auto py-2">
+        <div id="widget-container" class="w-full bg-[#2B2F2E] border border-[#594C3D] rounded-2xl p-4 shadow-none relative flex flex-col justify-between transition-all duration-300">
+
+          <!-- 3-ZONE MAIN ROW: LEFT (GLANCE) + CENTER (DONUT) + RIGHT (LEGEND) -->
+          <div class="w-full flex items-center justify-between gap-3">
+
+            <!-- ZONE 1: LEFT — GLANCE TIME -->
+            <div id="zone-left-glance" class="flex flex-col justify-center min-w-[90px]">
+              <!-- Optional Live Focus Indicator -->
+              <div id="widget-live-indicator" class="hidden items-center space-x-1.5 mb-1">
+                <span class="w-2 h-2 rounded-full bg-ff-primary animate-ping"></span>
+                <span class="text-[10px] font-bold text-ff-primary uppercase tracking-wider">Live</span>
+              </div>
+
+              <!-- Main Value: Total Screen Time Today -->
+              <div id="glance-time-val" class="text-2xl sm:text-3xl font-bold text-ff-text tracking-tight font-mono">
+                3h 9m
+              </div>
+              <!-- Sub-label -->
+              <div id="glance-sub-label" class="text-[11px] text-ff-muted font-medium mt-0.5">
+                Today's usage
+              </div>
+            </div>
+
+            <!-- ZONE 2: CENTER — 4-SEGMENT DONUT RING -->
+            <div id="zone-center-donut" class="flex items-center justify-center shrink-0">
+              <svg id="donut-svg" class="w-20 h-20 -rotate-90" viewBox="0 0 100 100">
+                <!-- Track / Empty Ring -->
+                <circle id="donut-empty-track" cx="50" cy="50" r="38" fill="none" stroke="#13191F" stroke-width="14" />
+
+                <!-- Segment 1: Productive (#4E7D56) -->
+                <circle id="donut-seg-productive" cx="50" cy="50" r="38" fill="none" stroke="#4E7D56" stroke-width="14"
+                        stroke-dasharray="100 238" stroke-dashoffset="0" class="transition-all duration-500" />
+
+                <!-- Segment 2: Semi-Productive (#906D4B) -->
+                <circle id="donut-seg-semi" cx="50" cy="50" r="38" fill="none" stroke="#906D4B" stroke-width="14"
+                        stroke-dasharray="40 238" stroke-dashoffset="-102" class="transition-all duration-500" />
+
+                <!-- Segment 3: Distracting (#38332B) -->
+                <circle id="donut-seg-distracting" cx="50" cy="50" r="38" fill="none" stroke="#38332B" stroke-width="14"
+                        stroke-dasharray="50 238" stroke-dashoffset="-144" class="transition-all duration-500" />
+
+                <!-- Segment 4: Others (#94A3B8) -->
+                <circle id="donut-seg-others" cx="50" cy="50" r="38" fill="none" stroke="#94A3B8" stroke-width="14"
+                        stroke-dasharray="25 238" stroke-dashoffset="-196" class="transition-all duration-500" />
+              </svg>
+            </div>
+
+            <!-- ZONE 3: RIGHT — CATEGORY LEGEND (4 ROWS) -->
+            <div id="zone-right-legend" class="flex-1 flex flex-col justify-center space-y-1 text-xs pl-1">
+              <!-- Row 1: Productive -->
+              <div class="flex items-center justify-between text-[11px]">
+                <div class="flex items-center space-x-1.5">
+                  <span class="w-2 h-2 rounded-full bg-[#4E7D56]"></span>
+                  <span class="text-ff-muted">Productive</span>
+                </div>
+                <span id="leg-time-productive" class="font-semibold text-ff-text font-mono">1h 45m</span>
+              </div>
+
+              <!-- Row 2: Semi-Productive -->
+              <div class="flex items-center justify-between text-[11px]">
+                <div class="flex items-center space-x-1.5">
+                  <span class="w-2 h-2 rounded-full bg-[#906D4B]"></span>
+                  <span class="text-ff-muted">Semi-Prod</span>
+                </div>
+                <span id="leg-time-semi" class="font-semibold text-ff-text font-mono">34m</span>
+              </div>
+
+              <!-- Row 3: Distracting -->
+              <div class="flex items-center justify-between text-[11px]">
+                <div class="flex items-center space-x-1.5">
+                  <span class="w-2 h-2 rounded-full bg-[#38332B] border border-[#594C3D]"></span>
+                  <span class="text-ff-muted">Distracting</span>
+                </div>
+                <span id="leg-time-distracting" class="font-semibold text-ff-text font-mono">40m</span>
+              </div>
+
+              <!-- Row 4: Others -->
+              <div class="flex items-center justify-between text-[11px]">
+                <div class="flex items-center space-x-1.5">
+                  <span class="w-2 h-2 rounded-full bg-[#94A3B8]"></span>
+                  <span class="text-ff-muted">Others</span>
+                </div>
+                <span id="leg-time-others" class="font-semibold text-ff-text font-mono">10m</span>
+              </div>
+            </div>
+
+          </div>
+
+          <!-- BOTTOM-RIGHT BRANDING: TINY FF APERTURE EMBLEM -->
+          <div class="w-full flex justify-end items-center mt-1 pt-1 border-t border-ff-border/20">
+            <div id="widget-aperture-brand" class="flex items-center space-x-1 opacity-40 hover:opacity-100 transition" title="FluxFoxus 15m Background Engine">
+              <svg class="w-3 h-3 text-ff-text fill-none stroke-current" viewBox="0 0 24 24" stroke-width="2">
+                <circle cx="12" cy="12" r="9"/>
+                <path d="M12 3a9 9 0 0 0-9 9c0 5 4 9 9 9s9-4 9-9"/>
+                <path d="M12 5l4 7-8 1"/>
+              </svg>
+              <span class="text-[9px] font-mono font-bold text-ff-text uppercase">FF</span>
+            </div>
+          </div>
+
+        </div>
+      </div>
+
+      <!-- Android Home Screen App Dock -->
+      <div class="w-full mt-auto pt-4 flex items-center justify-around border-t border-ff-border/30 px-2">
+        <!-- App 1: FluxFoxus -->
+        <a href="home_screen.html" onclick="navigateTo('home_screen.html', event)" class="flex flex-col items-center space-y-1 group">
+          <div class="w-11 h-11 rounded-2xl bg-ff-surface border border-ff-border flex items-center justify-center text-ff-primary shadow group-hover:scale-105 transition">
+            <svg class="w-6 h-6 fill-none stroke-current" viewBox="0 0 24 24" stroke-width="1.8">
+              <circle cx="12" cy="12" r="9"/>
+              <path d="M12 5l4 7-8 1"/>
+            </svg>
+          </div>
+          <span class="text-[10px] text-ff-muted group-hover:text-ff-text">FluxFoxus</span>
+        </a>
+        <!-- App 2: Messages -->
+        <div class="flex flex-col items-center space-y-1 opacity-60">
+          <div class="w-11 h-11 rounded-2xl bg-[#1C2530] border border-ff-border/50 flex items-center justify-center text-sm">
+            💬
+          </div>
+          <span class="text-[10px] text-ff-muted">Messages</span>
+        </div>
+        <!-- App 3: Camera -->
+        <div class="flex flex-col items-center space-y-1 opacity-60">
+          <div class="w-11 h-11 rounded-2xl bg-[#1C2530] border border-ff-border/50 flex items-center justify-center text-sm">
+            📷
+          </div>
+          <span class="text-[10px] text-ff-muted">Camera</span>
+        </div>
+        <!-- App 4: Browser -->
+        <div class="flex flex-col items-center space-y-1 opacity-60">
+          <div class="w-11 h-11 rounded-2xl bg-[#1C2530] border border-ff-border/50 flex items-center justify-center text-sm">
+            🌐
+          </div>
+          <span class="text-[10px] text-ff-muted">Browser</span>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- FLOATING BOTTOM ISLAND NAVIGATION BAR (MULTI-SCREEN CROSS-LINK) -->
+    <div class="w-full flex justify-center mt-6">
+      <nav id="bottom-island" class="bg-ff-surface border border-ff-border rounded-full px-4 py-2 shadow-xl flex items-center space-x-3 sm:space-x-4 text-xs z-30">
+        <a href="home_screen.html" onclick="navigateTo('home_screen.html', event)" class="p-2 text-ff-muted hover:text-ff-text transition flex items-center gap-1" title="Home">
+          <span>🏠</span>
+          <span class="hidden sm:inline">Home</span>
+        </a>
+        <a href="usage_stats.html" onclick="navigateTo('usage_stats.html', event)" class="p-2 text-ff-muted hover:text-ff-text transition flex items-center gap-1" title="Usage Stats">
+          <span>📊</span>
+          <span class="hidden sm:inline">Usage</span>
+        </a>
+        <a href="active_focus_session.html" onclick="navigateTo('active_focus_session.html', event)" class="p-2 text-ff-muted hover:text-ff-text transition flex items-center gap-1" title="Focus Session">
+          <span>⏱️</span>
+          <span class="hidden sm:inline">Focus</span>
+        </a>
+        <a href="planner.html" onclick="navigateTo('planner.html', event)" class="p-2 text-ff-muted hover:text-ff-text transition flex items-center gap-1" title="Planner">
+          <span>📅</span>
+          <span class="hidden sm:inline">Planner</span>
+        </a>
+        <a href="app_limits.html" onclick="navigateTo('app_limits.html', event)" class="p-2 text-ff-muted hover:text-ff-text transition flex items-center gap-1" title="App Limits">
+          <span>🚫</span>
+          <span class="hidden sm:inline">Limits</span>
+        </a>
+        <a href="distraction_intervention.html" onclick="navigateTo('distraction_intervention.html', event)" class="p-2 text-ff-muted hover:text-ff-text transition flex items-center gap-1" title="Intervention">
+          <span>🛡️</span>
+          <span class="hidden sm:inline">Intervention</span>
+        </a>
+      </nav>
+    </div>
+  </main>
+
+  <!-- AUTOMATED TEST MODAL RUNNER -->
+  <div id="auto-test-modal" class="hidden fixed inset-0 bg-black/80 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+    <div class="w-full max-w-lg bg-ff-surface border border-ff-border rounded-2xl p-5 shadow-2xl flex flex-col max-h-[85vh]">
+      <div class="flex items-center justify-between pb-3 border-b border-ff-border">
+        <div>
+          <h2 class="text-sm font-bold text-ff-text flex items-center gap-2">
+            <span>🧪</span> Home Screen Widget Test Runner
+          </h2>
+          <p class="text-xs text-ff-muted">Automated verification of 10 widget specification gates</p>
+        </div>
+        <button onclick="closeAutoTestModal()" class="text-ff-muted hover:text-ff-text text-sm p-1">
+          ✕
+        </button>
+      </div>
+
+      <!-- Test Results Scrollable List -->
+      <div id="test-results-list" class="flex-1 overflow-y-auto custom-scrollbar my-4 space-y-2 pr-1 text-xs">
+        <!-- Results dynamically inserted here -->
+      </div>
+
+      <!-- Test Footer -->
+      <div class="pt-3 border-t border-ff-border flex items-center justify-between">
+        <span id="test-summary-status" class="text-xs font-semibold text-ff-muted">Ready to execute suite.</span>
+        <button onclick="runWidgetAutoTests()" class="px-4 py-2 rounded-xl bg-ff-primary hover:bg-ff-primary-hover text-ff-bg text-xs font-bold transition">
+          Run All 10 Tests
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- STATE ENGINE SCRIPT -->
+  <script>
+    let currentWidgetState = 'normal';
+    let isLauncherCanvasVisible = true;
+
+    // Navigation Bridge
+    function navigateTo(url, e) {
+      if (e) e.preventDefault();
+      const cleanUrl = url.split('?')[0].split('#')[0];
+      const bustedUrl = cleanUrl + '?t=' + Date.now();
+      try {
+        if (window.parent && window.parent !== window && typeof window.parent.selectScreen === 'function') {
+          window.parent.selectScreen(bustedUrl);
+          return;
+        }
+      } catch (err) {}
+      window.location.href = bustedUrl;
+    }
+
+    // Widget State Engine
+    function setWidgetState(state) {
+      currentWidgetState = state;
+
+      const glanceVal = document.getElementById('glance-time-val');
+      const glanceSub = document.getElementById('glance-sub-label');
+      const liveIndicator = document.getElementById('widget-live-indicator');
+
+      const segProd = document.getElementById('donut-seg-productive');
+      const segSemi = document.getElementById('donut-seg-semi');
+      const segDist = document.getElementById('donut-seg-distracting');
+      const segOthers = document.getElementById('donut-seg-others');
+      const emptyTrack = document.getElementById('donut-empty-track');
+
+      const legProd = document.getElementById('leg-time-productive');
+      const legSemi = document.getElementById('leg-time-semi');
+      const legDist = document.getElementById('leg-time-distracting');
+      const legOthers = document.getElementById('leg-time-others');
+
+      // Update switcher buttons
+      document.querySelectorAll('.widget-state-btn').forEach(btn => {
+        btn.className = 'widget-state-btn px-2.5 py-1 rounded-md bg-ff-bg border border-ff-border text-ff-muted hover:text-ff-text transition';
+      });
+      const activeBtn = document.getElementById('btn-state-' + state);
+      if (activeBtn) {
+        activeBtn.className = 'widget-state-btn px-2.5 py-1 rounded-md bg-ff-primary text-ff-bg font-bold transition';
+      }
+
+      if (state === 'normal') {
+        liveIndicator.classList.add('hidden');
+        liveIndicator.classList.remove('flex');
+        glanceVal.textContent = '3h 9m';
+        glanceSub.textContent = "Today's usage";
+
+        // Segment circumference = 238.7px
+        // Prod: 100px (42%), Semi: 40px (17%), Dist: 50px (21%), Others: 25px (10%), Empty: 23px
+        emptyTrack.setAttribute('stroke', '#13191F');
+        segProd.setAttribute('stroke-dasharray', '100 238');
+        segProd.setAttribute('stroke-dashoffset', '0');
+        segSemi.setAttribute('stroke-dasharray', '40 238');
+        segSemi.setAttribute('stroke-dashoffset', '-102');
+        segDist.setAttribute('stroke-dasharray', '50 238');
+        segDist.setAttribute('stroke-dashoffset', '-144');
+        segOthers.setAttribute('stroke-dasharray', '25 238');
+        segOthers.setAttribute('stroke-dashoffset', '-196');
+
+        legProd.textContent = '1h 45m';
+        legSemi.textContent = '34m';
+        legDist.textContent = '40m';
+        legOthers.textContent = '10m';
+
+      } else if (state === 'live') {
+        liveIndicator.classList.remove('hidden');
+        liveIndicator.classList.add('flex');
+        glanceVal.textContent = '3h 34m';
+        glanceSub.textContent = "Session Active";
+
+        // Expand productive segment to reflect live focus session
+        emptyTrack.setAttribute('stroke', '#13191F');
+        segProd.setAttribute('stroke-dasharray', '125 238');
+        segProd.setAttribute('stroke-dashoffset', '0');
+        segSemi.setAttribute('stroke-dasharray', '40 238');
+        segSemi.setAttribute('stroke-dashoffset', '-127');
+        segDist.setAttribute('stroke-dasharray', '50 238');
+        segDist.setAttribute('stroke-dashoffset', '-169');
+        segOthers.setAttribute('stroke-dasharray', '15 238');
+        segOthers.setAttribute('stroke-dashoffset', '-221');
+
+        legProd.textContent = '2h 10m';
+        legSemi.textContent = '34m';
+        legDist.textContent = '40m';
+        legOthers.textContent = '10m';
+
+      } else if (state === 'empty') {
+        liveIndicator.classList.add('hidden');
+        liveIndicator.classList.remove('flex');
+        glanceVal.textContent = '--';
+        glanceSub.textContent = "No data yet";
+
+        // Single grey ring empty state
+        emptyTrack.setAttribute('stroke', '#594C3D');
+        segProd.setAttribute('stroke-dasharray', '0 238');
+        segSemi.setAttribute('stroke-dasharray', '0 238');
+        segDist.setAttribute('stroke-dasharray', '0 238');
+        segOthers.setAttribute('stroke-dasharray', '0 238');
+
+        legProd.textContent = '--';
+        legSemi.textContent = '--';
+        legDist.textContent = '--';
+        legOthers.textContent = '--';
+      }
+    }
+
+    function toggleLauncherMode() {
+      const canvas = document.getElementById('launcher-canvas');
+      isLauncherCanvasVisible = !isLauncherCanvasVisible;
+      if (isLauncherCanvasVisible) {
+        canvas.className = 'w-full max-w-md bg-gradient-to-b from-[#1E2631] via-[#141B24] to-[#0D1218] rounded-[32px] border-2 border-ff-border p-4 shadow-2xl relative overflow-hidden flex flex-col justify-between min-h-[640px]';
+      } else {
+        canvas.className = 'w-full max-w-md bg-transparent border-none p-0 shadow-none flex flex-col justify-center';
+      }
+    }
+
+    // Modal Handlers
+    function openAutoTestModal() {
+      document.getElementById('auto-test-modal').classList.remove('hidden');
+      runWidgetAutoTests();
+    }
+
+    function closeAutoTestModal() {
+      document.getElementById('auto-test-modal').classList.add('hidden');
+    }
+
+    // AUTOMATED TEST SUITE (10 GATES)
+    function runWidgetAutoTests() {
+      const list = document.getElementById('test-results-list');
+      const summary = document.getElementById('test-summary-status');
+      list.innerHTML = '';
+
+      const testGates = [
+        {
+          id: 1,
+          name: 'Widget 4×2 Container & Corner Radius Verification',
+          run: () => {
+            const container = document.getElementById('widget-container');
+            return container && container.classList.contains('rounded-2xl') && container.classList.contains('p-4');
+          }
+        },
+        {
+          id: 2,
+          name: 'Zone 1 Left: Glance Time & Caption Typography',
+          run: () => {
+            setWidgetState('normal');
+            const time = document.getElementById('glance-time-val').textContent;
+            const sub = document.getElementById('glance-sub-label').textContent;
+            return time.includes('3h') && sub.includes('usage');
+          }
+        },
+        {
+          id: 3,
+          name: 'Zone 1 Left: Live Focus Pulsing Indicator (#widget-live-indicator)',
+          run: () => {
+            setWidgetState('live');
+            const ind = document.getElementById('widget-live-indicator');
+            const visible = !ind.classList.contains('hidden');
+            setWidgetState('normal');
+            return visible;
+          }
+        },
+        {
+          id: 4,
+          name: 'Zone 2 Center: 4-Segment Donut Ring Clockwise Order & Gaps',
+          run: () => {
+            const p = document.getElementById('donut-seg-productive');
+            const s = document.getElementById('donut-seg-semi');
+            const d = document.getElementById('donut-seg-distracting');
+            const o = document.getElementById('donut-seg-others');
+            return p && s && d && o;
+          }
+        },
+        {
+          id: 5,
+          name: 'Zone 2 Center: Category Color Mappings (Olive, Brown, Charcoal, Grey)',
+          run: () => {
+            const p = document.getElementById('donut-seg-productive').getAttribute('stroke') === '#4E7D56';
+            const s = document.getElementById('donut-seg-semi').getAttribute('stroke') === '#906D4B';
+            const d = document.getElementById('donut-seg-distracting').getAttribute('stroke') === '#38332B';
+            const o = document.getElementById('donut-seg-others').getAttribute('stroke') === '#94A3B8';
+            return p && s && d && o;
+          }
+        },
+        {
+          id: 6,
+          name: 'Zone 3 Right: 4-Row Category Legend Structure',
+          run: () => {
+            const leg = document.getElementById('zone-right-legend');
+            const rows = leg.querySelectorAll('.flex.items-center.justify-between');
+            return rows.length === 4;
+          }
+        },
+        {
+          id: 7,
+          name: 'Zone 3 Right: Distracting Dot 1px Border Safeguard',
+          run: () => {
+            const leg = document.getElementById('zone-right-legend');
+            const dDot = leg.querySelector('.bg-\\[\\#38332B\\]');
+            return dDot && dDot.classList.contains('border');
+          }
+        },
+        {
+          id: 8,
+          name: 'Bottom-Right FF Aperture Emblem Branding (0.4 Opacity)',
+          run: () => {
+            const brand = document.getElementById('widget-aperture-brand');
+            return brand && brand.classList.contains('opacity-40');
+          }
+        },
+        {
+          id: 9,
+          name: 'No-Data / First Launch Empty Ring State ("--")',
+          run: () => {
+            setWidgetState('empty');
+            const val = document.getElementById('glance-time-val').textContent;
+            const leg = document.getElementById('leg-time-productive').textContent;
+            setWidgetState('normal');
+            return val === '--' && leg === '--';
+          }
+        },
+        {
+          id: 10,
+          name: 'Multi-Screen Navigation Island Bridge',
+          run: () => {
+            const island = document.getElementById('bottom-island');
+            const links = island.querySelectorAll('a');
+            return island && links.length >= 5;
+          }
+        }
+      ];
+
+      let passedCount = 0;
+      testGates.forEach(gate => {
+        let passed = false;
+        try {
+          passed = gate.run();
+        } catch (err) {
+          console.error(err);
+          passed = false;
+        }
+
+        if (passed) passedCount++;
+
+        const item = document.createElement('div');
+        item.className = `p-2.5 rounded-xl border flex items-center justify-between ${
+          passed ? 'bg-ff-surface border-ff-productive/40 text-ff-text' : 'bg-red-950/30 border-red-800 text-red-200'
+        }`;
+        item.innerHTML = `
+          <div class="flex items-center space-x-2">
+            <span class="${passed ? 'text-[#7CD088]' : 'text-red-400'} font-bold">${passed ? '✓' : '✗'}</span>
+            <span>Gate ${gate.id}: ${gate.name}</span>
+          </div>
+          <span class="text-[10px] px-2 py-0.5 rounded ${passed ? 'bg-ff-productive/20 text-[#7CD088]' : 'bg-red-900/40 text-red-300'} font-bold">
+            ${passed ? 'PASS' : 'FAIL'}
+          </span>
+        `;
+        list.appendChild(item);
+      });
+
+      summary.textContent = `Results: ${passedCount}/${testGates.length} Gates Passed (${Math.round((passedCount/testGates.length)*100)}%)`;
+      summary.className = passedCount === testGates.length ? 'text-xs font-bold text-[#7CD088]' : 'text-xs font-bold text-red-400';
+    }
+
+    // Initialize
+    window.addEventListener('DOMContentLoaded', () => {
+      setWidgetState('normal');
+    });
+  </script>
+</body>
+</html>

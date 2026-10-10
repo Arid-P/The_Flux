@@ -28,7 +28,8 @@
 | **Responsive Scaling & Orientation (Phase 1-A & Phase 1-B Step 5)** | Completed | Reusable `ResponsiveLayout` utilities (`AppBreakpoints`, `ResponsiveContent`, `AdaptiveScrollBody`), adaptive flip-clock orientation, flexible headers/cards, 48/48 responsive test assertions passing, 140/140 total Flutter tests passing, 0 lints. |
 | **DOM Responsiveness & Island Navigation Synchronization** | Completed | Fixed bottom island mobile revert issue: implemented `navigateTo()` bridge across all 6 mockups with review hub iframe synchronization, timestamp cache-busting, `box-sizing: content-box` for 768px tablet mode, and auto tab sync on iframe load. 100% tests passing. |
 | **Distraction Intervention & Study Mode UI (`ui_distracted_intervention.md`)** | Completed | 5/10/20/40 time window overlay, 5s auto-vanishing active countdown banner, YouTube Study Mode grabber with off-toggle dismissal, cooldown wait countdown (10s/15s/20s), non-whitelisted video interception, and friction typing confirmation in `ui_mockups/distraction_intervention.html`. Fluid tablet/desktop layout. 100% tests passing. |
-| **Remaining UI and Backend Implementation** | Backlog | Home Widget mockup (`ui_widget.md`), Riverpod state management, Background services, and MethodChannel IPC bridge. |
+| **Home Screen Widget UI Mockup (`ui_widget.md`)** | Completed | Standard 4×2 Android widget container, Left Zone glance time + live focus pulsing dot, Center Zone 4-segment SVG donut ring with 2px gaps, Right Zone 4-row category legend, FF aperture branding, and 10 assertion gates in `ui_mockups/widget.html`. 100% tests passing. |
+| **Remaining UI and Backend Implementation** | Backlog | Riverpod state management, Background services, and MethodChannel IPC bridge. |
 
 ---
 
@@ -58,6 +59,7 @@
 - [x] Distraction Intervention UI Prototype completed: High-fidelity interactive 2/5/10/20 time window overlay, cooldown wait friction countdown (5s/10s/15s), YouTube Study Mode card & edge grabber, non-whitelisted video interception, and friction typing confirmation in `ui_mockups/distraction_intervention.html`. 100% tests passing.
 - [x] Phase 1-B Step 10 completed: Streaks system and daily evaluation (`StreakRecord` domain entity, `StreakRepository` CRUD with atomic increments and longest streak tracking, neutral days `minimumSessionsPerDay=0`, `FocusSessionRepository` daily date queries, `StreakEvaluationService` per TRD §5.3.1, WorkManager background task scheduler, 15 new unit tests, 155/155 total suite tests passing, 0 lints).
 - [x] Phase 1-C Step 11 completed: Accessibility Service and App Detection (`FluxFoxusAccessibilityService.kt`, MethodChannel `com.fluxfoxus/accessibility_service`, `AppDetectionService` bridge, `SessionBlockingEnforcer` focus session redirect logic, 12 new unit and platform tests, 167/167 total suite tests passing, 0 lints).
+- [x] Android Home Screen Widget UI Mockup (`ui_widget.md`) completed: Standard 4×2 widget container, Left Zone glance time + live focus pulsing dot, Center Zone 4-segment SVG donut ring with 2px gaps, Right Zone 4-row category legend, FF aperture branding, and 10 assertion gates in `ui_mockups/widget.html`. 100% tests passing.
 
 ---
 
@@ -143,8 +145,25 @@
 ## 4. Backlog
 - [ ] Remaining UI screens generation:
   - [x] 2/5/10/20 Distraction Intervention (`ui_distracted_intervention.md`) -> **COMPLETED by Code2**
-  - [ ] Home Widget (`ui_widget.md`)
+  - [ ] Home Widget (`ui_widget.md`) -> **IN PROGRESS by Code2**
 - [ ] Remaining Flutter Phase 2, 3, and 4 feature implementations.
+
+#### Active Task for C2 (Home Screen Widget Mockup)
+```text
+Task: Build interactive Android Home Screen Widget prototype (ui_mockups/widget.html).
+Status: IN PROGRESS
+Specification: prompts_docx/FLUXFOXUS/Phase 1/ui_widget.md & ff_design_override.md
+Components:
+- Standard 4x2 Android widget container in Rustic Medley palette (#2B2F2E surface, #594C3D border, rounded-2xl)
+- Left Zone: Glance time display ("3h 9m" in Ghost White #F8FAFC) + "Today's usage" sub-label
+- Center Zone: 4-segment SVG donut ring (Productive #4E7D56, Semi-Prod #906D4B, Distracting #38332B, Others #94A3B8) with 2px gaps
+- Right Zone: Category legend rows with color dots, labels, and individual time breakdowns
+- Bottom-Right Branding: Tiny FF aperture emblem (opacity 0.4)
+- Interactive States: Normal today breakdown, Live Focus active (pulsing #CA9C68 dot + ticking time), No-data first launch ("--")
+- Simulated Android Launcher canvas with wallpaper, dock, and app icons for authentic glance preview
+- Embedded #auto-test-modal runner with 10 assertion gates
+- Integration into Port 8080 unified review hub
+```
 
 #### Completed Task for C2 (Distraction Intervention & Study Mode Mockup)
 ```text

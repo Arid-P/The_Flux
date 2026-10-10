@@ -104,20 +104,24 @@ All screens live in `ui_mockups/` and are served via background Python HTTP serv
 
 ## 5. Next Task to Execute (Queued Task)
 
-* **Status:** `IDLE` (Task completed & verified).
-* **Completed Task:** `Distraction Intervention & YouTube Study Mode UI Mockup`
-  - Created and refined `ui_mockups/distraction_intervention.html` per `prompts_docx/FLUXFOXUS/Phase 1/ui_distracted_intervention.md`, `ff_design_override.md`, and user feedback.
-  - Implemented 5/10/20/40 bottom-sheet intervention overlay on top of blurred app content.
-  - Active session island countdown banner auto-vanishes after 5 seconds.
-  - YouTube Study Mode edge grabber tab is hidden by default and only visible while Study Mode is ON in YouTube; turning Study Mode off via toggle hides the tab completely and restores the intervention time selection screen.
-  - Fluid responsive layout replacing narrow smartphone constraints, expanding across tablet, landscape, and desktop viewports.
-  - Non-whitelisted channel interception banner with friction confirmation sentence typing flow.
-  - In-browser `#auto-test-modal` assertion runner (10/10 gates passing).
-  - Integrated into `ui_mockups/index.html` (port 8080 unified review hub) with 🛡️ Intervention tab.
-  - Test suites: `test_intervention_screen.js` (100% pass) and `test_code2_screens.js` (Section 7, 100% pass).
+* **Status:** `IDLE` (All Phase 1 UI Mockups completed & verified).
+* **Completed Tasks:**
+  1. **Distraction Intervention & YouTube Study Mode UI Mockup** (`ui_mockups/distraction_intervention.html`):
+     - Created and refined per `ui_distracted_intervention.md` and user feedback.
+     - 5/10/20/40 time options, 5s auto-vanishing active countdown banner, YouTube Study Mode grabber with off-toggle dismissal, cooldown wait (10s/15s/20s), channel whitelist typing confirmation, and 10 assertion gates (100% pass).
+  2. **Android Home Screen Widget (4×2) UI Mockup** (`ui_mockups/widget.html`):
+     - Created per `prompts_docx/FLUXFOXUS/Phase 1/ui_widget.md` and `ff_design_override.md`.
+     - Standard 4×2 container with Rustic Medley `#2B2F2E` surface, `#594C3D` border, 16px corner radius, and flat 2D zero elevation.
+     - Left Zone: Glance usage time (`3h 9m`), "Today's usage" caption, pulsing Amber Autumn (`#CA9C68`) live dot + "Live" badge when Focus is active.
+     - Center Zone: 4-segment SVG donut ring (clockwise: Productive `#4E7D56`, Semi `#906D4B`, Distracting `#38332B`, Others `#94A3B8`) with 2px gaps.
+     - Right Zone: 4-row category legend with formatted usage times and 1px border safeguard on charcoal distracting dot.
+     - Bottom-Right: Subtle FF camera aperture emblem watermark (opacity 0.4).
+     - Switchable widget states: Normal State, Live Focus Active, Empty / First Launch (`--`).
+     - In-browser `#auto-test-modal` test runner (10/10 gates passing) and integrated into Port 8080 unified review hub (`ui_mockups/index.html`).
+     - Dedicated test runner `test_widget_screen.js` and Section 8 in `test_code2_screens.js` passing 100%.
 * **Subsequent Backlog Tasks:**
-  - Home Widget mockup (`ui_widget.md` -> `ui_mockups/widget.html`).
-  - Integration with native Flutter screens as directed by user.
+  - Standby for user design feedback on Home Screen Widget or Distraction Intervention.
+  - Coordinate with `Code1` when transitioning to native Flutter implementation of remaining Phase 1 screens.
 
 ---
 

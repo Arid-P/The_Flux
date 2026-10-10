@@ -10,7 +10,7 @@ This registry coordinates concurrent/subsequent AI coding agents working in this
 | Agent Name | Role / Specialty | Status | Branch | Current Task / Active Scope | Reserved / Active Files | Port(s) Used |
 |---|---|---|---|---|---|---|
 | **Code1** | Lead UI Designer | **ACTIVE** | `ff` | Phase 1-C Step 11 Completed (167/167 tests passing, 0 lints). Starting Phase 1-C Step 12: UsageStats Integration (`UsageStatsManager` Kotlin bridge, `com.fluxfoxus/usage_stats` MethodChannel, 7-day rolling average calculation in Hive, default categorization). | `fluxfoxus/lib/features/usage_stats/`, `fluxfoxus/android/app/src/main/`, `progress_tracker.md`, `agent_worklog.md` | None (all quiet) |
-| **Code2** | Companion UI Designer / Responsive Architect | **IDLE** | `ff` | COMPLETED & VERIFIED: Phase 1 UI Mockup — Distraction Intervention (`ui_mockups/distraction_intervention.html`) with 2/5/10/20 time window, cooldown friction wait, YouTube Study Mode, Edge Grabber, and Channel Whitelist typing verification. 100% tests passing. | `ui_mockups/distraction_intervention.html`, `ui_mockups/index.html`, `test_intervention_screen.js` | `8080` (Unified Hub) |
+| **Code2** | Companion UI Designer / Responsive Architect | **IDLE** | `ff` | Completed: Phase 1 UI Mockup Home Screen Widget (`ui_mockups/widget.html`) per `ui_widget.md` (4x2 donut ring widget, glance time, category legend, live focus state, no-data state, Android launcher preview, 10/10 auto-tests passing, unified hub integrated). Headless tests pass 100%. | None | `8080` (Unified Hub) |
 | **Code3** | Context & Documentation Manager | **IDLE** | `ff` | Completed: (1) Updated code3.md role. (2) Created 13 context/memory files in `.c3_context/`. (3) Generated comprehensive `README.md`. (4) Expanded root `.gitignore` for full Flutter/Android/Python/Node stack. | `.c3_context/` (exclusive), `README.md`, `code3.md`, `.gitignore` | None |
 
 ---
@@ -151,22 +151,19 @@ This registry coordinates concurrent/subsequent AI coding agents working in this
   - Refactored HTML mockups (`home_screen.html`, `active_focus_session.html`, `planner.html`, `preset_creation.html`, `app_limits.html`, `usage_stats.html`, `index.html`) so internal screens adapt responsively to viewport simulator dimensions (320px, 390px, 640px, 768px, 1024px, 100% full window), utilizing full width/height with dynamic grid layouts (`md:grid-cols-2`, `lg:grid-cols-3`), responsive flip-clock orientation (horizontal split seam cards), and centered navigation/floating action buttons.
 * **What `Code2` is doing right now:**
   - `IDLE` / Standing by for user feedback.
-  - Completed & Refined **Phase 1 UI Mockup: Distraction Intervention** (`ui_mockups/distraction_intervention.html`):
-    - 5/10/20/40 time window overlay with blurred app backdrop.
-    - Active session island countdown banner auto-vanishes after 5 seconds per user feedback.
-    - YouTube Study Mode edge grabber tab is hidden by default and only visible while Study Mode is ON in YouTube; turning Study Mode off via toggle hides the tab completely and restores the intervention time selection screen.
-    - Fluid responsive viewport layout replacing narrow phone container constraints, allowing seamless multi-column expansion on tablet and desktop.
-    - App info (app icon, daily limit, flame streak counter).
-    - Progress bar (spent today vs limit left) with Rustic Medley gradient.
-    - YouTube Study Mode card ("Watch only Study channels on YouTube") activating whitelist mode.
-    - Interactive 2x2 time option grid (5m, 10m, 20m, 40m) with unselected/selected states.
-    - Dynamic Exit button ("Exit [App Name]").
-    - Cooldown countdown wait period logic (10s, 15s, 20s) on overlay return with disabled buttons and progress timer.
-    - Non-whitelisted channel interception banner with "Got it" vs "Add to Study List".
-    - Channel whitelist confirmation sentence typing flow with exact-match validation.
+  - Completed **Phase 1 UI Mockup: Android Home Screen Widget (4×2)** (`ui_mockups/widget.html`):
+    - Standard 4×2 container with Rustic Medley `#2B2F2E` surface, `#594C3D` 1px border, 16px corner radius, flat 2D zero-elevation.
+    - Left Zone: Glance usage time (`3h 9m`), "Today's usage" caption, pulsing Amber Autumn (`#CA9C68`) live dot + "Live" badge when Focus is active.
+    - Center Zone: 4-segment SVG donut ring (clockwise: Productive `#4E7D56`, Semi `#906D4B`, Distracting `#38332B`, Others `#94A3B8`) with 2px gaps.
+    - Right Zone: 4-row category legend with formatted usage times and 1px border safeguard on charcoal distracting dot.
+    - Bottom-Right: Subtle FF camera aperture emblem watermark (opacity 0.4).
+    - Simulated Android launcher environment with wallpaper, status bar, Google search pill, and app dock.
+    - Switchable widget states: Normal State, Live Focus Active, Empty / First Launch (`--`).
     - In-browser `#auto-test-modal` test runner (10/10 gates passing) and integrated into Port 8080 unified review hub (`ui_mockups/index.html`).
-    - Dedicated test runner `test_intervention_screen.js` and Section 7 in `test_code2_screens.js` passing 100%.
+    - Dedicated test runner `test_widget_screen.js` and Section 8 in `test_code2_screens.js` passing 100%.
 * **Exclusive Resources / Do Not Overwrite:**
+  - `ui_mockups/widget.html` (Code2 screen)
+  - `test_widget_screen.js` (Code2 test runner)
   - `ui_mockups/distraction_intervention.html` (Code2 screen)
   - `test_intervention_screen.js` (Code2 test runner)
   - `ui_mockups/index.html` (Simulator Hub)
