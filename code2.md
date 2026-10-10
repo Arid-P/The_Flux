@@ -85,44 +85,34 @@ All screens live in `ui_mockups/` and are served via background Python HTTP serv
    - 2×2 category legend grid with dividers.
    - Searchable app section with live filtering, empty state, and interactive App Detail bottom sheet.
    - 10 automated assertion gates passing in `#auto-test-modal`.
-6. **Testing & Git Status**:
-   - `test_code2_screens.js` passes 100% across all 4 Code2 screens (`home_screen`, `app_limits`, `planner`, `usage_stats`).
-   - Clean git state on branch `ff`. Commits pushed to `origin/ff` up to commit `cecc4d3`.
+6. **Usage Stats Color Vividness & 7-Week Horizon (Completed)**:
+   - Daily stacked bars enhanced with high-contrast vivid Rustic Medley category colors (`#58A366`, `#B88856`, `#C27838`, `#7E8F9F`).
+   - Today Bézier stacked area chart refined with high-opacity gradients and crisp stroke outlines.
+   - Weekly horizon updated to 7 rolling weeks.
+7. **Review Hub Viewport Preservation & Island Navigation Bridge (Completed)**:
+   - Resolved issue where navigating via the floating bottom island caused screens to revert to a mobile ratio or stale cached markup.
+   - Implemented `navigateTo(url)` bridge across all 6 screens (`home_screen.html`, `planner.html`, `usage_stats.html`, `app_limits.html`, `active_focus_session.html`, `preset_creation.html`) with cross-frame `window.parent.selectScreen` and timestamp-based cache busting (`?t=Date.now()`).
+   - Configured `#device-bezel` with `box-sizing: content-box` in `index.html` ensuring genuine 768px inner viewport triggers responsive `@media (min-width: 768px)` Tailwind breakpoints cleanly.
+   - Configured automatic iframe `load` listener in `index.html` to sync active top header tabs and standalone link upon any screen navigation.
+   - Removed redundant `min-h-screen` container styles across screens to prevent vertical layout overflow.
+8. **Testing & Git Status**:
+   - `test_code2_screens.js` passes 100% across all 6 sections (Home, App Limits, Planner, Usage Stats, Limits CRUD, Hub Bridge).
+   - `test_planner_screen.js`, `test_preset_creation.js`, `test_usage_stats.js` all pass 100%.
+   - All 48 Flutter responsive layout tests pass (100%).
 
 ---
 
 ## 5. Next Task to Execute (Queued Task)
 
-### Task Name:
-**`Refine Usage Stats Screen: Enhance Color Vividness & Adjust Weekly Horizon (Bug Fix & Polish)`**
-
-### Specific Requirements & User Feedback to Address:
-1. **Daily View Stacked Bars Color Vividness & Distinctness**:
-   - **User Feedback:** *"in daily, the colours in the bars are not as vivid or clear or ditinct as i hope"*
-   - **Implementation Goal:**
-     - The category segment colors in the daily stacked bars currently appear too dark/muted against the dark background.
-     - Increase color saturation, contrast, and visual distinctness for all 4 categories:
-       - **Productive:** Crisp, vibrant Olive Green (e.g. `#4E7D56` / `#58A366` with a bright edge/fill).
-       - **Semi-Productive:** Rich warm amber/tanned wood (e.g. `#906D4B` / `#B88856`).
-       - **Distracting:** Currently `#38332B` blends into the background; make it clearly distinct with a visible outline, warm carbon contrast (e.g. `#C27838` or a defined border/hatching or high-contrast slate `#474036`).
-       - **Others:** Clearly readable slate `#64748B` / `#7E8F9F`.
-     - Ensure the selected bar pops with a high-contrast glowing outline or vibrant fill, while unselected bars retain a distinct structured greyscale.
-2. **Today View Bézier Area Chart Vividness**:
-   - **User Feedback:** *"same issue in today as well"*
-   - **Implementation Goal:**
-     - Make the 4 Bézier stacked area layers in `view-chart-today` significantly more vivid and distinct.
-     - Use higher-opacity gradients and crisp colored stroke outlines (`stroke="#4E7D56"`, `stroke="#906D4B"`, `stroke="#C27838"`, `stroke="#64748B"`, stroke-width 1.5–2px) along each curve ridge so the boundaries between categories are sharp and easily readable.
-3. **Weekly View Horizon: 7 Days / Bars Adjustment**:
-   - **User Feedback:** *"IN week why is it 5 days? it should be 7 days."*
-   - **Implementation Goal:**
-     - In `ui_usage_stats.md` Section 7.1, the spec mentioned "5 most recent weeks", which displayed 5 bars. However, the user expected **7 items** (either 7 rolling weeks or 7 weekly aggregate bars to match the 7-column layout of the daily view).
-     - Update the weekly chart dataset and rendering to feature **7 distinct bars** (e.g., 7 rolling weeks: `Feb 9`, `Feb 16`, `Feb 23`, `Mar 2`, `Mar 9`, `Mar 16`, `Mar 23`) or a 7-day multi-week aggregated comparison so the visual rhythm consistently spans 7 columns.
-     - Ensure all 7 bars are rendered with the enhanced vivid category colors and clean X-axis labels.
-4. **Automated Tests & Regression Verification**:
-   - Update `test_usage_stats.js` and `test_code2_screens.js` to assert the 7-bar count in the weekly view.
-   - Run in-browser automated tests in `#auto-test-modal` and verify 100% passing rate.
-   - Perform `raupwfiles` (`agent_worklog.md` and `progress_tracker.md`) before and after the fix.
-   - Commit and push changes cleanly to `origin/ff`.
+* **Status:** `IDLE` (Task completed & verified).
+* **Completed Task:** `Fix Review Hub Viewport Preservation & Island Navigation Bridge`
+  - Fixed issue where bottom island navigation reverted to a mobile ratio or stale cached markup.
+  - Implemented `navigateTo()` cross-frame bridge across all screens.
+  - Configured `#device-bezel` with `box-sizing: content-box` in `index.html` to guarantee strict 768px inner viewport width.
+  - Configured automatic iframe load event synchronization with top header tabs and standalone link.
+* **Subsequent Backlog Tasks:**
+  - Additional helper screens or mockups (Intervention screens, home widget).
+  - Integration with native Flutter screens as directed by user.
 
 ---
 
@@ -131,13 +121,6 @@ All screens live in `ui_mockups/` and are served via background Python HTTP serv
 When resuming in this codespace or a new session:
 1. Verify branch is `ff`: `git branch` (must show `* ff`).
 2. Run automated test suite: `node test_code2_screens.js`.
-3. Check running background HTTP servers:
-   - Port 8086: `python3 -m http.server 8086 --directory ui_mockups`
-   - Port 8088: `python3 -m http.server 8088 --directory ui_mockups`
-   - Port 8089: `python3 -m http.server 8089 --directory ui_mockups`
-   - Port 8090: `python3 -m http.server 8090 --directory ui_mockups`
-4. Update `agent_worklog.md` and `progress_tracker.md` to set `Code2` status to `ACTIVE` for the Usage Stats visual refinement task.
-5. Apply the edits to `ui_mockups/usage_stats.html` (vivid strokes/gradients in Today Bézier chart, vivid bar colors in Daily view, and 7 bars in Weekly view).
-6. Run `node test_usage_stats.js` and `node test_code2_screens.js`.
-7. Commit cleanly with `git commit -m "fix(ui): enhance color contrast and update weekly horizon to 7 bars in usage stats"` and run `git push origin ff`.
-8. Provide the review response with the mandatory 3-part **Review Summary**.
+3. Check running background HTTP preview server on port `8080`: `python3 serve_mockups.py`.
+4. Update `agent_worklog.md` and `progress_tracker.md` to coordinate with other agents.
+5. Provide the review response with the mandatory 3-part **Review Summary**.

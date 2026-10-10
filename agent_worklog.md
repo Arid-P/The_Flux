@@ -10,7 +10,7 @@ This registry coordinates concurrent/subsequent AI coding agents working in this
 | Agent Name | Role / Specialty | Status | Branch | Current Task / Active Scope | Reserved / Active Files | Port(s) Used |
 |---|---|---|---|---|---|---|
 | **Code1** | Lead UI Designer | **ACTIVE** | `ff` | Phase 1-B Step 8 & 9 COMPLETED (Stop Focusing friction modal with 15-25s formula wait, live inline counter, streak reset flow, blurred backdrop; FocusSessionScreen countdown completion auto-nav to Home; 140/140 tests passing, 0 lints). Next: Phase 1-B Step 10 (Streaks & Daily Evaluation). | `fluxfoxus/lib/features/focus/`, `fluxfoxus/lib/presentation/widgets/`, `fluxfoxus/lib/presentation/screens/focus_session_screen.dart`, `progress_tracker.md`, `agent_worklog.md` | None (all quiet) |
-| **Code2** | Companion UI Designer / Responsive Architect | **ACTIVE** | `ff` | Completed Responsive Layouts: All 6 screens (Home, Focus, Planner, Preset, Limits, Usage) now utilize fluid `md:` and `lg:` grid container adaptations for tablet/desktop widths. Fixed iframe caching on port 8080. | `ui_mockups/` | `8080` (Unified Review Hub) |
+| **Code2** | Companion UI Designer / Responsive Architect | **IDLE** | `ff` | COMPLETED: Bottom Island Navigation Synchronization & Viewport Preservation. Fixed mobile revert issue by bridging iframe island clicks to parent `selectScreen` with timestamp cache-busting, `box-sizing: content-box` on bezel, and iframe `load` listener tab sync. | `ui_mockups/` | `8080` (Unified Review Hub) |
 | **Code3** | Context & Documentation Manager | **IDLE** | `ff` | Completed: (1) Updated code3.md role. (2) Created 13 context/memory files in `.c3_context/`. (3) Generated comprehensive `README.md`. (4) Expanded root `.gitignore` for full Flutter/Android/Python/Node stack. | `.c3_context/` (exclusive), `README.md`, `code3.md`, `.gitignore` | None |
 
 ---
@@ -131,13 +131,14 @@ This registry coordinates concurrent/subsequent AI coding agents working in this
   - Built standalone verification test scripts (`test_usage_stats.js`, `test_code2_screens.js`) passing 100% of DOM, color tokens, and state assertions across all screens.
   - Refactored HTML mockups (`home_screen.html`, `active_focus_session.html`, `planner.html`, `preset_creation.html`, `app_limits.html`, `usage_stats.html`, `index.html`) so internal screens adapt responsively to viewport simulator dimensions (320px, 390px, 640px, 768px, 1024px, 100% full window), utilizing full width/height with dynamic grid layouts (`md:grid-cols-2`, `lg:grid-cols-3`), responsive flip-clock orientation (horizontal split seam cards), and centered navigation/floating action buttons.
 * **What `Code2` is doing right now:**
-  - `ACTIVE` / Inspecting DOM responsiveness and diagnosing screenshot (`Screenshot From 2026-09-28 14-11-01.png`):
-    - Inspected DOM tree of `https://automatic-lamp-69wg949jq69phr5rq-8080.app.github.dev` and all 6 screens on port 8080.
-    - Verified all fixed mobile wrapper divs (`w-[390px] h-[830px]`, `w-[380px] h-[800px]`) were eliminated in commit `dba72d5`.
-    - Verified screens expand to fluid `w-full max-w-5xl mx-auto flex-1` containers with active Tailwind responsive breakpoints.
-    - Diagnosed that user screenshot displays the pre-`dba72d5` state or uninvalidated browser cache of the iframe.
-    - Keeping Port 8080 strictly open and active per user directive.
-    - Paused: Awaiting user explicit "yes" before making any further modifications.
+  - `IDLE` / Standing by for user feedback.
+  - Successfully resolved the bottom island navigation issue:
+    - Iframe island clicks and in-screen navigations now communicate seamlessly with the parent review hub (`window.parent.selectScreen`), preserving the active viewport dimension, scale, and orientation.
+    - Synchronized top header screen tabs and standalone link on any iframe navigation via both cross-frame bridge and automatic iframe `load` listener.
+    - Added timestamp cache busting (`?t=Date.now()`) to prevent stale mobile container caching.
+    - Sized device bezel with `box-sizing: content-box` so 768px tablet mode delivers exact 768px inner width and triggers Tailwind `md:` breakpoint.
+    - Removed redundant `min-h-screen` container constraints across mockups.
+    - All 6 sections of `test_code2_screens.js` pass 100%. All Flutter responsive tests pass 100%.
 * **Exclusive Resources / Do Not Overwrite:**
   - `fluxfoxus/lib/core/theme/responsive_layout.dart`
   - `fluxfoxus/test/responsive_test.dart`

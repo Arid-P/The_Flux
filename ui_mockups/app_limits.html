@@ -75,7 +75,7 @@
   </div>
 
   <!-- RESPONSIVE APP CONTAINER -->
-  <div class="w-full max-w-5xl mx-auto flex-1 flex flex-col justify-between p-4 sm:p-6 md:p-8 relative min-h-screen">
+  <div class="w-full max-w-5xl mx-auto flex-1 flex flex-col justify-between p-4 sm:p-6 md:p-8 relative">
     
     <!-- TOP BAR (Status Bar + Header) -->
     <div class="w-full shrink-0 pb-3 border-b border-ff-border/60 bg-ff-bg z-10">
@@ -157,18 +157,18 @@
       <div class="w-full max-w-md mx-auto h-16 bg-ff-surface border border-ff-border rounded-full px-3 flex items-center justify-between shadow-xl">
         
         <!-- Tab 1: Home -->
-        <a href="home_screen.html" class="flex flex-col items-center justify-center px-2 py-1 text-ff-text hover:text-ff-primary transition">
+        <a href="home_screen.html" onclick="event.preventDefault(); navigateTo('home_screen.html');" class="flex flex-col items-center justify-center px-2 py-1 text-ff-text hover:text-ff-primary transition">
           <svg class="w-5 h-5 fill-current" viewBox="0 0 24 24"><path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z"/></svg>
           <span class="text-[10px] font-medium mt-0.5">Home</span>
         </a>
 
         <!-- Group 1: [Usage + Focus] -->
         <div class="flex items-center space-x-1 bg-ff-bg/50 border border-ff-border/40 rounded-full px-2 py-1">
-          <a href="usage_stats.html" class="flex flex-col items-center justify-center px-2 py-0.5 text-ff-text hover:text-ff-primary transition">
+          <a href="usage_stats.html" onclick="event.preventDefault(); navigateTo('usage_stats.html');" class="flex flex-col items-center justify-center px-2 py-0.5 text-ff-text hover:text-ff-primary transition">
             <svg class="w-4 h-4 fill-none stroke-current stroke-2" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><polyline points="12 6 12 12 16 14"/></svg>
             <span class="text-[9px] font-medium mt-0.5">Usage</span>
           </a>
-          <a href="active_focus_session.html" class="flex flex-col items-center justify-center px-2 py-0.5 text-ff-text hover:text-ff-primary transition">
+          <a href="active_focus_session.html" onclick="event.preventDefault(); navigateTo('active_focus_session.html');" class="flex flex-col items-center justify-center px-2 py-0.5 text-ff-text hover:text-ff-primary transition">
             <svg class="w-4 h-4 fill-none stroke-current stroke-2" viewBox="0 0 24 24"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
             <span class="text-[9px] font-medium mt-0.5">Focus</span>
           </a>
@@ -176,7 +176,7 @@
 
         <!-- Group 2: [Planner + Block (ACTIVE)] -->
         <div class="flex items-center space-x-1 bg-ff-bg/50 border border-ff-border/40 rounded-full px-2 py-1">
-          <a href="planner.html" class="flex flex-col items-center justify-center px-2 py-0.5 text-ff-text hover:text-ff-primary transition">
+          <a href="planner.html" onclick="event.preventDefault(); navigateTo('planner.html');" class="flex flex-col items-center justify-center px-2 py-0.5 text-ff-text hover:text-ff-primary transition">
             <svg class="w-4 h-4 fill-none stroke-current stroke-2" viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
             <span class="text-[9px] font-medium mt-0.5">Planner</span>
           </a>
@@ -502,6 +502,16 @@
 
   <!-- JAVASCRIPT STATE STORE & REACTIVE ENGINE -->
   <script>
+    function navigateTo(url) {
+      if (window.parent && window.parent !== window && typeof window.parent.selectScreen === 'function') {
+        window.parent.selectScreen(url);
+      } else {
+        const bust = 't=' + Date.now();
+        const sep = url.includes('?') ? '&' : '?';
+        window.location.href = url + sep + bust;
+      }
+    }
+
     // 1. Reactive State Store
     let appLimits = [
       {

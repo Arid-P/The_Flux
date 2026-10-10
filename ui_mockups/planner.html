@@ -85,7 +85,7 @@
   </div>
 
   <!-- RESPONSIVE APP CONTAINER -->
-  <div class="w-full max-w-5xl mx-auto flex-1 flex flex-col justify-between p-4 sm:p-6 md:p-8 relative min-h-screen">
+  <div class="w-full max-w-5xl mx-auto flex-1 flex flex-col justify-between p-4 sm:p-6 md:p-8 relative">
 
     <!-- Top Speaker Notch & Status Bar -->
     <div class="w-full shrink-0 pt-1 pb-3 px-1 flex items-center justify-between text-xs text-ff-muted select-none">
@@ -232,7 +232,7 @@
       <div class="w-full max-w-md h-16 bg-ff-surface border border-ff-border rounded-full px-3 flex items-center justify-between shadow-2xl">
         
         <!-- Tab 1: Home -->
-        <a href="home_screen.html" class="flex flex-col items-center justify-center px-2 py-1 text-ff-muted hover:text-ff-text transition">
+        <a href="home_screen.html" onclick="event.preventDefault(); navigateTo('home_screen.html');" class="flex flex-col items-center justify-center px-2 py-1 text-ff-muted hover:text-ff-text transition">
           <svg class="w-5 h-5 fill-current" viewBox="0 0 24 24">
             <path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z"/>
           </svg>
@@ -242,7 +242,7 @@
         <!-- Group 1: [Usage + Focus] Pill Sub-container -->
         <div class="flex items-center space-x-1 bg-ff-bg/50 border border-ff-border/40 rounded-full px-2 py-1">
           <!-- Tab 2: Usage -->
-          <a href="usage_stats.html" class="flex flex-col items-center justify-center px-2 py-0.5 text-ff-muted hover:text-ff-primary transition">
+          <a href="usage_stats.html" onclick="event.preventDefault(); navigateTo('usage_stats.html');" class="flex flex-col items-center justify-center px-2 py-0.5 text-ff-muted hover:text-ff-primary transition">
             <svg class="w-4 h-4 fill-none stroke-current stroke-2" viewBox="0 0 24 24">
               <circle cx="12" cy="12" r="9"/>
               <polyline points="12 6 12 12 16 14"/>
@@ -250,7 +250,7 @@
             <span class="text-[9px] font-medium mt-0.5">Usage</span>
           </a>
           <!-- Tab 3: Focus -->
-          <a href="active_focus_session.html" class="flex flex-col items-center justify-center px-2 py-0.5 text-ff-muted hover:text-ff-primary transition">
+          <a href="active_focus_session.html" onclick="event.preventDefault(); navigateTo('active_focus_session.html');" class="flex flex-col items-center justify-center px-2 py-0.5 text-ff-muted hover:text-ff-primary transition">
             <svg class="w-4 h-4 fill-none stroke-current stroke-2" viewBox="0 0 24 24">
               <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/>
               <circle cx="12" cy="12" r="3"/>
@@ -272,7 +272,7 @@
             <span class="text-[9px] font-bold mt-0.5">Planner</span>
           </button>
           <!-- Tab 5: Block -->
-          <a href="app_limits.html" class="flex flex-col items-center justify-center px-2 py-0.5 text-ff-muted hover:text-ff-primary transition">
+          <a href="app_limits.html" onclick="event.preventDefault(); navigateTo('app_limits.html');" class="flex flex-col items-center justify-center px-2 py-0.5 text-ff-muted hover:text-ff-primary transition">
             <svg class="w-4 h-4 fill-none stroke-current stroke-2" viewBox="0 0 24 24">
               <circle cx="12" cy="12" r="9"/>
               <line x1="4.93" y1="4.93" x2="19.07" y2="19.07"/>
@@ -370,7 +370,7 @@
         </div>
 
         <div class="pt-2 border-t border-ff-border/50 flex space-x-2">
-          <a href="preset_creation.html?returnUrl=planner.html" class="flex-1 py-2.5 rounded-xl bg-ff-primary text-ff-bg text-center font-bold text-xs hover:bg-[#b88c5a] transition">
+          <a href="preset_creation.html?returnUrl=planner.html" onclick="event.preventDefault(); navigateTo('preset_creation.html?returnUrl=planner.html');" class="flex-1 py-2.5 rounded-xl bg-ff-primary text-ff-bg text-center font-bold text-xs hover:bg-[#b88c5a] transition">
             Create New Preset
           </a>
           <button onclick="toggleFabModal(false)" class="px-4 py-2.5 rounded-xl bg-ff-bg border border-ff-border text-ff-muted text-xs hover:text-ff-text">
@@ -431,6 +431,16 @@
 
   <!-- APPLICATION LOGIC & TEST ENGINE -->
   <script>
+    function navigateTo(url) {
+      if (window.parent && window.parent !== window && typeof window.parent.selectScreen === 'function') {
+        window.parent.selectScreen(url);
+      } else {
+        const bust = 't=' + Date.now();
+        const sep = url.includes('?') ? '&' : '?';
+        window.location.href = url + sep + bust;
+      }
+    }
+
     // -------------------------------------------------------------------------
     // 1. In-Memory Calendar & Sessions State Engine
     // -------------------------------------------------------------------------

@@ -83,7 +83,7 @@
   </div>
 
   <!-- RESPONSIVE APP CONTAINER -->
-  <div class="w-full max-w-5xl mx-auto flex-1 flex flex-col justify-between p-4 sm:p-6 md:p-8 relative min-h-screen">
+  <div class="w-full max-w-5xl mx-auto flex-1 flex flex-col justify-between p-4 sm:p-6 md:p-8 relative">
     
     <!-- TOP BAR (Status Bar + Header) -->
     <div class="w-full shrink-0 pb-3 border-b border-ff-border/60 bg-ff-bg z-10">
@@ -716,17 +716,27 @@
       document.getElementById('yt-channels-badge').innerText = channelCount;
     }
 
+    function navigateTo(url) {
+      if (window.parent && window.parent !== window && typeof window.parent.selectScreen === 'function') {
+        window.parent.selectScreen(url);
+      } else {
+        const bust = 't=' + Date.now();
+        const sep = url.includes('?') ? '&' : '?';
+        window.location.href = url + sep + bust;
+      }
+    }
+
     function goBack() {
       const urlParams = new URLSearchParams(window.location.search);
       const returnUrl = urlParams.get('returnUrl');
       if (returnUrl) {
-        window.location.href = returnUrl;
+        navigateTo(returnUrl);
       } else if (document.referrer && document.referrer.includes('.html')) {
-        window.location.href = document.referrer;
+        navigateTo(document.referrer);
       } else if (window.history.length > 1) {
         window.history.back();
       } else {
-        window.location.href = 'planner.html';
+        navigateTo('planner.html');
       }
     }
 

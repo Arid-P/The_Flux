@@ -25,6 +25,7 @@ The preview server `serve_mockups.py` is running in your Codespace background. T
     - 💻 Tablet Landscape (1024 × 768)
     - 🖥️ Full Viewport
   - [ ] **Orientation Flip & Scaling**: Click `🔄 Flip Orientation` and test zoom dropdown (50% to 100%).
+  - [ ] **Floating Island Navigation**: Tap any tab in the bottom floating pill nav bar (Usage, Focus, Planner, Block, Home) from within the app window. Verify the screen switches dynamically, preserves the active viewport profile, and updates the top screen selector tab.
 
 ---
 

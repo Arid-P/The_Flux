@@ -289,7 +289,7 @@
         <!-- Action Buttons (Locked during formula wait time) -->
         <div class="space-y-2.5 pt-2">
           <!-- Quit Session Button -->
-          <button id="btn-quit-session" disabled 
+          <button id="btn-quit-session" disabled onclick="navigateTo('home_screen.html')"
                   class="w-full py-3 rounded-full text-xs font-bold tracking-wide transition-all duration-300 bg-ff-bg/40 text-ff-muted border border-ff-border cursor-not-allowed">
             Quit Session (<span id="btn-quit-timer">18s</span>)
           </button>
@@ -308,6 +308,16 @@
 
   <!-- JAVASCRIPT STATE CONTROLLER -->
   <script>
+    function navigateTo(url) {
+      if (window.parent && window.parent !== window && typeof window.parent.selectScreen === 'function') {
+        window.parent.selectScreen(url);
+      } else {
+        const bust = 't=' + Date.now();
+        const sep = url.includes('?') ? '&' : '?';
+        window.location.href = url + sep + bust;
+      }
+    }
+
     let currentMode = 'focus'; // 'focus' or 'break'
     let isPaused = false;
     let countdownInterval;

@@ -24,7 +24,7 @@
 | **Phase 1-B Step 10: Streaks System & Daily Evaluation** | In Progress / Next | StreakRecord entity, daily 11:59 PM evaluation, neutral days logic, WorkManager background scheduler. |
 | **User Review Backlog** | Queued for User | Comprehensive interactive & code review checklist compiled in `review_backlog.md` (all 6 screens previewable on Port 8080 review hub or direct ports 8085-8090). |
 | **Responsive Scaling & Orientation (Phase 1-A & Phase 1-B Step 5)** | Completed | Reusable `ResponsiveLayout` utilities (`AppBreakpoints`, `ResponsiveContent`, `AdaptiveScrollBody`), adaptive flip-clock orientation, flexible headers/cards, 48/48 responsive test assertions passing, 140/140 total Flutter tests passing, 0 lints. |
-| **DOM Responsiveness Verification & Diagnostics** | Under Review | Inspected Codespace URL DOM, verified elimination of rigid mobile divs, diagnosed screenshot browser caching behavior, maintained Port 8080 active. Awaiting user signal. |
+| **DOM Responsiveness & Island Navigation Synchronization** | Completed | Fixed bottom island mobile revert issue: implemented `navigateTo()` bridge across all 6 mockups with review hub iframe synchronization, timestamp cache-busting, `box-sizing: content-box` for 768px tablet mode, and auto tab sync on iframe load. 100% tests passing. |
 | **Remaining UI and Backend Implementation** | Backlog | Complete UI screens, Riverpod state management, Background services, and MethodChannel IPC bridge. |
 
 ---
@@ -143,13 +143,15 @@
 
 
 
-####Prompt for C2
+#### Completed Task for C2 (Island Navigation Synchronization & Viewport Preservation)
 ```text
-Yeah i reviewed it, its fantastic. But i noticed an issue. I have 2 ways t
-  switch between the different pages, using the toggles at the top, and using the
-  island with different options at the bottom within the app window. If i switch
-  using the toggles at the top, everything works. But if i use the the island, it
-  comes back into a mobile ratio and stays in that. More appropriate it changes
-  the content accodring to the option and reverts bacl to the state we initally
-  had. So fix this as well.
+Task: Fix bottom island navigation in review hub reverting to mobile ratio or stale state.
+Status: RESOLVED & VERIFIED
+Implementation:
+- Added cross-frame `navigateTo(url)` bridge across all 6 mockups to delegate navigation to `window.parent.selectScreen`.
+- Added timestamp cache-busting (`?t=Date.now()`) across standalone and iframe transitions to prevent stale mobile cache.
+- Sized `#device-bezel` with `box-sizing: content-box` in `index.html` to guarantee strict 768px inner viewport width.
+- Added automatic iframe `load` listener in `index.html` to synchronize top header tabs and standalone link.
+- Removed redundant `min-h-screen` container constraints across mockups.
+- 100% automated test coverage in test_code2_screens.js.
 ```

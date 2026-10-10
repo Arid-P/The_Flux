@@ -221,13 +221,16 @@
       return url + sep + 't=' + Date.now();
     }
 
-    function selectScreen(url, btn) {
-      currentScreen = url;
-      const busted = getBustedUrl(url);
-      document.getElementById('preview-frame').src = busted;
-      document.getElementById('btn-standalone').href = busted;
+    function syncActiveTab(cleanUrl, btn) {
+      if (!btn) {
+        document.querySelectorAll('.screen-tab').forEach(b => {
+          const onclickAttr = b.getAttribute('onclick') || '';
+          if (onclickAttr.includes(cleanUrl)) {
+            btn = b;
+          }
+        });
+      }
 
-      // Update screen tab buttons
       document.querySelectorAll('.screen-tab').forEach(b => {
         b.className = 'screen-tab px-3 py-1.5 rounded-lg text-ff-text hover:bg-ff-bg border border-transparent hover:border-ff-border font-medium transition';
       });
@@ -235,6 +238,28 @@
         btn.className = 'screen-tab px-3 py-1.5 rounded-lg bg-ff-primary text-ff-bg font-bold shadow-sm transition';
       }
     }
+
+    function selectScreen(url, btn) {
+      const cleanUrl = url.split('?')[0];
+      currentScreen = url;
+      const busted = getBustedUrl(url);
+      const frame = document.getElementById('preview-frame');
+
+      try {
+        const frameLoc = frame.contentWindow && frame.contentWindow.location.href;
+        if (!frameLoc || !frameLoc.includes(cleanUrl)) {
+          frame.src = busted;
+        }
+      } catch (e) {
+        frame.src = busted;
+      }
+
+      document.getElementById('btn-standalone').href = busted;
+      syncActiveTab(cleanUrl, btn);
+    }
+
+    // Expose globally for iframe child access
+    window.selectScreen = selectScreen;
 
     function setViewport(w, h, label, btn) {
       currentWidth = w;
@@ -246,6 +271,7 @@
 
       if (w === '100%') {
         stage.style.width = '100%';
+        bezel.style.boxSizing = 'border-box';
         bezel.style.width = '100%';
         bezel.style.maxWidth = '100%';
         bezel.style.height = 'calc(100vh - 160px)';
@@ -253,8 +279,9 @@
         badge.textContent = 'Full Viewport (Fluid Desktop)';
       } else {
         stage.style.width = 'auto';
+        bezel.style.boxSizing = 'content-box';
         bezel.style.width = w + 'px';
-        bezel.style.maxWidth = '100%';
+        bezel.style.maxWidth = 'calc(100vw - 48px)';
         bezel.style.height = h + 'px';
         bezel.style.borderRadius = (w >= 768) ? '16px' : '28px';
         badge.textContent = `${w} × ${h} px (${label})`;
@@ -270,6 +297,7 @@
 
       applyScale();
     }
+    window.setViewport = setViewport;
 
     function flipOrientation() {
       if (currentWidth === '100%') return;
@@ -296,8 +324,32 @@
       }
     }
 
-    // Default to Tablet Portrait (768x1024) to immediately demonstrate adaptive responsive layout
+    // Default to Tablet Portrait (768x1024) and setup automatic iframe navigation listeners
     window.addEventListener('DOMContentLoaded', () => {
+      const frame = document.getElementById('preview-frame');
+      
+      // Automatic iframe navigation sync
+      frame.addEventListener('load', () => {
+        try {
+          const framePath = frame.contentWindow.location.pathname;
+          const fileName = framePath.substring(framePath.lastIndexOf('/') + 1);
+          if (fileName && fileName.endsWith('.html') && fileName !== 'index.html') {
+            syncActiveTab(fileName, null);
+            currentScreen = fileName;
+            document.getElementById('btn-standalone').href = getBustedUrl(fileName);
+          }
+        } catch (e) {
+          // Cross-origin fallback
+        }
+      });
+
+      // PostMessage bridge for child iframes
+      window.addEventListener('message', (event) => {
+        if (event.data && event.data.type === 'ff_navigate' && event.data.screen) {
+          selectScreen(event.data.screen);
+        }
+      });
+
       selectScreen('home_screen.html', document.querySelector('.screen-tab'));
       setViewport(768, 1024, 'Tablet Portrait', null);
     });

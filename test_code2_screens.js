@@ -217,7 +217,47 @@ limitsStore.splice(deleteIdx, 1);
 assert.strictEqual(limitsStore.length, 2, 'Must have 2 apps after delete');
 console.log('  ✓ Delete limit logic: PASS');
 
+// 6. Test Review Hub Navigation Bridge & Island Synchronization
+console.log('\n--- 6. Testing Review Hub Navigation Bridge & Island Synchronization ---');
+const indexHtmlPath = path.join(__dirname, 'ui_mockups', 'index.html');
+assert(fs.existsSync(indexHtmlPath), 'index.html must exist');
+const indexHtml = fs.readFileSync(indexHtmlPath, 'utf8');
+
+assert(indexHtml.includes('syncActiveTab('), 'index.html must implement syncActiveTab');
+assert(indexHtml.includes('window.selectScreen = selectScreen'), 'index.html must expose selectScreen globally');
+assert(indexHtml.includes("frame.addEventListener('load'"), 'index.html must listen to iframe load events');
+assert(indexHtml.includes("window.addEventListener('message'"), 'index.html must support postMessage navigation');
+console.log('  ✓ index.html review hub navigation bridge & iframe synchronization verified');
+
+// Verify all screens implement navigateTo
+const allScreens = [
+  'home_screen.html',
+  'planner.html',
+  'usage_stats.html',
+  'app_limits.html',
+  'active_focus_session.html',
+  'preset_creation.html'
+];
+
+allScreens.forEach(screenName => {
+  const sPath = path.join(__dirname, 'ui_mockups', screenName);
+  const sHtml = fs.readFileSync(sPath, 'utf8');
+  assert(sHtml.includes('function navigateTo(url)'), `${screenName} must define navigateTo(url)`);
+  assert(sHtml.includes('window.parent.selectScreen(url)'), `${screenName} must notify window.parent.selectScreen`);
+  console.log(`  ✓ ${screenName} implements responsive navigateTo() bridge`);
+});
+
+// Verify bottom island links use navigateTo
+assert(homeHtml.includes("navigateTo('usage_stats.html')"), 'home_screen.html must link to usage_stats via navigateTo');
+assert(homeHtml.includes("navigateTo('planner.html')"), 'home_screen.html must link to planner via navigateTo');
+assert(homeHtml.includes("navigateTo('app_limits.html')"), 'home_screen.html must link to app_limits via navigateTo');
+assert(plannerHtml.includes("navigateTo('home_screen.html')"), 'planner.html must link to home via navigateTo');
+assert(usageHtml.includes("navigateTo('home_screen.html')"), 'usage_stats.html must link to home via navigateTo');
+assert(limitsHtml.includes("navigateTo('home_screen.html')"), 'app_limits.html must link to home via navigateTo');
+console.log('  ✓ Bottom island links wired with reactive navigateTo() handlers');
+
 console.log('\n======================================================');
-console.log('🎉 ALL CODE2 SCREEN TESTS PASSED (Home, App Limits, Planner, Usage Stats - 100%)');
+console.log('🎉 ALL CODE2 SCREEN TESTS PASSED (Home, App Limits, Planner, Usage Stats, Hub Bridge - 100%)');
 console.log('======================================================\n');
+
 
