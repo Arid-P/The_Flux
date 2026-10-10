@@ -9,7 +9,7 @@ This registry coordinates concurrent/subsequent AI coding agents working in this
 
 | Agent Name | Role / Specialty | Status | Branch | Current Task / Active Scope | Reserved / Active Files | Port(s) Used |
 |---|---|---|---|---|---|---|
-| **Code1** | Lead UI Designer | **ACTIVE** | `ff` | Phase 1-B Step 7 COMPLETED (Break System: countdown in Tanned Wood #906D4B, decrement counter, exhaustion state with greyscale/0.4 opacity, 0-breaks configured absence, End Break Early button in Amber Autumn #CA9C68, auto-break expiry resumption, haptics, 5 dedicated tests). Now executing Phase 1-B Step 8: Stop Focusing Modal. | `fluxfoxus/lib/features/focus/`, `fluxfoxus/lib/presentation/widgets/`, `fluxfoxus/lib/presentation/screens/focus_session_screen.dart`, `progress_tracker.md`, `agent_worklog.md` | None (all quiet) |
+| **Code1** | Lead UI Designer | **ACTIVE** | `ff` | Phase 1-B Step 8 & 9 COMPLETED (Stop Focusing friction modal with 15-25s formula wait, live inline counter, streak reset flow, blurred backdrop; FocusSessionScreen countdown completion auto-nav to Home; 140/140 tests passing, 0 lints). Next: Phase 1-B Step 10 (Streaks & Daily Evaluation). | `fluxfoxus/lib/features/focus/`, `fluxfoxus/lib/presentation/widgets/`, `fluxfoxus/lib/presentation/screens/focus_session_screen.dart`, `progress_tracker.md`, `agent_worklog.md` | None (all quiet) |
 | **Code2** | Companion UI Designer / Responsive Architect | **ACTIVE** | `ff` | Completed Responsive Layouts: All 6 screens (Home, Focus, Planner, Preset, Limits, Usage) now utilize fluid `md:` and `lg:` grid container adaptations for tablet/desktop widths. Fixed iframe caching on port 8080. | `ui_mockups/` | `8080` (Unified Review Hub) |
 | **Code3** | Context & Documentation Manager | **IDLE** | `ff` | Completed: (1) Updated code3.md role. (2) Created 13 context/memory files in `.c3_context/`. (3) Generated comprehensive `README.md`. (4) Expanded root `.gitignore` for full Flutter/Android/Python/Node stack. | `.c3_context/` (exclusive), `README.md`, `code3.md`, `.gitignore` | None |
 
@@ -21,7 +21,7 @@ This registry coordinates concurrent/subsequent AI coding agents working in this
 * **Assigned Identity:** `Code1`
 * **Role:** Lead UI Designer
 * **Current Working Branch:** `ff` (Strict branch lock — DO NOT SWITCH BRANCHES)
-* **Status:** `ACTIVE` (Step 7 Completed; Executing Phase 1-B Step 8: Stop Focusing Modal)
+* **Status:** `ACTIVE` (Step 8 & 9 Completed; Executing Phase 1-B Step 10: Streaks & Daily Evaluation)
 * **Completed:**
   - Built static HTML/Tailwind preview of the **Active Focus Session Screen** (`ui_mockups/active_focus_session.html`) with split-line mechanical flip-clock, bottom controls, and Rustic Medley palette override.
   - Preview reviewed and approved by user.
@@ -77,12 +77,18 @@ This registry coordinates concurrent/subsequent AI coding agents working in this
     - `FocusSessionNotifier`: Guarded `startBreak()` with `canTakeBreak`, auto-break expiration returning to running focus session, `HapticFeedback.mediumImpact()` and `heavyImpact()`.
     - `FocusSessionScreen`: Break button logic (absent when `breaksTotal == 0`; active outline with remaining count when `canTakeBreak`; greyscale `Opacity(0.4)` and non-interactive when exhausted; transforms into prominent Amber Autumn `#CA9C68` "End Break Early" button during break; Pause button hidden during break; clock digits and seam shift to Tanned Wood `#906D4B`).
     - Dedicated test suite `test/features/focus/break_system_test.dart` with 5 tests passing (128/128 total suite passing, 0 lints).
+  - Implemented Phase 1-B Step 8 & Step 9: Stop Focusing Modal & Session Completion:
+    - `WaitTimeCalculator`: Formula implementation per TRD §5.3.3 (`calculateWaitSeconds({streakDays, todayDistractingUsage, avgDistractingUsage})`), clamping wait time between 15 and 25 seconds based on sliding bracket weights (55/45 down to 0/100) and distracting usage ratio, excluding productive screen time.
+    - `StopFocusingModal`: Friction card with 12px radius, blurred backdrop, mechanical bell icon (`#CA9C68`), "Finish the goal?" heading, streak display (`[Amber dot] X days -> [Grey dot] 0 days`), 15–25s locked buttons with inline countdown counter `Quit Session (18s)`, "Keep Going" resuming session, and "Quit Session" resetting streak to 0.
+    - `StreakRepository`: SQLite CRUD operations on `streak_records` table (`getCurrentStreak`, `resetStreak`, `updateStreak`) + hermetic `FakeStreakRepository` for testing.
+    - `FocusSessionScreen`: Seamless integration with `StopFocusingModal`, pausing session while modal is shown, resetting streak and stopping session on confirm, or resuming on cancel; plus automated navigation listener `ref.listen` routing to Home upon session completion (00:00).
+    - Test suites: `wait_time_calculator_test.dart` (4 tests), `stop_focusing_modal_test.dart` (6 tests), updated `focus_session_screen_test.dart` (6 tests). Total codebase suite: 140/140 passing, 0 analyzer issues.
 * **What `Code1` is doing right now:**
-  - Executing Phase 1-B Step 8: Stop Focusing Modal (Discipline Friction) per `ui_focus_session.md` §3 and TRD §5.3.3.
+  - Prepared and ready to execute Phase 1-B Step 10: Streaks System & Daily Evaluation per TRD §4.5 & §5.3.
 * **Next Steps for `Code1`:**
-  - Implement `StopFocusingModal` widget, streak reset & wait time formula.
-  - Wire modal to `FocusSessionScreen` stop button.
-  - Write widget & unit tests for Stop Focusing Modal.
+  - Implement `StreakRecord` entity and streak evaluation service for daily checks (minimum sessions per day).
+  - Configure WorkManager background daily job at 11:59 PM.
+  - Wire streak evaluation tests and integration with completed sessions.
 * **Exclusive Resources / Do Not Overwrite:**
   - `fluxfoxus/lib/features/focus/`
   - `fluxfoxus/lib/presentation/widgets/flip_clock.dart`

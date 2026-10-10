@@ -190,5 +190,21 @@ void main() {
       expect(await fakeStreakRepo.getCurrentStreak(), 5);
       expect(find.text('COUNTDOWN ACTIVE'), findsOneWidget);
     });
+
+    testWidgets('Automatically navigates to Home when session completes', (WidgetTester tester) async {
+      await tester.pumpWidget(buildTestApp());
+      await tester.pumpAndSettle();
+
+      expect(find.byType(FocusSessionScreen), findsOneWidget);
+
+      final element = tester.element(find.byType(FocusSessionScreen));
+      final container = ProviderScope.containerOf(element);
+      await container.read(focusSessionProvider.notifier).completeSession();
+      await tester.pump(const Duration(seconds: 4));
+      await tester.pumpAndSettle();
+
+      expect(find.byType(FocusSessionScreen), findsNothing);
+      expect(find.byType(FloatingBottomNavBar), findsOneWidget);
+    });
   });
 }

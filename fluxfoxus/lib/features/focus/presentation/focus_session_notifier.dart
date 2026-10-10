@@ -215,7 +215,13 @@ class FocusSessionNotifier extends Notifier<FocusSession?> {
     } catch (_) {}
   }
 
-  /// Completes the session successfully upon countdown reaching zero.
+  /// Completes the session successfully upon countdown reaching zero or completion trigger.
+  Future<void> completeSession([FocusSession? targetSession]) async {
+    final session = targetSession ?? state;
+    if (session == null) return;
+    await _completeSession(session);
+  }
+
   Future<void> _completeSession(FocusSession session) async {
     _ticker?.cancel();
     try {
@@ -237,8 +243,14 @@ class FocusSessionNotifier extends Notifier<FocusSession?> {
       title: '🎉 Focus Complete!',
       text: 'Great job! Session completed.',
     );
+    unawaited(_delayedStopForeground());
+  }
+
+  Future<void> _delayedStopForeground() async {
     await Future<void>.delayed(const Duration(seconds: 3));
-    await _foreground.stopService();
+    try {
+      await _foreground.stopService();
+    } catch (_) {}
   }
 
   void _startTicker() {

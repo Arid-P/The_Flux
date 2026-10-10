@@ -62,6 +62,14 @@ class _FocusSessionScreenState extends ConsumerState<FocusSessionScreen> {
 
   @override
   Widget build(BuildContext context) {
+    ref.listen<FocusSession?>(focusSessionProvider, (previous, next) {
+      if (next?.status == SessionStatus.completed) {
+        if (context.mounted) {
+          context.go(AppRoutes.home);
+        }
+      }
+    });
+
     final session = ref.watch(focusSessionProvider) ??
         FocusSession(
           id: 'initial',

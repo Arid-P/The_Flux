@@ -70,7 +70,9 @@ All spec docs are in `/workspaces/The_Flux/prompts_docx/`. The most critical one
 | Phase 1-A Step 3: Navigation Shell | `24db347` | go_router, floating pill nav bar, full-screen takeover on /focus/session, ApertureIcon, 10 tests passing |
 | Phase 1-A Step 4: Permissions Onboarding | `7c7d54f` | 4-step wizard, PermissionService, PermissionsNotifier, 13 tests passing |
 | Phase 1-B Step 5: Preset System | `7ab48a2` | Presets SQLite CRUD, interactive creation screen, emoji picker, break steppers, app restrictions, YouTube mode, fake repo fix, 51/51 tests passing |
-| Phase 1-B Step 6: Focus Timer + Foreground Service | Current | Focus timer domain models, Hive focus_session_state 5s persistence, SQLite logging, ForegroundTimerService, FocusSessionNotifier, mechanical FlipClock, FocusSessionScreen, 123/123 tests passing, 0 lints |
+| Phase 1-B Step 6: Focus Timer + Foreground Service | `529fbd9` | Focus timer domain models, Hive focus_session_state 5s persistence, SQLite logging, ForegroundTimerService, FocusSessionNotifier, mechanical FlipClock, FocusSessionScreen, 123/123 tests passing, 0 lints |
+| Phase 1-B Step 7: Break System | `e0e8d02` | Break countdown in `#906D4B`, break count decrement, greyscale disabled state on break exhaustion, 0-breaks configured removal, End Break Early button, haptic feedback, 128/128 tests passing, 0 lints |
+| Phase 1-B Step 8 & 9: Stop Focusing Modal & Session Completion | Current | StopFocusingModal, wait time formula (15-25s), live inline counter, streak reset flow, blurred backdrop, countdown auto-completion (00:00) with vibration and auto-nav to Home, 140/140 tests passing, 0 lints |
 
 ### Phase 1-B Step 5 (Latest — Commit `7ab48a2`)
 
@@ -223,43 +225,36 @@ fluxfoxus/test/core/navigation/
 
 ## 7. Next Immediate Task
 
-### Task: Phase 1-B Step 8 — Stop Focusing Modal (Discipline Friction)
+### Task: Phase 1-B Step 10 — Streaks System & Daily Evaluation
 
 **Reference Docs:**
-- `prompts_docx/C1/GMP_FF_BUILD.md` → Phase 1-B Step 8
-- `prompts_docx/FLUXFOXUS/Phase 1/ui_focus_session.md` → Section 3 (Stop Focusing Modal)
-- `prompts_docx/FLUXFOXUS/Phase 1/FF_TRD_v1.0.md` → Section 5.3.3 (Wait Time Calculation & Streak Reset)
+- `prompts_docx/C1/GMP_FF_BUILD.md` → Phase 1-B Step 10
+- `prompts_docx/FLUXFOXUS/Phase 1/FF_TRD_v1.0.md` → Section 4.5 (`streak_records` table) & Section 5.3 (Streak Evaluation Logic)
+- `prompts_docx/FLUXFOXUS/Phase 1/FF_PRD_v1.0.md` → Section 4.2 (Daily Streak Evaluation & Minimum Sessions)
 - `ff_design_override.md` → Rustic Medley Palette
 
 **What to build:**
-1. **`StopFocusingModal` Widget:**
-   - Centered floating card with 12px radius, `#2B2F2E` surface, `#594C3D` border, blurred backdrop.
-   - Mechanical alert bell icon (`#CA9C68`).
-   - "Finish the goal?" heading + "You will break your focus streak if you stop now." subtitle.
-   - Streak row: [Amber dot] X days → [Grey dot] 0 days.
-   - Wait timer (15–25s calculated formula from TRD §5.3.3):
-     - Both buttons disabled during countdown.
-     - Live inline counter: "Quit Session (18s)".
-   - Actions:
-     - "Keep Going" (Primary, `#CA9C68`): Closes modal, resumes session.
-     - "Quit Session" (Secondary, outlined `#906D4B`): Resets streak, logs session stopped, navigates to Home.
-2. **Wait Time Formula:**
-   - `calculateWaitSeconds({required int streakDays, required Duration todayDistractingUsage, required Duration avgDistractingUsage})`.
-3. **Streak Reset & Focus Session Integration:**
-   - Trigger modal on "Stop Focusing" button tap in `FocusSessionScreen`.
-4. **Automated Unit & Widget Tests:**
-   - Formula validation unit tests, modal layout widget tests, countdown timer & action tests.
+1. **Streak Domain Models & State Management:**
+   - `StreakRecord` domain entity matching SQLite `streak_records` schema.
+   - Streak evaluation service calculating whether today's session goals were met (minimum sessions per day).
+2. **WorkManager Daily Evaluation Task:**
+   - Background periodic worker scheduled daily at 11:59 PM to evaluate streak continuation, neutral day preservation, or streak break.
+3. **Streak Neutral Days & Recovery:**
+   - Neutral days logic (minimum sessions = 0 allowed without breaking streak).
+4. **Integration with Active Sessions:**
+   - `StreakRepository` integration with `FocusSessionNotifier` on successful completion (increments/evaluates streak).
+5. **Automated Unit Tests:**
+   - Hermetic test suite for streak evaluation, neutral days, streak preservation, and SQLite persistence.
 
-**Key File Paths for Step 8:**
+**Key File Paths for Step 10:**
 ```
-fluxfoxus/lib/presentation/widgets/
-  stop_focusing_modal.dart             # Stop Focusing friction modal & wait calculation
-
 fluxfoxus/lib/features/focus/
-  domain/wait_time_calculator.dart     # Formula per TRD 5.3.3
+  domain/streak_record.dart            # StreakRecord model
+  services/streak_evaluation_service.dart # Daily evaluation logic
+  data/streak_repository.dart          # Already initialized in Step 8
 
-fluxfoxus/test/presentation/widgets/
-  stop_focusing_modal_test.dart        # Unit & widget tests for modal
+fluxfoxus/test/features/focus/
+  streak_evaluation_service_test.dart  # Unit tests for streak evaluation
 ```
 
 
@@ -333,7 +328,7 @@ When resuming as Code1:
 
 1. **Read** `agent_worklog.md` to check Code2's current files
 2. **Read** this `code1.md` fully
-3. **Phase 1-B Step 5, Step 6, and Step 7** are ✅ Completed with 128/128 tests passing and 0 analyzer lints.
-4. **All preview servers** and unused ports are cleanly shut down (PID 69402 serving port 8080 unified review hub active).
-5. **Next Step:** Phase 1-B Step 8 (Stop Focusing Modal).
+3. **Phase 1-B Steps 5, 6, 7, 8, and 9** are ✅ Completed with 140/140 tests passing and 0 analyzer lints.
+4. **All preview servers** and unused ports are cleanly shut down (port 8080 unified review hub active).
+5. **Next Step:** Phase 1-B Step 10 (Streaks System & Daily Evaluation).
 
