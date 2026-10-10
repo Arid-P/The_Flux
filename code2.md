@@ -105,13 +105,17 @@ All screens live in `ui_mockups/` and are served via background Python HTTP serv
 ## 5. Next Task to Execute (Queued Task)
 
 * **Status:** `IDLE` (Task completed & verified).
-* **Completed Task:** `Fix Review Hub Viewport Preservation & Island Navigation Bridge`
-  - Fixed issue where bottom island navigation reverted to a mobile ratio or stale cached markup.
-  - Implemented `navigateTo()` cross-frame bridge across all screens.
-  - Configured `#device-bezel` with `box-sizing: content-box` in `index.html` to guarantee strict 768px inner viewport width.
-  - Configured automatic iframe load event synchronization with top header tabs and standalone link.
+* **Completed Task:** `Distraction Intervention & YouTube Study Mode UI Mockup`
+  - Created `ui_mockups/distraction_intervention.html` per `prompts_docx/FLUXFOXUS/Phase 1/ui_distracted_intervention.md` and `ff_design_override.md`.
+  - Implemented 2/5/10/20 bottom-sheet intervention overlay on top of blurred app content.
+  - Interactive state machine: App switching (Instagram, YouTube, Reddit), time option selection (2m, 5m, 10m, 20m), session countdown timer, post-duration cooldown lock (5s, 10s, 15s wait periods with disabled buttons).
+  - YouTube Study Mode Card & Edge Grabber (~32px x 80px vertical pill with aperture icon expanding into horizontal control panel).
+  - Non-whitelisted channel interception banner with friction confirmation sentence typing flow.
+  - In-browser `#auto-test-modal` assertion runner (10/10 gates passing).
+  - Integrated into `ui_mockups/index.html` (port 8080 unified review hub) with 🛡️ Intervention tab.
+  - Test suites: `test_intervention_screen.js` (100% pass) and `test_code2_screens.js` (Section 7 added, 100% pass).
 * **Subsequent Backlog Tasks:**
-  - Additional helper screens or mockups (Intervention screens, home widget).
+  - Home Widget mockup (`ui_widget.md` -> `ui_mockups/widget.html`).
   - Integration with native Flutter screens as directed by user.
 
 ---

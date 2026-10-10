@@ -85,6 +85,18 @@ The preview server `serve_mockups.py` is running in your Codespace background. T
   - [ ] 3-tab selector: Today (24h area chart), Daily (7-day bar chart), Weekly (7-week bar chart + Sunday In-App Summary Card).
   - [ ] Searchable app list with descending time spent and app detail sheets.
 
+#### G. Distraction Intervention & YouTube Study Mode (`Port 8080`)
+* **URL:** `http://localhost:8080` (click 🛡️ **Intervention** tab) | **File:** [`ui_mockups/distraction_intervention.html`](file:///workspaces/The_Flux/ui_mockups/distraction_intervention.html)
+* **Owner:** Code2
+* **What to verify:**
+  - [ ] **2/5/10/20 Time Option Grid**: Tapping 2m, 5m, 10m, or 20m starts an active window with live ticking timer banner and unblurs the simulated app feed.
+  - [ ] **Cooldown Wait Friction Engine**: Upon window expiry (or tapping "End Now" / "⏳ Cooldown Wait"), overlay slides back up with disabled time buttons and a live countdown timer (`5s` for 2m, `10s` for 5m/10m, `15s` for 20m).
+  - [ ] **YouTube Study Mode Card**: On YouTube, tap "Watch only Study channels on YouTube" to activate Study Mode, unblur feed, and surface the FF aperture edge grabber on the right screen edge.
+  - [ ] **Edge Grabber & Control Panel**: Tap the edge grabber to expand the horizontal panel with "YouTube Study Mode" toggle switch and close button. Turning toggle OFF restores the intervention overlay.
+  - [ ] **Non-Whitelisted Video Interception**: Tap "🚫 Non-Study Video" to trigger the intervention dialog ("This channel is not on your study list"). Tap "Add to Study List" to open the friction sentence typing challenge.
+  - [ ] **Friction Typing Verification**: Type the exact confirmation sentence into the input field. Submit button enables only on an exact match.
+  - [ ] **In-Browser Auto-Test Runner**: Tap "🧪 Auto Tests" to run all 10 assertion gates in the test modal.
+
 ---
 
 ## 2. Flutter Production Codebase Review

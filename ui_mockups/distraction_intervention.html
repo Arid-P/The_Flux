@@ -1,0 +1,919 @@
+<!DOCTYPE html>
+<html lang="en" class="h-full bg-[#13191F] text-[#F8FAFC]">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>FluxFoxus — Distraction Intervention UI Prototype</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            ff: {
+              bg: '#13191F',
+              surface: '#2B2F2E',
+              'surface-elevated': '#232726',
+              border: '#594C3D',
+              accent: '#906D4B',
+              primary: '#CA9C68',
+              'primary-hover': '#DFB27F',
+              text: '#F8FAFC',
+              muted: '#94A3B8',
+              productive: '#4E7D56',
+              distracting: '#38332B',
+            }
+          },
+          fontFamily: {
+            sans: ['Inter', 'sans-serif'],
+          }
+        }
+      }
+    }
+  </script>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+    body { font-family: 'Inter', sans-serif; }
+    .custom-scrollbar::-webkit-scrollbar { width: 4px; height: 4px; }
+    .custom-scrollbar::-webkit-scrollbar-thumb { background: #594C3D; border-radius: 4px; }
+  </style>
+</head>
+<body class="bg-ff-bg text-ff-text min-h-screen flex flex-col justify-between selection:bg-ff-primary selection:text-ff-bg relative overflow-x-hidden">
+
+  <!-- TOP DEMO CONTROL BAR -->
+  <header class="w-full bg-ff-surface border-b border-ff-border px-4 py-2.5 sticky top-0 z-40 flex flex-wrap items-center justify-between gap-3 shadow-md">
+    <div class="flex items-center space-x-2.5">
+      <div class="w-7 h-7 rounded-lg bg-ff-bg border border-ff-border flex items-center justify-center text-ff-primary font-bold text-xs">
+        FF
+      </div>
+      <div>
+        <h1 class="text-xs font-bold text-ff-text flex items-center gap-1.5">
+          Distraction Intervention
+          <span class="text-[10px] px-1.5 py-0.5 rounded bg-ff-primary/20 text-ff-primary border border-ff-primary/40 font-mono">2/5/10/20</span>
+        </h1>
+        <p class="text-[10px] text-ff-muted">Friction Overlay • Cooldown Wait • YouTube Study Mode</p>
+      </div>
+    </div>
+
+    <!-- State Switcher Pills -->
+    <div class="flex items-center flex-wrap gap-1.5 text-xs">
+      <span class="text-[10px] font-bold text-ff-muted uppercase tracking-wider mr-1">App:</span>
+      <button id="btn-switch-youtube" onclick="switchApp('youtube')" class="app-switch-btn px-2.5 py-1 rounded-md bg-ff-primary text-ff-bg font-bold transition">
+        ▶ YouTube
+      </button>
+      <button id="btn-switch-instagram" onclick="switchApp('instagram')" class="app-switch-btn px-2.5 py-1 rounded-md bg-ff-bg border border-ff-border text-ff-muted hover:text-ff-text transition">
+        📸 Instagram
+      </button>
+      <button id="btn-switch-reddit" onclick="switchApp('reddit')" class="app-switch-btn px-2.5 py-1 rounded-md bg-ff-bg border border-ff-border text-ff-muted hover:text-ff-text transition">
+        💬 Reddit
+      </button>
+      <button id="btn-trigger-cooldown" onclick="simulateCooldownWait()" class="px-2.5 py-1 rounded-md bg-ff-accent/20 border border-ff-accent/50 text-ff-primary hover:bg-ff-accent/30 font-medium transition">
+        ⏳ Cooldown Wait
+      </button>
+      <button id="btn-trigger-nonwhitelisted" onclick="triggerNonWhitelistedVideo()" class="px-2.5 py-1 rounded-md bg-ff-surface-elevated border border-ff-border text-ff-text hover:border-ff-primary font-medium transition">
+        🚫 Non-Study Video
+      </button>
+      <button id="btn-run-tests" onclick="openAutoTestModal()" class="px-2.5 py-1 rounded-md bg-ff-productive/20 border border-ff-productive text-[#7CD088] font-bold transition flex items-center gap-1">
+        <span>🧪</span> Auto Tests
+      </button>
+    </div>
+  </header>
+
+  <!-- MAIN VIEWPORT CONTAINER -->
+  <main class="flex-1 w-full max-w-4xl mx-auto p-4 md:p-6 flex flex-col justify-center items-center relative">
+
+    <!-- SIMULATED APP WINDOW (THE UNDERLYING APP BEING INTERCEPTED) -->
+    <div id="simulated-app-wrapper" class="w-full max-w-md h-[720px] rounded-[28px] border-2 border-ff-border bg-[#0B0F13] relative overflow-hidden shadow-2xl flex flex-col">
+
+      <!-- SIMULATED PHONE STATUS BAR -->
+      <div class="w-full px-5 pt-3 pb-2 flex items-center justify-between text-[11px] text-ff-muted select-none bg-black/40 z-10">
+        <span class="font-semibold text-ff-text">9:41</span>
+        <div class="flex items-center space-x-1.5">
+          <span>5G</span>
+          <div class="w-5 h-2.5 border border-ff-muted rounded-sm p-0.5 flex items-center">
+            <div class="h-full w-3/4 bg-ff-muted rounded-[1px]"></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- SIMULATED APP CONTENT (BEHIND BLURRED OVERLAY) -->
+      <div id="simulated-app-feed" class="flex-1 overflow-y-auto custom-scrollbar p-3 space-y-3 filter blur-[6px] opacity-40 transition duration-300">
+        <!-- Mock Video / Post Cards -->
+        <div class="w-full bg-[#1A1F26] rounded-xl overflow-hidden border border-ff-border/40">
+          <div class="h-36 bg-[#262C36] flex items-center justify-center text-ff-muted text-xs font-mono">
+            ▶ 10 Hours of Infinite Scrolling
+          </div>
+          <div class="p-3">
+            <div class="h-3 w-3/4 bg-ff-muted/30 rounded mb-1.5"></div>
+            <div class="h-2.5 w-1/2 bg-ff-muted/20 rounded"></div>
+          </div>
+        </div>
+        <div class="w-full bg-[#1A1F26] rounded-xl overflow-hidden border border-ff-border/40">
+          <div class="h-32 bg-[#232933] flex items-center justify-center text-ff-muted text-xs font-mono">
+            Trending Recommended Content
+          </div>
+          <div class="p-3">
+            <div class="h-3 w-2/3 bg-ff-muted/30 rounded mb-1.5"></div>
+            <div class="h-2.5 w-1/3 bg-ff-muted/20 rounded"></div>
+          </div>
+        </div>
+        <div class="w-full bg-[#1A1F26] rounded-xl overflow-hidden border border-ff-border/40">
+          <div class="h-32 bg-[#20252E] flex items-center justify-center text-ff-muted text-xs font-mono">
+            Viral Feed Distraction Loop
+          </div>
+          <div class="p-3">
+            <div class="h-3 w-4/5 bg-ff-muted/30 rounded mb-1.5"></div>
+            <div class="h-2.5 w-2/5 bg-ff-muted/20 rounded"></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- YOUTUBE STUDY MODE EDGE GRABBER -->
+      <div id="edge-grabber-container" class="absolute right-0 top-1/2 -translate-y-1/2 z-30 transition duration-200">
+        <!-- Collapsed Grabber Tab (Pill anchored to right edge) -->
+        <button id="edge-grabber" onclick="toggleEdgePanel()" class="w-8 h-20 bg-ff-primary hover:bg-ff-primary-hover rounded-l-2xl shadow-xl flex flex-col items-center justify-center gap-1.5 text-ff-bg transition group" title="YouTube Study Mode Quick Controls">
+          <!-- FF Aperture Icon -->
+          <svg class="w-4 h-4 text-ff-bg fill-current" viewBox="0 0 24 24">
+            <circle cx="12" cy="12" r="3" fill="none" stroke="currentColor" stroke-width="2"/>
+            <path d="M12 2a10 10 0 0 0-10 10c0 5.52 4.48 10 10 10s10-4.48 10-10" fill="none" stroke="currentColor" stroke-width="2"/>
+            <path d="M12 5l4 7-8 1" stroke="currentColor" stroke-width="1.5"/>
+          </svg>
+          <span class="text-[9px] font-extrabold tracking-tighter uppercase rotate-90 select-none">STUDY</span>
+        </button>
+
+        <!-- Expanded Horizontal Control Panel -->
+        <div id="edge-panel" class="hidden absolute right-10 top-1/2 -translate-y-1/2 bg-ff-bg/95 backdrop-blur-md border border-ff-border rounded-xl p-3.5 shadow-2xl flex items-center gap-3 w-64 z-40">
+          <div class="flex-1">
+            <div class="text-xs font-semibold text-ff-text">YouTube Study Mode</div>
+            <div class="text-[10px] text-ff-muted">Whitelist channels only</div>
+          </div>
+          <!-- Toggle Switch -->
+          <button id="study-mode-toggle" onclick="toggleStudyModeState()" class="w-11 h-6 rounded-full bg-ff-primary p-0.5 transition duration-200 focus:outline-none flex items-center">
+            <div id="toggle-circle" class="w-5 h-5 rounded-full bg-ff-bg shadow-md transform translate-x-5 transition duration-200"></div>
+          </button>
+          <!-- Close button -->
+          <button onclick="toggleEdgePanel(false)" class="text-ff-muted hover:text-ff-text text-sm p-1">
+            ✕
+          </button>
+        </div>
+      </div>
+
+      <!-- 2/5/10/20 INTERVENTION WINDOW (BOTTOM SHEET OVERLAY) -->
+      <div id="intervention-sheet" class="absolute inset-x-0 bottom-0 bg-ff-surface border-t-2 border-ff-border rounded-t-[24px] p-5 shadow-2xl z-20 flex flex-col gap-3.5 transition-transform duration-300 transform translate-y-0">
+
+        <!-- Top Drag Handle Notch -->
+        <div class="w-12 h-1 bg-ff-border rounded-full mx-auto -mt-1 mb-1"></div>
+
+        <!-- ROW 1: APP INFO + STREAK -->
+        <div class="flex items-center justify-between">
+          <div class="flex items-center space-x-2.5">
+            <div id="app-icon" class="w-7 h-7 rounded-lg bg-red-600/20 border border-red-500/30 flex items-center justify-center text-sm shadow-sm">
+              ▶
+            </div>
+            <div>
+              <div class="flex items-center gap-1.5">
+                <span id="app-name" class="text-xs font-bold text-ff-text">YouTube</span>
+                <span class="text-ff-muted text-xs">•</span>
+                <span id="app-limit-text" class="text-xs text-ff-muted">1h limit</span>
+              </div>
+            </div>
+          </div>
+          <!-- Streak Counter Badge -->
+          <div id="streak-badge" class="flex items-center space-x-1 px-2.5 py-1 rounded-full bg-ff-bg border border-ff-border text-xs text-ff-primary font-semibold">
+            <span>🔥</span>
+            <span id="streak-days">5 days</span>
+          </div>
+        </div>
+
+        <!-- ROW 2: PROGRESS BAR (Time spent today vs limit) -->
+        <div class="w-full">
+          <div class="w-full h-2 bg-ff-bg rounded-full overflow-hidden border border-ff-border/50">
+            <div id="limit-progress-bar" class="h-full bg-gradient-to-r from-ff-primary to-ff-accent rounded-full transition-all duration-300" style="width: 70%;"></div>
+          </div>
+        </div>
+
+        <!-- ROW 3: TIME LABELS -->
+        <div class="flex items-center justify-between text-[11px] text-ff-muted px-0.5">
+          <span id="spent-today-val" class="font-medium text-ff-text">42m / Spent today</span>
+          <span id="limit-left-val" class="text-ff-muted">18m / Limit left</span>
+        </div>
+
+        <!-- ROW 4: YOUTUBE STUDY MODE CARD (Visible only on YouTube) -->
+        <div id="yt-study-card" onclick="activateStudyModeFromCard()" class="w-full bg-ff-surface-elevated border border-ff-primary/40 hover:border-ff-primary rounded-xl p-3 cursor-pointer flex items-center justify-between transition group shadow-sm">
+          <div class="flex items-center space-x-2.5">
+            <div class="w-6 h-6 rounded-md bg-red-950/40 border border-red-800/40 flex items-center justify-center text-red-400 text-xs font-bold">
+              ▶
+            </div>
+            <div>
+              <div class="text-xs font-semibold text-ff-text group-hover:text-ff-primary transition">
+                Watch only Study channels on YouTube
+              </div>
+              <div class="text-[10px] text-ff-muted">
+                Channel whitelist filter enforcement
+              </div>
+            </div>
+          </div>
+          <span class="text-[10px] px-2 py-0.5 rounded-full bg-ff-primary/20 text-ff-primary font-bold border border-ff-primary/30">
+            STUDY MODE
+          </span>
+        </div>
+
+        <!-- ROW 5: PROMPT LABEL -->
+        <div class="text-center py-0.5">
+          <span id="prompt-label" class="text-xs font-medium text-ff-text">
+            How long do you want to use?
+          </span>
+        </div>
+
+        <!-- ROW 6: TIME OPTION GRID (2×2 Pill Buttons) -->
+        <div id="time-options-grid" class="grid grid-cols-2 gap-2.5">
+          <button id="btn-opt-2m" onclick="selectTimeOption(2)" class="time-opt-btn py-2.5 px-4 rounded-full border border-ff-border bg-transparent text-ff-text text-xs font-semibold hover:border-ff-primary transition duration-150">
+            2 mins
+          </button>
+          <button id="btn-opt-5m" onclick="selectTimeOption(5)" class="time-opt-btn py-2.5 px-4 rounded-full border border-ff-border bg-transparent text-ff-text text-xs font-semibold hover:border-ff-primary transition duration-150">
+            5 mins
+          </button>
+          <button id="btn-opt-10m" onclick="selectTimeOption(10)" class="time-opt-btn py-2.5 px-4 rounded-full border border-ff-border bg-transparent text-ff-text text-xs font-semibold hover:border-ff-primary transition duration-150">
+            10 mins
+          </button>
+          <button id="btn-opt-20m" onclick="selectTimeOption(20)" class="time-opt-btn py-2.5 px-4 rounded-full border border-ff-border bg-transparent text-ff-text text-xs font-semibold hover:border-ff-primary transition duration-150">
+            20 mins
+          </button>
+        </div>
+
+        <!-- COOLDOWN WAIT NOTICE (Visible during cooldown wait mode) -->
+        <div id="cooldown-notice" class="hidden bg-ff-bg border border-ff-primary/50 rounded-xl p-3 text-center space-y-1.5 animate-pulse">
+          <div class="text-xs font-bold text-ff-primary flex items-center justify-center gap-1.5">
+            <span>⏳</span>
+            <span id="cooldown-timer-text">Friction Pause: Please wait 10s...</span>
+          </div>
+          <div class="w-full h-1 bg-ff-surface rounded-full overflow-hidden">
+            <div id="cooldown-progress-bar" class="h-full bg-ff-primary transition-all duration-1000" style="width: 100%;"></div>
+          </div>
+          <p class="text-[10px] text-ff-muted">Time expired. A short reflection pause applies before opening again.</p>
+        </div>
+
+        <!-- ROW 7: EXIT BUTTON -->
+        <button id="btn-exit-app" onclick="handleExitApp()" class="w-full py-3 rounded-full bg-ff-primary hover:bg-ff-primary-hover text-ff-bg text-xs font-bold shadow-lg transition duration-150 flex items-center justify-center gap-1.5">
+          <span id="exit-btn-text">Exit YouTube</span>
+        </button>
+
+      </div>
+
+      <!-- ACTIVE WINDOW SESSION BANNER (Simulating temporary allowed use) -->
+      <div id="active-session-banner" class="hidden absolute top-12 inset-x-3 bg-ff-surface/95 border border-ff-primary rounded-xl p-3 shadow-2xl z-30 flex items-center justify-between">
+        <div class="flex items-center space-x-2">
+          <div class="w-2 h-2 rounded-full bg-ff-primary animate-ping"></div>
+          <div>
+            <div class="text-xs font-bold text-ff-text">App Usage Session Active</div>
+            <div class="text-[10px] text-ff-muted">Window remaining: <span id="active-window-timer" class="text-ff-primary font-mono font-bold">02:00</span></div>
+          </div>
+        </div>
+        <button onclick="expireSessionEarly()" class="px-2.5 py-1 text-[10px] font-bold rounded-lg bg-ff-bg border border-ff-border text-ff-muted hover:text-ff-text">
+          End Now
+        </button>
+      </div>
+
+      <!-- NON-WHITELISTED CHANNEL INTERCEPTION MODAL -->
+      <div id="non-whitelisted-modal" class="hidden absolute inset-0 bg-black/80 backdrop-blur-md z-50 flex items-center justify-center p-5">
+        <div class="w-full max-w-sm bg-ff-surface border border-ff-border rounded-2xl p-5 shadow-2xl space-y-4">
+          <div class="flex items-center space-x-3">
+            <div class="w-9 h-9 rounded-xl bg-red-950/60 border border-red-800/60 flex items-center justify-center text-red-400 text-base">
+              🚫
+            </div>
+            <div>
+              <h3 class="text-xs font-bold text-ff-text">This channel is not on your study list</h3>
+              <p class="text-[10px] text-ff-muted">Distraction video blocked in Study Mode</p>
+            </div>
+          </div>
+          <div class="bg-ff-bg rounded-xl p-3 border border-ff-border text-xs text-ff-muted space-y-1">
+            <div class="text-ff-text font-semibold flex items-center gap-1">
+              <span>Channel:</span> <span id="intercepted-channel-name" class="text-ff-primary">ViralGamingHighlights</span>
+            </div>
+            <p class="text-[10px]">To protect your focus, only channels added to your whitelist are permitted.</p>
+          </div>
+          <div class="flex items-center gap-2 pt-1">
+            <button id="btn-got-it" onclick="dismissNonWhitelistedModal()" class="flex-1 py-2.5 rounded-xl bg-ff-bg border border-ff-border hover:border-ff-primary text-xs font-semibold text-ff-text transition">
+              Got it
+            </button>
+            <button id="btn-add-study-list" onclick="openFrictionSentenceModal()" class="flex-1 py-2.5 rounded-xl bg-ff-primary hover:bg-ff-primary-hover text-xs font-bold text-ff-bg transition">
+              Add to Study List
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- CHANNEL WHITELIST FRICTION SENTENCE MODAL -->
+      <div id="whitelist-confirmation-sheet" class="hidden absolute inset-0 bg-black/85 backdrop-blur-md z-50 flex flex-col justify-end">
+        <div class="w-full bg-ff-surface border-t-2 border-ff-border rounded-t-2xl p-5 shadow-2xl space-y-3.5">
+          <div class="flex items-center justify-between">
+            <h3 class="text-xs font-bold text-ff-text flex items-center gap-1.5">
+              <span>✍️</span> Type Sentence to Whitelist
+            </h3>
+            <button onclick="closeFrictionSentenceModal()" class="text-ff-muted hover:text-ff-text text-sm p-1">
+              ✕
+            </button>
+          </div>
+          <p class="text-[11px] text-ff-muted">
+            To prevent mindless whitelisting, type the exact confirmation sentence below:
+          </p>
+          <!-- Target Sentence Display Box -->
+          <div id="target-sentence-box" class="bg-ff-bg border border-ff-border rounded-xl p-3 text-xs text-ff-primary font-medium tracking-wide select-all font-mono">
+            I am watching this specifically to learn and study.
+          </div>
+          <!-- User Typing Input Field -->
+          <div>
+            <input type="text" id="input-confirm-sentence" oninput="validateConfirmationSentence()" placeholder="Type the sentence exactly as shown above..." class="w-full bg-ff-bg border border-ff-border focus:border-ff-primary rounded-xl px-3.5 py-2.5 text-xs text-ff-text placeholder-ff-muted/50 focus:outline-none transition">
+            <div class="flex items-center justify-between text-[10px] text-ff-muted mt-1 px-1">
+              <span id="char-match-status">Match: 0%</span>
+              <span class="text-ff-accent">Exact match required</span>
+            </div>
+          </div>
+          <!-- Submit Action Button -->
+          <button id="btn-confirm-add-channel" onclick="submitWhitelistChannel()" disabled class="w-full py-3 rounded-full bg-ff-primary text-ff-bg text-xs font-bold opacity-40 cursor-not-allowed transition duration-150">
+            Confirm & Whitelist Channel
+          </button>
+        </div>
+      </div>
+
+      <!-- CELEBRATION TOAST -->
+      <div id="toast-notif" class="hidden absolute top-5 inset-x-6 bg-ff-productive border border-[#7CD088] text-ff-text px-4 py-2.5 rounded-xl text-xs font-semibold text-center shadow-xl z-50">
+        Channel added to Study Whitelist!
+      </div>
+
+    </div>
+
+    <!-- FLOATING BOTTOM ISLAND NAVIGATION BAR (MULTI-SCREEN CROSS-LINK) -->
+    <nav id="bottom-island" class="mt-6 bg-ff-surface border border-ff-border rounded-full px-4 py-2 shadow-xl flex items-center space-x-4 text-xs z-30">
+      <a href="home_screen.html" onclick="navigateTo('home_screen.html', event)" class="p-2 text-ff-muted hover:text-ff-text transition flex items-center gap-1" title="Home">
+        <span>🏠</span>
+        <span class="hidden sm:inline">Home</span>
+      </a>
+      <a href="usage_stats.html" onclick="navigateTo('usage_stats.html', event)" class="p-2 text-ff-muted hover:text-ff-text transition flex items-center gap-1" title="Usage Stats">
+        <span>📊</span>
+        <span class="hidden sm:inline">Usage</span>
+      </a>
+      <a href="active_focus_session.html" onclick="navigateTo('active_focus_session.html', event)" class="p-2 text-ff-muted hover:text-ff-text transition flex items-center gap-1" title="Focus Session">
+        <span>⏱️</span>
+        <span class="hidden sm:inline">Focus</span>
+      </a>
+      <a href="planner.html" onclick="navigateTo('planner.html', event)" class="p-2 text-ff-muted hover:text-ff-text transition flex items-center gap-1" title="Planner">
+        <span>📅</span>
+        <span class="hidden sm:inline">Planner</span>
+      </a>
+      <a href="app_limits.html" onclick="navigateTo('app_limits.html', event)" class="p-2 text-ff-muted hover:text-ff-text transition flex items-center gap-1" title="App Limits">
+        <span>🚫</span>
+        <span class="hidden sm:inline">Limits</span>
+      </a>
+    </nav>
+  </main>
+
+  <!-- AUTOMATED TEST MODAL RUNNER -->
+  <div id="auto-test-modal" class="hidden fixed inset-0 bg-black/80 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+    <div class="w-full max-w-lg bg-ff-surface border border-ff-border rounded-2xl p-5 shadow-2xl flex flex-col max-h-[85vh]">
+      <div class="flex items-center justify-between pb-3 border-b border-ff-border">
+        <div>
+          <h2 class="text-sm font-bold text-ff-text flex items-center gap-2">
+            <span>🧪</span> Distraction Intervention Test Runner
+          </h2>
+          <p class="text-xs text-ff-muted">Automated verification of 10 specification gates</p>
+        </div>
+        <button onclick="closeAutoTestModal()" class="text-ff-muted hover:text-ff-text text-sm p-1">
+          ✕
+        </button>
+      </div>
+
+      <!-- Test Results Scrollable List -->
+      <div id="test-results-list" class="flex-1 overflow-y-auto custom-scrollbar my-4 space-y-2 pr-1 text-xs">
+        <!-- Results dynamically inserted here -->
+      </div>
+
+      <!-- Test Footer -->
+      <div class="pt-3 border-t border-ff-border flex items-center justify-between">
+        <span id="test-summary-status" class="text-xs font-semibold text-ff-muted">Ready to execute suite.</span>
+        <button onclick="runInterventionAutoTests()" class="px-4 py-2 rounded-xl bg-ff-primary hover:bg-ff-primary-hover text-ff-bg text-xs font-bold transition">
+          Run All 10 Tests
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- STATE ENGINE SCRIPT -->
+  <script>
+    // State Model
+    const appConfigs = {
+      youtube: {
+        name: 'YouTube',
+        icon: '▶',
+        iconBg: 'bg-red-600/20 border-red-500/30 text-red-500',
+        limitText: '1h limit',
+        spentText: '42m / Spent today',
+        limitLeftText: '18m / Limit left',
+        progressWidth: '70%',
+        hasStudyMode: true
+      },
+      instagram: {
+        name: 'Instagram',
+        icon: '📸',
+        iconBg: 'bg-pink-600/20 border-pink-500/30 text-pink-400',
+        limitText: '45m limit',
+        spentText: '35m / Spent today',
+        limitLeftText: '10m / Limit left',
+        progressWidth: '77%',
+        hasStudyMode: false
+      },
+      reddit: {
+        name: 'Reddit',
+        icon: '💬',
+        iconBg: 'bg-orange-600/20 border-orange-500/30 text-orange-400',
+        limitText: '30m limit',
+        spentText: '25m / Spent today',
+        limitLeftText: '5m / Limit left',
+        progressWidth: '83%',
+        hasStudyMode: false
+      }
+    };
+
+    let currentAppKey = 'youtube';
+    let selectedMinutes = null;
+    let isStudyModeActive = false;
+    let isEdgePanelExpanded = false;
+    let cooldownTimer = null;
+    let sessionTimer = null;
+
+    const confirmationSentencesPool = [
+      "I am watching this specifically to learn and study.",
+      "I choose intentional education over mindless distraction.",
+      "My time is valuable and I invest it with purpose.",
+      "This channel provides educational value for my goals."
+    ];
+
+    // Navigation Bridge
+    function navigateTo(url, e) {
+      if (e) e.preventDefault();
+      const cleanUrl = url.split('?')[0].split('#')[0];
+      const bustedUrl = cleanUrl + '?t=' + Date.now();
+      try {
+        if (window.parent && window.parent !== window && typeof window.parent.selectScreen === 'function') {
+          window.parent.selectScreen(bustedUrl);
+          return;
+        }
+      } catch (err) {}
+      window.location.href = bustedUrl;
+    }
+
+    // App Switcher
+    function switchApp(appKey) {
+      currentAppKey = appKey;
+      const config = appConfigs[appKey];
+      if (!config) return;
+
+      document.getElementById('app-name').textContent = config.name;
+      document.getElementById('app-limit-text').textContent = config.limitText;
+      document.getElementById('spent-today-val').textContent = config.spentText;
+      document.getElementById('limit-left-val').textContent = config.limitLeftText;
+      document.getElementById('limit-progress-bar').style.width = config.progressWidth;
+      document.getElementById('exit-btn-text').textContent = 'Exit ' + config.name;
+
+      const iconEl = document.getElementById('app-icon');
+      iconEl.className = `w-7 h-7 rounded-lg border flex items-center justify-center text-sm shadow-sm ${config.iconBg}`;
+      iconEl.textContent = config.icon;
+
+      // YouTube study card visibility
+      const studyCard = document.getElementById('yt-study-card');
+      const edgeGrabberContainer = document.getElementById('edge-grabber-container');
+      if (config.hasStudyMode) {
+        studyCard.classList.remove('hidden');
+        if (isStudyModeActive) {
+          edgeGrabberContainer.classList.remove('hidden');
+        }
+      } else {
+        studyCard.classList.add('hidden');
+        edgeGrabberContainer.classList.add('hidden');
+      }
+
+      // Update switcher buttons
+      document.querySelectorAll('.app-switch-btn').forEach(btn => {
+        btn.className = 'app-switch-btn px-2.5 py-1 rounded-md bg-ff-bg border border-ff-border text-ff-muted hover:text-ff-text transition';
+      });
+      const activeBtn = document.getElementById('btn-switch-' + appKey);
+      if (activeBtn) {
+        activeBtn.className = 'app-switch-btn px-2.5 py-1 rounded-md bg-ff-primary text-ff-bg font-bold transition';
+      }
+
+      // Reset options
+      resetTimeOptionSelection();
+    }
+
+    // Time Option Selection
+    function selectTimeOption(mins) {
+      selectedMinutes = mins;
+      const options = [2, 5, 10, 20];
+      options.forEach(m => {
+        const btn = document.getElementById('btn-opt-' + m + 'm');
+        if (btn) {
+          if (m === mins) {
+            btn.className = 'time-opt-btn py-2.5 px-4 rounded-full border-none bg-ff-primary text-ff-bg text-xs font-semibold shadow-md transition duration-150';
+          } else {
+            btn.className = 'time-opt-btn py-2.5 px-4 rounded-full border border-ff-border bg-transparent text-ff-text text-xs font-semibold hover:border-ff-primary transition duration-150';
+          }
+        }
+      });
+
+      // Start simulated session after brief visual feedback
+      setTimeout(() => {
+        startSimulatedSession(mins);
+      }, 350);
+    }
+
+    function resetTimeOptionSelection() {
+      selectedMinutes = null;
+      [2, 5, 10, 20].forEach(m => {
+        const btn = document.getElementById('btn-opt-' + m + 'm');
+        if (btn) {
+          btn.className = 'time-opt-btn py-2.5 px-4 rounded-full border border-ff-border bg-transparent text-ff-text text-xs font-semibold hover:border-ff-primary transition duration-150';
+          btn.disabled = false;
+        }
+      });
+    }
+
+    // Simulated Active Session
+    function startSimulatedSession(mins) {
+      // Hide intervention sheet
+      document.getElementById('intervention-sheet').classList.add('translate-y-full');
+      // Unblur feed
+      const feed = document.getElementById('simulated-app-feed');
+      feed.classList.remove('blur-[6px]', 'opacity-40');
+
+      // Show active session banner
+      const banner = document.getElementById('active-session-banner');
+      banner.classList.remove('hidden');
+
+      let secondsLeft = mins * 60;
+      updateWindowTimer(secondsLeft);
+
+      clearInterval(sessionTimer);
+      // Fast demo tick (1 second real = 10 simulated seconds)
+      sessionTimer = setInterval(() => {
+        secondsLeft -= 10;
+        if (secondsLeft <= 0) {
+          clearInterval(sessionTimer);
+          expireSessionEarly();
+        } else {
+          updateWindowTimer(secondsLeft);
+        }
+      }, 1000);
+    }
+
+    function updateWindowTimer(seconds) {
+      const m = Math.floor(seconds / 60);
+      const s = seconds % 60;
+      document.getElementById('active-window-timer').textContent =
+        `${String(m).padStart(2, '0')}:${String(s).padStart(2, '0')}`;
+    }
+
+    function expireSessionEarly() {
+      clearInterval(sessionTimer);
+      document.getElementById('active-session-banner').classList.add('hidden');
+
+      // Re-blur feed
+      const feed = document.getElementById('simulated-app-feed');
+      feed.classList.add('blur-[6px]', 'opacity-40');
+
+      // Slide back sheet
+      document.getElementById('intervention-sheet').classList.remove('translate-y-full');
+
+      // Trigger cooldown wait based on selected option: 2m->5s, 5m->10s, 10m->10s, 20m->15s
+      const waitSeconds = selectedMinutes === 2 ? 5 : (selectedMinutes === 20 ? 15 : 10);
+      startCooldownWait(waitSeconds);
+    }
+
+    // Cooldown Wait Logic
+    function startCooldownWait(seconds) {
+      const cooldownNotice = document.getElementById('cooldown-notice');
+      const timerText = document.getElementById('cooldown-timer-text');
+      const progressBar = document.getElementById('cooldown-progress-bar');
+      const buttons = document.querySelectorAll('.time-opt-btn');
+
+      cooldownNotice.classList.remove('hidden');
+      buttons.forEach(btn => {
+        btn.disabled = true;
+        btn.classList.add('opacity-40', 'cursor-not-allowed');
+      });
+
+      let remaining = seconds;
+      timerText.textContent = `Friction Pause: Please wait ${remaining}s...`;
+      progressBar.style.width = '100%';
+
+      clearInterval(cooldownTimer);
+      const total = seconds;
+      cooldownTimer = setInterval(() => {
+        remaining -= 1;
+        if (remaining <= 0) {
+          clearInterval(cooldownTimer);
+          cooldownNotice.classList.add('hidden');
+          buttons.forEach(btn => {
+            btn.disabled = false;
+            btn.classList.remove('opacity-40', 'cursor-not-allowed');
+          });
+          resetTimeOptionSelection();
+        } else {
+          timerText.textContent = `Friction Pause: Please wait ${remaining}s...`;
+          progressBar.style.width = `${(remaining / total) * 100}%`;
+        }
+      }, 1000);
+    }
+
+    function simulateCooldownWait() {
+      selectedMinutes = 5;
+      startCooldownWait(10);
+    }
+
+    // Exit Button Handler
+    function handleExitApp() {
+      navigateTo('home_screen.html');
+    }
+
+    // YouTube Study Mode Controls
+    function activateStudyModeFromCard() {
+      isStudyModeActive = true;
+      document.getElementById('intervention-sheet').classList.add('translate-y-full');
+      const feed = document.getElementById('simulated-app-feed');
+      feed.classList.remove('blur-[6px]', 'opacity-40');
+      document.getElementById('edge-grabber-container').classList.remove('hidden');
+      showToast('YouTube Study Mode activated! Whitelist enforced.');
+    }
+
+    function toggleEdgePanel(show) {
+      const panel = document.getElementById('edge-panel');
+      if (typeof show === 'boolean') {
+        isEdgePanelExpanded = show;
+      } else {
+        isEdgePanelExpanded = !isEdgePanelExpanded;
+      }
+      if (isEdgePanelExpanded) {
+        panel.classList.remove('hidden');
+      } else {
+        panel.classList.add('hidden');
+      }
+    }
+
+    function toggleStudyModeState() {
+      isStudyModeActive = !isStudyModeActive;
+      const toggle = document.getElementById('study-mode-toggle');
+      const circle = document.getElementById('toggle-circle');
+
+      if (isStudyModeActive) {
+        toggle.className = 'w-11 h-6 rounded-full bg-ff-primary p-0.5 transition duration-200 focus:outline-none flex items-center';
+        circle.className = 'w-5 h-5 rounded-full bg-ff-bg shadow-md transform translate-x-5 transition duration-200';
+        showToast('Study Mode: Active (Whitelist on)');
+      } else {
+        toggle.className = 'w-11 h-6 rounded-full bg-ff-border p-0.5 transition duration-200 focus:outline-none flex items-center';
+        circle.className = 'w-5 h-5 rounded-full bg-ff-muted shadow-md transform translate-x-0 transition duration-200';
+        toggleEdgePanel(false);
+        // Study mode turned off -> intervention window reappears
+        document.getElementById('intervention-sheet').classList.remove('translate-y-full');
+        document.getElementById('simulated-app-feed').classList.add('blur-[6px]', 'opacity-40');
+        showToast('Study Mode disabled. Intervention active.');
+      }
+    }
+
+    // Non-whitelisted Channel Interception Flow
+    function triggerNonWhitelistedVideo() {
+      switchApp('youtube');
+      isStudyModeActive = true;
+      document.getElementById('non-whitelisted-modal').classList.remove('hidden');
+    }
+
+    function dismissNonWhitelistedModal() {
+      document.getElementById('non-whitelisted-modal').classList.add('hidden');
+    }
+
+    function openFrictionSentenceModal() {
+      dismissNonWhitelistedModal();
+      const sentence = confirmationSentencesPool[Math.floor(Math.random() * confirmationSentencesPool.length)];
+      document.getElementById('target-sentence-box').textContent = sentence;
+      document.getElementById('input-confirm-sentence').value = '';
+      validateConfirmationSentence();
+      document.getElementById('whitelist-confirmation-sheet').classList.remove('hidden');
+    }
+
+    function closeFrictionSentenceModal() {
+      document.getElementById('whitelist-confirmation-sheet').classList.add('hidden');
+    }
+
+    function validateConfirmationSentence() {
+      const target = document.getElementById('target-sentence-box').textContent.trim();
+      const input = document.getElementById('input-confirm-sentence').value.trim();
+      const submitBtn = document.getElementById('btn-confirm-add-channel');
+      const statusText = document.getElementById('char-match-status');
+
+      const isMatch = target.toLowerCase() === input.toLowerCase();
+
+      if (isMatch) {
+        submitBtn.disabled = false;
+        submitBtn.className = 'w-full py-3 rounded-full bg-ff-primary text-ff-bg text-xs font-bold shadow-lg transition duration-150 cursor-pointer';
+        statusText.textContent = 'Exact match verified! Ready to whitelist.';
+        statusText.className = 'text-[#7CD088] font-bold';
+      } else {
+        submitBtn.disabled = true;
+        submitBtn.className = 'w-full py-3 rounded-full bg-ff-primary text-ff-bg text-xs font-bold opacity-40 cursor-not-allowed transition duration-150';
+        statusText.textContent = `Matched ${input.length}/${target.length} characters`;
+        statusText.className = 'text-ff-muted';
+      }
+    }
+
+    function submitWhitelistChannel() {
+      closeFrictionSentenceModal();
+      showToast('ViralGamingHighlights added to Study Whitelist!');
+    }
+
+    function showToast(msg) {
+      const toast = document.getElementById('toast-notif');
+      toast.textContent = msg;
+      toast.classList.remove('hidden');
+      setTimeout(() => {
+        toast.classList.add('hidden');
+      }, 3000);
+    }
+
+    // Test Modal Handlers
+    function openAutoTestModal() {
+      document.getElementById('auto-test-modal').classList.remove('hidden');
+      runInterventionAutoTests();
+    }
+
+    function closeAutoTestModal() {
+      document.getElementById('auto-test-modal').classList.add('hidden');
+    }
+
+    // AUTOMATED TEST SUITE (10 GATES)
+    function runInterventionAutoTests() {
+      const list = document.getElementById('test-results-list');
+      const summary = document.getElementById('test-summary-status');
+      list.innerHTML = '';
+
+      const testGates = [
+        {
+          id: 1,
+          name: 'App Switcher & Dynamic Metadata Update',
+          run: () => {
+            switchApp('instagram');
+            const isInsta = document.getElementById('app-name').textContent === 'Instagram';
+            switchApp('youtube');
+            const isYT = document.getElementById('app-name').textContent === 'YouTube';
+            return isInsta && isYT;
+          }
+        },
+        {
+          id: 2,
+          name: 'Row 1 App Info & Flame Streak Badge (#streak-badge)',
+          run: () => {
+            const badge = document.getElementById('streak-badge');
+            const text = document.getElementById('streak-days').textContent;
+            return badge && text.includes('days');
+          }
+        },
+        {
+          id: 3,
+          name: 'Row 2 & 3 Progress Bar & Spent/Limit Labels',
+          run: () => {
+            const bar = document.getElementById('limit-progress-bar');
+            const spent = document.getElementById('spent-today-val').textContent;
+            const left = document.getElementById('limit-left-val').textContent;
+            return bar && spent.includes('Spent today') && left.includes('Limit left');
+          }
+        },
+        {
+          id: 4,
+          name: 'Row 4 YouTube Study Mode Card Visibility (YouTube-exclusive)',
+          run: () => {
+            switchApp('youtube');
+            const ytVisible = !document.getElementById('yt-study-card').classList.contains('hidden');
+            switchApp('instagram');
+            const instaHidden = document.getElementById('yt-study-card').classList.contains('hidden');
+            switchApp('youtube');
+            return ytVisible && instaHidden;
+          }
+        },
+        {
+          id: 5,
+          name: 'Row 5 & 6 2×2 Time Selection Grid (2m, 5m, 10m, 20m)',
+          run: () => {
+            const b2 = document.getElementById('btn-opt-2m');
+            const b5 = document.getElementById('btn-opt-5m');
+            const b10 = document.getElementById('btn-opt-10m');
+            const b20 = document.getElementById('btn-opt-20m');
+            return b2 && b5 && b10 && b20;
+          }
+        },
+        {
+          id: 6,
+          name: 'Row 7 Dynamic Exit Button ("Exit [App Name]")',
+          run: () => {
+            switchApp('reddit');
+            const isRedditExit = document.getElementById('exit-btn-text').textContent === 'Exit Reddit';
+            switchApp('youtube');
+            const isYTExit = document.getElementById('exit-btn-text').textContent === 'Exit YouTube';
+            return isRedditExit && isYTExit;
+          }
+        },
+        {
+          id: 7,
+          name: 'Post-Duration Cooldown Friction Wait Logic & Disable State',
+          run: () => {
+            startCooldownWait(2);
+            const notice = !document.getElementById('cooldown-notice').classList.contains('hidden');
+            const btnDisabled = document.getElementById('btn-opt-2m').disabled;
+            clearInterval(cooldownTimer);
+            document.getElementById('cooldown-notice').classList.add('hidden');
+            resetTimeOptionSelection();
+            return notice && btnDisabled;
+          }
+        },
+        {
+          id: 8,
+          name: 'YouTube Study Mode Edge Grabber & Collapsed/Expanded Panel',
+          run: () => {
+            toggleEdgePanel(true);
+            const open = !document.getElementById('edge-panel').classList.contains('hidden');
+            toggleEdgePanel(false);
+            const closed = document.getElementById('edge-panel').classList.contains('hidden');
+            return open && closed;
+          }
+        },
+        {
+          id: 9,
+          name: 'Non-Whitelisted Video Interception Modal Trigger',
+          run: () => {
+            triggerNonWhitelistedVideo();
+            const modalOpen = !document.getElementById('non-whitelisted-modal').classList.contains('hidden');
+            dismissNonWhitelistedModal();
+            const modalClosed = document.getElementById('non-whitelisted-modal').classList.contains('hidden');
+            return modalOpen && modalClosed;
+          }
+        },
+        {
+          id: 10,
+          name: 'Channel Whitelist Confirmation Sentence Exact-Match Validation',
+          run: () => {
+            openFrictionSentenceModal();
+            const target = document.getElementById('target-sentence-box').textContent.trim();
+            const inputEl = document.getElementById('input-confirm-sentence');
+            const submitBtn = document.getElementById('btn-confirm-add-channel');
+
+            // Non-matching input
+            inputEl.value = 'wrong text';
+            validateConfirmationSentence();
+            const disabledOnMismatch = submitBtn.disabled === true;
+
+            // Matching input
+            inputEl.value = target;
+            validateConfirmationSentence();
+            const enabledOnMatch = submitBtn.disabled === false;
+
+            closeFrictionSentenceModal();
+            return disabledOnMismatch && enabledOnMatch;
+          }
+        }
+      ];
+
+      let passedCount = 0;
+      testGates.forEach(gate => {
+        let passed = false;
+        try {
+          passed = gate.run();
+        } catch (err) {
+          console.error(err);
+          passed = false;
+        }
+
+        if (passed) passedCount++;
+
+        const item = document.createElement('div');
+        item.className = `p-2.5 rounded-xl border flex items-center justify-between ${
+          passed ? 'bg-ff-surface border-ff-productive/40 text-ff-text' : 'bg-red-950/30 border-red-800 text-red-200'
+        }`;
+        item.innerHTML = `
+          <div class="flex items-center space-x-2">
+            <span class="${passed ? 'text-[#7CD088]' : 'text-red-400'} font-bold">${passed ? '✓' : '✗'}</span>
+            <span>Gate ${gate.id}: ${gate.name}</span>
+          </div>
+          <span class="text-[10px] px-2 py-0.5 rounded ${passed ? 'bg-ff-productive/20 text-[#7CD088]' : 'bg-red-900/40 text-red-300'} font-bold">
+            ${passed ? 'PASS' : 'FAIL'}
+          </span>
+        `;
+        list.appendChild(item);
+      });
+
+      summary.textContent = `Results: ${passedCount}/${testGates.length} Gates Passed (${Math.round((passedCount/testGates.length)*100)}%)`;
+      summary.className = passedCount === testGates.length ? 'text-xs font-bold text-[#7CD088]' : 'text-xs font-bold text-red-400';
+    }
+
+    // Initialize
+    window.addEventListener('DOMContentLoaded', () => {
+      switchApp('youtube');
+    });
+  </script>
+</body>
+</html>

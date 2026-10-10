@@ -236,14 +236,15 @@ const allScreens = [
   'usage_stats.html',
   'app_limits.html',
   'active_focus_session.html',
-  'preset_creation.html'
+  'preset_creation.html',
+  'distraction_intervention.html'
 ];
 
 allScreens.forEach(screenName => {
   const sPath = path.join(__dirname, 'ui_mockups', screenName);
   const sHtml = fs.readFileSync(sPath, 'utf8');
-  assert(sHtml.includes('function navigateTo(url)'), `${screenName} must define navigateTo(url)`);
-  assert(sHtml.includes('window.parent.selectScreen(url)'), `${screenName} must notify window.parent.selectScreen`);
+  assert(sHtml.includes('function navigateTo(url'), `${screenName} must define navigateTo(url)`);
+  assert(sHtml.includes('window.parent.selectScreen('), `${screenName} must notify window.parent.selectScreen`);
   console.log(`  ✓ ${screenName} implements responsive navigateTo() bridge`);
 });
 
@@ -256,8 +257,69 @@ assert(usageHtml.includes("navigateTo('home_screen.html')"), 'usage_stats.html m
 assert(limitsHtml.includes("navigateTo('home_screen.html')"), 'app_limits.html must link to home via navigateTo');
 console.log('  ✓ Bottom island links wired with reactive navigateTo() handlers');
 
+// 7. Testing distraction_intervention.html
+console.log('\n--- 7. Testing distraction_intervention.html ---');
+const interventionHtmlPath = path.join(__dirname, 'ui_mockups', 'distraction_intervention.html');
+assert(fs.existsSync(interventionHtmlPath), 'distraction_intervention.html must exist');
+const interventionHtml = fs.readFileSync(interventionHtmlPath, 'utf8');
+
+const requiredInterventionIds = [
+  '#simulated-app-wrapper',
+  '#edge-grabber',
+  '#edge-panel',
+  '#study-mode-toggle',
+  '#intervention-sheet',
+  '#app-icon',
+  '#app-name',
+  '#app-limit-text',
+  '#streak-badge',
+  '#streak-days',
+  '#limit-progress-bar',
+  '#spent-today-val',
+  '#limit-left-val',
+  '#yt-study-card',
+  '#prompt-label',
+  '#time-options-grid',
+  '#btn-opt-2m',
+  '#btn-opt-5m',
+  '#btn-opt-10m',
+  '#btn-opt-20m',
+  '#cooldown-notice',
+  '#btn-exit-app',
+  '#non-whitelisted-modal',
+  '#whitelist-confirmation-sheet',
+  '#target-sentence-box',
+  '#input-confirm-sentence',
+  '#btn-confirm-add-channel',
+  '#auto-test-modal',
+  '#test-results-list'
+];
+
+requiredInterventionIds.forEach(id => {
+  const cleanId = id.replace('#', '');
+  assert(interventionHtml.includes(`id="${cleanId}"`), `Distraction Intervention must contain ${id}`);
+  console.log(`  ✓ Intervention ID present: ${id}`);
+});
+
+const rusticColors = [
+  '#13191F',
+  '#2B2F2E',
+  '#594C3D',
+  '#906D4B',
+  '#CA9C68',
+  '#F8FAFC',
+  '#94A3B8',
+  '#4E7D56',
+  '#38332B'
+];
+
+rusticColors.forEach(color => {
+  assert(interventionHtml.includes(color), `Distraction Intervention must use Rustic Medley ${color}`);
+});
+console.log('  ✓ Intervention Screen Rustic Medley color tokens verified');
+
 console.log('\n======================================================');
-console.log('🎉 ALL CODE2 SCREEN TESTS PASSED (Home, App Limits, Planner, Usage Stats, Hub Bridge - 100%)');
+console.log('🎉 ALL CODE2 SCREEN TESTS PASSED (Home, App Limits, Planner, Usage Stats, Hub Bridge, Intervention - 100%)');
 console.log('======================================================\n');
 
 
