@@ -23,6 +23,7 @@ class ThemeTokens {
 
   /// #906D4B — Tanned Wood. Secondary UI elements, break timer display, sub-labels.
   static const Color accent = Color(0xFF906D4B);
+  static const Color secondary = Color(0xFF906D4B);
 
   /// #CA9C68 — Amber Autumn. Primary actions, start/stop buttons, active states,
   /// and the mechanical split seam line of the flip-clock.

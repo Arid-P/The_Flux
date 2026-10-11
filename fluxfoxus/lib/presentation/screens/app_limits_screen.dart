@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../core/database/database_tables.dart';
@@ -77,17 +78,168 @@ class _AppLimitsScreenState extends ConsumerState<AppLimitsScreen> {
     } catch (_) {}
   }
 
-  Future<void> _toggleLimit(String packageName, bool currentActive) async {
+  Future<void> _toggleLimit(String packageName, String appName, int streakDays, bool currentActive) async {
+    if (currentActive) {
+      _showTurnOffBlockSheet(packageName, appName, streakDays);
+    } else {
+      await _resumeLimit(packageName);
+    }
+  }
+
+  Future<void> _resumeLimit(String packageName) async {
     try {
       final db = await ref.read(appDatabaseProvider).database;
       await db.update(
         DatabaseTables.appLimits,
-        {DatabaseTables.colLimitIsActive: currentActive ? 0 : 1},
+        {
+          DatabaseTables.colLimitIsActive: 1,
+          DatabaseTables.colLimitPausedUntil: null,
+        },
         where: '${DatabaseTables.colLimitPackageName} = ?',
         whereArgs: [packageName],
       );
       await _loadLimits();
     } catch (_) {}
+  }
+
+  Future<void> _pauseLimit(String packageName, Duration duration) async {
+    try {
+      final db = await ref.read(appDatabaseProvider).database;
+      final pausedUntil = DateTime.now().add(duration);
+      await db.update(
+        DatabaseTables.appLimits,
+        {
+          DatabaseTables.colLimitIsActive: 0,
+          DatabaseTables.colLimitPausedUntil: pausedUntil.millisecondsSinceEpoch,
+        },
+        where: '${DatabaseTables.colLimitPackageName} = ?',
+        whereArgs: [packageName],
+      );
+      await _loadLimits();
+    } catch (_) {}
+  }
+
+  Future<void> _addExtraSession(String packageName, int minutes) async {
+    try {
+      final db = await ref.read(appDatabaseProvider).database;
+      final rows = await db.query(
+        DatabaseTables.appLimits,
+        where: '${DatabaseTables.colLimitPackageName} = ?',
+        whereArgs: [packageName],
+        limit: 1,
+      );
+      if (rows.isEmpty) return;
+
+      final current = rows.first;
+      final count = current[DatabaseTables.colLimitExtraSessionCount] as int? ?? 0;
+      final duration = current[DatabaseTables.colLimitExtraSessionDuration] as int? ?? 300;
+      if (count >= 6) return;
+      if ((count * duration) + (minutes * 60) > 3600) return;
+
+      await db.update(
+        DatabaseTables.appLimits,
+        {
+          DatabaseTables.colLimitExtraSessionCount: count + 1,
+          DatabaseTables.colLimitExtraSessionDuration: minutes * 60,
+        },
+        where: '${DatabaseTables.colLimitPackageName} = ?',
+        whereArgs: [packageName],
+      );
+      await _loadLimits();
+    } catch (_) {}
+  }
+
+  void _showTurnOffBlockSheet(String packageName, String appName, int streakDays) {
+    int countdown = 3;
+    Duration selectedDuration = const Duration(hours: 1);
+    Timer? timer;
+
+    showModalBottomSheet(
+      context: context,
+      backgroundColor: ThemeTokens.surface,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+      ),
+      builder: (ctx) => StatefulBuilder(
+        builder: (context, setSheetState) {
+          timer ??= Timer.periodic(const Duration(seconds: 1), (t) {
+            if (countdown > 0) {
+              setSheetState(() => countdown--);
+            } else {
+              t.cancel();
+            }
+          });
+
+          return Padding(
+            padding: const EdgeInsets.all(AppSpacing.l),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
+                Row(
+                  children: [
+                    const Icon(Icons.warning_amber_rounded, color: ThemeTokens.accent, size: 28),
+                    const SizedBox(width: AppSpacing.s),
+                    Expanded(
+                      child: Text(
+                        'Turn Off Block: $appName',
+                        style: AppTypography.heading2(),
+                      ),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: AppSpacing.s),
+                Text(
+                  streakDays > 0
+                      ? 'Turning off this limit will freeze your $streakDays-day streak on $appName! Are you sure?'
+                      : 'Are you sure you want to pause this application limit?',
+                  style: AppTypography.body(color: ThemeTokens.textMuted),
+                ),
+                const SizedBox(height: AppSpacing.m),
+                Text('PAUSE DURATION', style: AppTypography.label()),
+                const SizedBox(height: AppSpacing.xs),
+                Wrap(
+                  spacing: 8,
+                  children: [
+                    ChoiceChip(
+                      label: const Text('1 Hour'),
+                      selected: selectedDuration == const Duration(hours: 1),
+                      onSelected: (_) => setSheetState(() => selectedDuration = const Duration(hours: 1)),
+                    ),
+                    ChoiceChip(
+                      label: const Text('Rest of Today'),
+                      selected: selectedDuration == const Duration(hours: 8),
+                      onSelected: (_) => setSheetState(() => selectedDuration = const Duration(hours: 8)),
+                    ),
+                    ChoiceChip(
+                      label: const Text('Until Tomorrow'),
+                      selected: selectedDuration == const Duration(hours: 24),
+                      onSelected: (_) => setSheetState(() => selectedDuration = const Duration(hours: 24)),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: AppSpacing.l),
+                ElevatedButton(
+                  key: const Key('confirm_pause_limit_button'),
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: ThemeTokens.accent,
+                    foregroundColor: ThemeTokens.background,
+                    padding: const EdgeInsets.symmetric(vertical: 14),
+                  ),
+                  onPressed: countdown > 0
+                      ? null
+                      : () async {
+                          Navigator.pop(ctx);
+                          await _pauseLimit(packageName, selectedDuration);
+                        },
+                  child: Text(countdown > 0 ? 'Wait (${countdown}s)' : 'Pause Limit'),
+                ),
+              ],
+            ),
+          );
+        },
+      ),
+    ).whenComplete(() => timer?.cancel());
   }
 
   void _showAddDialog() {
@@ -289,8 +441,13 @@ class _AppLimitsScreenState extends ConsumerState<AppLimitsScreen> {
                           final name = app[DatabaseTables.colLimitAppName] as String;
                           final dailySec = app[DatabaseTables.colLimitDailySeconds] as int? ?? 1800;
                           final isActive = (app[DatabaseTables.colLimitIsActive] as int? ?? 1) == 1;
+                          final pausedUntilEpoch = app[DatabaseTables.colLimitPausedUntil] as int?;
+                          final streakDays = app[DatabaseTables.colLimitStreakDays] as int? ?? 0;
+                          final extraCount = app[DatabaseTables.colLimitExtraSessionCount] as int? ?? 0;
 
                           final limitMins = dailySec ~/ 60;
+                          final isPaused = pausedUntilEpoch != null &&
+                              DateTime.fromMillisecondsSinceEpoch(pausedUntilEpoch).isAfter(DateTime.now());
 
                           return Padding(
                             padding: const EdgeInsets.only(bottom: AppSpacing.s),
@@ -299,9 +456,16 @@ class _AppLimitsScreenState extends ConsumerState<AppLimitsScreen> {
                               packageName: pkg,
                               icon: Icons.apps_outlined,
                               spentText: '$limitMins mins daily limit',
-                              isActive: isActive,
-                              onToggle: () => _toggleLimit(pkg, isActive),
+                              isActive: isActive && !isPaused,
+                              isPaused: isPaused,
+                              pausedUntil: pausedUntilEpoch != null
+                                  ? DateTime.fromMillisecondsSinceEpoch(pausedUntilEpoch)
+                                  : null,
+                              streakDays: streakDays,
+                              extraSessionsUsed: extraCount,
+                              onToggle: () => _toggleLimit(pkg, name, streakDays, isActive && !isPaused),
                               onDelete: () => _deleteLimit(pkg),
+                              onAddExtraTime: (mins) => _addExtraSession(pkg, mins),
                             ),
                           );
                         }),
@@ -335,52 +499,152 @@ class _AppLimitsScreenState extends ConsumerState<AppLimitsScreen> {
     required IconData icon,
     required String spentText,
     required bool isActive,
+    bool isPaused = false,
+    DateTime? pausedUntil,
+    int streakDays = 0,
+    int extraSessionsUsed = 0,
     required VoidCallback onToggle,
     required VoidCallback onDelete,
+    required ValueChanged<int> onAddExtraTime,
   }) {
     return Container(
       padding: const EdgeInsets.all(AppSpacing.m),
       decoration: BoxDecoration(
         color: ThemeTokens.surface,
         borderRadius: BorderRadius.circular(ThemeTokens.radiusLg),
-        border: Border.all(color: ThemeTokens.border, width: 1),
+        border: Border.all(
+          color: isPaused ? ThemeTokens.warning.withValues(alpha: 0.5) : ThemeTokens.border,
+          width: 1,
+        ),
       ),
-      child: Row(
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Container(
-            width: 40,
-            height: 40,
-            decoration: BoxDecoration(
-              color: ThemeTokens.surfaceElevated,
-              borderRadius: BorderRadius.circular(ThemeTokens.radiusMd),
+          Row(
+            children: [
+              Container(
+                width: 40,
+                height: 40,
+                decoration: BoxDecoration(
+                  color: ThemeTokens.surfaceElevated,
+                  borderRadius: BorderRadius.circular(ThemeTokens.radiusMd),
+                ),
+                child: Icon(icon, color: ThemeTokens.primary, size: 20),
+              ),
+              const SizedBox(width: AppSpacing.m),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Row(
+                      children: [
+                        Flexible(
+                          child: Text(
+                            appName,
+                            style: AppTypography.body(weight: FontWeight.w600),
+                            overflow: TextOverflow.ellipsis,
+                          ),
+                        ),
+                        if (streakDays > 0) ...[
+                          const SizedBox(width: AppSpacing.xs),
+                          Container(
+                            padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                            decoration: BoxDecoration(
+                              color: ThemeTokens.surfaceElevated,
+                              borderRadius: BorderRadius.circular(ThemeTokens.radiusSm),
+                              border: Border.all(color: ThemeTokens.accent, width: 0.8),
+                            ),
+                            child: Row(
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                const Icon(Icons.local_fire_department, size: 12, color: ThemeTokens.accent),
+                                const SizedBox(width: 2),
+                                Text(
+                                  '${streakDays}d',
+                                  style: AppTypography.micro(color: ThemeTokens.textPrimary, weight: FontWeight.w600),
+                                ),
+                              ],
+                            ),
+                          ),
+                        ],
+                      ],
+                    ),
+                    const SizedBox(height: 2),
+                    Text(spentText, style: AppTypography.caption(color: ThemeTokens.textMuted)),
+                  ],
+                ),
+              ),
+              Switch(
+                value: isActive && !isPaused,
+                activeThumbColor: ThemeTokens.primary,
+                activeTrackColor: ThemeTokens.primary.withValues(alpha: 0.3),
+                inactiveThumbColor: ThemeTokens.textMuted,
+                inactiveTrackColor: ThemeTokens.surfaceElevated,
+                onChanged: (_) => onToggle(),
+              ),
+              IconButton(
+                icon: const Icon(Icons.delete_outline, size: 20, color: ThemeTokens.textMuted),
+                tooltip: 'Remove Limit',
+                onPressed: onDelete,
+              ),
+            ],
+          ),
+          if (isPaused && pausedUntil != null) ...[
+            const SizedBox(height: AppSpacing.s),
+            Container(
+              padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+              decoration: BoxDecoration(
+                color: ThemeTokens.surfaceElevated,
+                borderRadius: BorderRadius.circular(ThemeTokens.radiusSm),
+                border: Border.all(color: ThemeTokens.warning.withValues(alpha: 0.4)),
+              ),
+              child: Text(
+                'Paused till ${pausedUntil.hour.toString().padLeft(2, '0')}:${pausedUntil.minute.toString().padLeft(2, '0')}',
+                style: AppTypography.caption(color: ThemeTokens.warning),
+              ),
             ),
-            child: Icon(icon, color: ThemeTokens.primary, size: 20),
-          ),
-          const SizedBox(width: AppSpacing.m),
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(appName, style: AppTypography.body(weight: FontWeight.w600)),
-                const SizedBox(height: 2),
-                Text(spentText, style: AppTypography.caption(color: ThemeTokens.textMuted)),
-              ],
-            ),
-          ),
-          Switch(
-            value: isActive,
-            activeThumbColor: ThemeTokens.primary,
-            activeTrackColor: ThemeTokens.primary.withValues(alpha: 0.3),
-            inactiveThumbColor: ThemeTokens.textMuted,
-            inactiveTrackColor: ThemeTokens.surfaceElevated,
-            onChanged: (_) => onToggle(),
-          ),
-          IconButton(
-            icon: const Icon(Icons.delete_outline, size: 20, color: ThemeTokens.textMuted),
-            tooltip: 'Remove Limit',
-            onPressed: onDelete,
+          ],
+          const SizedBox(height: AppSpacing.s),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Text(
+                'Extra: $extraSessionsUsed/6 used',
+                style: AppTypography.micro(color: ThemeTokens.textMuted),
+              ),
+              Wrap(
+                spacing: 6,
+                children: [
+                  _buildQuickExtraChip('+5m', 5, onAddExtraTime, extraSessionsUsed >= 6),
+                  _buildQuickExtraChip('+10m', 10, onAddExtraTime, extraSessionsUsed >= 6),
+                  _buildQuickExtraChip('+15m', 15, onAddExtraTime, extraSessionsUsed >= 6),
+                ],
+              ),
+            ],
           ),
         ],
+      ),
+    );
+  }
+
+  Widget _buildQuickExtraChip(String label, int mins, ValueChanged<int> onAdd, bool disabled) {
+    return InkWell(
+      onTap: disabled ? null : () => onAdd(mins),
+      borderRadius: BorderRadius.circular(ThemeTokens.radiusSm),
+      child: Container(
+        padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+        decoration: BoxDecoration(
+          color: ThemeTokens.surfaceElevated,
+          borderRadius: BorderRadius.circular(ThemeTokens.radiusSm),
+          border: Border.all(color: disabled ? ThemeTokens.border : ThemeTokens.secondary, width: 0.8),
+        ),
+        child: Text(
+          label,
+          style: AppTypography.micro(
+            color: disabled ? ThemeTokens.textMuted : ThemeTokens.textPrimary,
+            weight: FontWeight.w600,
+          ),
+        ),
       ),
     );
   }
