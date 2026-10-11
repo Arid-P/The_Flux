@@ -9,7 +9,7 @@ This registry coordinates concurrent/subsequent AI coding agents working in this
 
 | Agent Name | Role / Specialty | Status | Branch | Current Task / Active Scope | Reserved / Active Files | Port(s) Used |
 |---|---|---|---|---|---|---|
-| **Code1** | Lead UI / Flutter Architect | **ACTIVE** | `ff` | Resolved preset saving failure, eliminated hardcoded data across 7 screens with live SQLite/Hive persistence, added PresetEditScreen widget tests, and marked track complete. | `fluxfoxus/lib/presentation/screens/`, `fluxfoxus/lib/features/`, `progress_tracker.md`, `agent_worklog.md` | None (all quiet) |
+| **Code1** | Lead UI / Flutter Architect | **ACTIVE** | `ff` | Resolved preset saving failure, eliminated hardcoded data across 7 screens with live SQLite/Hive persistence, validated 169/169 test passes, 0 lints, and preparing Phase 1-C Step 12. | `fluxfoxus/lib/presentation/screens/`, `fluxfoxus/lib/features/`, `progress_tracker.md`, `agent_worklog.md` | None (all quiet) |
 | **Code2** | Companion UI Designer / Responsive Architect | **ACTIVE** | `ff` | Providing design verification, token auditing, and exact math/chart specifications (Bézier splines, category colors, radii, spacing, icon mappings) for Code1's native Flutter port. | `agent_worklog.md`, `code2.md`, `ui_mockups/` (read/audit) | `8080` (Unified Hub) |
 | **Code3** | Context & Documentation Manager | **IDLE** | `ff` | Completed: (1) Updated code3.md role. (2) Created 13 context/memory files in `.c3_context/`. (3) Generated comprehensive `README.md`. (4) Expanded root `.gitignore` for full Flutter/Android/Python/Node stack. | `.c3_context/` (exclusive), `README.md`, `code3.md`, `.gitignore` | None |
 

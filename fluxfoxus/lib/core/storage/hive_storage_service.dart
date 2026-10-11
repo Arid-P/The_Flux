@@ -37,14 +37,10 @@ class HiveStorageService {
   // Preferences Accessors
   // ---------------------------------------------------------------------------
   Box get preferencesBox {
-    if (_prefBox != null && _prefBox!.isOpen) {
-      return _prefBox!;
+    if (_prefBox == null || !_prefBox!.isOpen) {
+      throw StateError('Preferences box has not been initialized. Call init() first.');
     }
-    if (Hive.isBoxOpen(boxPreferences)) {
-      _prefBox = Hive.box(boxPreferences);
-      return _prefBox!;
-    }
-    throw StateError('Preferences box has not been initialized. Call init() first.');
+    return _prefBox!;
   }
 
   int get minimumSessionsPerDay =>
@@ -72,20 +68,16 @@ class HiveStorageService {
   // App Categories Accessors (packageName -> category override)
   // ---------------------------------------------------------------------------
   Box<String> get categoriesBox {
-    if (_categoriesBox != null && _categoriesBox!.isOpen) {
-      return _categoriesBox!;
+    if (_categoriesBox == null || !_categoriesBox!.isOpen) {
+      throw StateError('App categories box has not been initialized.');
     }
-    if (Hive.isBoxOpen(boxAppCategories)) {
-      _categoriesBox = Hive.box<String>(boxAppCategories);
-      return _categoriesBox!;
-    }
-    throw StateError('App categories box has not been initialized.');
+    return _categoriesBox!;
   }
 
   String? getCategory(String packageName) => categoriesBox.get(packageName);
 
-  Future<void> setCategory(String packageName, String category) async {
-    await categoriesBox.put(packageName, category);
+  Future<void> setCategory(String packageName, dynamic category) async {
+    await categoriesBox.put(packageName, category as String);
   }
 
   Map<String, String> getAllCategories() =>
@@ -95,14 +87,10 @@ class HiveStorageService {
   // App Metadata Accessors (packageName -> {displayName, iconPath, etc})
   // ---------------------------------------------------------------------------
   Box<Map> get metadataBox {
-    if (_metadataBox != null && _metadataBox!.isOpen) {
-      return _metadataBox!;
+    if (_metadataBox == null || !_metadataBox!.isOpen) {
+      throw StateError('App metadata box has not been initialized.');
     }
-    if (Hive.isBoxOpen(boxAppMetadata)) {
-      _metadataBox = Hive.box<Map>(boxAppMetadata);
-      return _metadataBox!;
-    }
-    throw StateError('App metadata box has not been initialized.');
+    return _metadataBox!;
   }
 
   Map? getMetadata(String packageName) => metadataBox.get(packageName);

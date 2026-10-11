@@ -26,7 +26,6 @@ class _UsageStatsScreenState extends ConsumerState<UsageStatsScreen> {
   final TextEditingController _searchController = TextEditingController();
 
   List<_AppUsageData> _apps = [];
-  bool _isLoading = true;
   int _todaySeconds = 0;
   int _dailySeconds = 0;
   int _weeklySeconds = 0;
@@ -84,13 +83,10 @@ class _UsageStatsScreenState extends ConsumerState<UsageStatsScreen> {
             _AppUsageData('WhatsApp', 'Semi-Productive', Duration(minutes: (todaySum > 0 ? 10 : 0)), Icons.chat_outlined, const Color(0xFF906D4B)),
             _AppUsageData('Chrome', 'Others', Duration(minutes: (todaySum > 0 ? 5 : 0)), Icons.language_outlined, const Color(0xFF64748B)),
           ];
-          _isLoading = false;
         });
       }
     } catch (_) {
-      if (mounted) {
-        setState(() => _isLoading = false);
-      }
+      // Gracefully maintain defaults if loading fails
     }
   }
 

@@ -211,7 +211,7 @@ class _ChannelWhitelistScreenState extends ConsumerState<ChannelWhitelistScreen>
                   Expanded(
                     child: ListView.separated(
                       itemCount: _channels.length,
-                      separatorBuilder: (_, __) => const SizedBox(height: AppSpacing.s),
+                      separatorBuilder: (_, _) => const SizedBox(height: AppSpacing.s),
                       itemBuilder: (ctx, idx) {
                         final ch = _channels[idx];
                         final id = ch[DatabaseTables.colChannelId] as String;

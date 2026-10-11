@@ -134,7 +134,7 @@ class _FocusStartScreenState extends ConsumerState<FocusStartScreen> {
 
                     return ListView.separated(
                       itemCount: presetsList.length,
-                      separatorBuilder: (_, __) => const SizedBox(height: AppSpacing.s),
+                      separatorBuilder: (_, _) => const SizedBox(height: AppSpacing.s),
                       itemBuilder: (context, index) {
                         final p = presetsList[index];
                         final isSelected = p.id == (selectedPreset?.id ?? presetsList.first.id);

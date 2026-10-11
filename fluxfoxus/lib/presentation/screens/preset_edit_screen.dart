@@ -254,7 +254,14 @@ class _PresetEditScreenState extends ConsumerState<PresetEditScreen> {
     return Scaffold(
       backgroundColor: ThemeTokens.background,
       appBar: AppBar(
-        title: Text('Edit Preset', style: AppTypography.heading1()),
+        title: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Text('Edit Preset', style: AppTypography.heading1()),
+            Text(widget.presetId, style: AppTypography.caption(color: ThemeTokens.textMuted)),
+          ],
+        ),
         backgroundColor: ThemeTokens.background,
         elevation: 0,
         leading: IconButton(

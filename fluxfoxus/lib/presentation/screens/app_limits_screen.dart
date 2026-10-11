@@ -136,7 +136,7 @@ class _AppLimitsScreenState extends ConsumerState<AppLimitsScreen> {
               ),
               const SizedBox(height: AppSpacing.s),
               DropdownButtonFormField<String>(
-                value: selectedCategory,
+                initialValue: selectedCategory,
                 dropdownColor: ThemeTokens.surfaceElevated,
                 items: const [
                   DropdownMenuItem(value: 'Distracting', child: Text('Distracting')),

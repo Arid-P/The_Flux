@@ -2,7 +2,16 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../focus/focus.dart';
 
-final timerMinutesProvider = StateProvider<int>((ref) => 20);
+class TimerMinutesNotifier extends Notifier<int> {
+  @override
+  int build() => 20;
+
+  @override
+  set state(int value) => super.state = value;
+}
+
+final timerMinutesProvider =
+    NotifierProvider<TimerMinutesNotifier, int>(TimerMinutesNotifier.new);
 
 /// ScreenDisciplinePage provides a simple test harness for screen discipline sessions.
 class ScreenDisciplinePage extends ConsumerStatefulWidget {
