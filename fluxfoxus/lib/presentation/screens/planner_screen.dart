@@ -6,8 +6,17 @@ import '../../core/theme/theme.dart';
 import '../../features/focus/focus.dart';
 import '../../features/presets/presentation/presets_provider.dart';
 
-/// PlannerScreen renders the calendar day strip, streaks, daily focus vs screen time stats,
-/// and scheduled session cards per ui_mockups/planner.html and ui_planner.md.
+/// Provider fetching focus sessions for a given date from SQLite.
+final plannerSessionsForDateProvider =
+    FutureProvider.family.autoDispose<List<Map<String, dynamic>>, DateTime>((ref, date) async {
+  final repo = ref.watch(focusSessionRepositoryProvider);
+  final completed = await repo.getCompletedForDate(date);
+  final scheduled = await repo.getScheduledForDate(date);
+  return [...completed, ...scheduled];
+});
+
+/// PlannerScreen renders the calendar day strip, streaks, daily focus stats,
+/// and scheduled/completed session cards per ui_mockups/planner.html and ui_planner.md.
 class PlannerScreen extends ConsumerStatefulWidget {
   const PlannerScreen({super.key});
 
@@ -16,20 +25,61 @@ class PlannerScreen extends ConsumerStatefulWidget {
 }
 
 class _PlannerScreenState extends ConsumerState<PlannerScreen> {
-  int _selectedDayIndex = 2; // Wednesday (Today) by default
+  late int _selectedDayIndex;
+  late DateTime _weekMonday;
 
-  final List<String> _dayNames = const ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
-  final List<String> _dayNumbers = const ['23', '24', '25', '26', '27', '28', '29'];
+  static const List<String> _dayNames = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
+  static const List<String> _monthNames = [
+    'January', 'February', 'March', 'April', 'May', 'June',
+    'July', 'August', 'September', 'October', 'November', 'December'
+  ];
+
+  @override
+  void initState() {
+    super.initState();
+    final now = DateTime.now();
+    _selectedDayIndex = now.weekday - 1; // 0 for Monday, 6 for Sunday
+    _weekMonday = DateTime(now.year, now.month, now.day).subtract(Duration(days: now.weekday - 1));
+  }
+
+  DateTime _getDateForIndex(int index) {
+    return _weekMonday.add(Duration(days: index));
+  }
+
+  String _formatDuration(int seconds) {
+    if (seconds <= 0) return '0m';
+    final h = seconds ~/ 3600;
+    final m = (seconds % 3600) ~/ 60;
+    if (h > 0 && m > 0) return '${h}h ${m}m';
+    if (h > 0) return '${h}h';
+    return '${m}m';
+  }
+
+  String _formatTime(int millisecondsSinceEpoch) {
+    final dt = DateTime.fromMillisecondsSinceEpoch(millisecondsSinceEpoch);
+    final hour = dt.hour == 0 ? 12 : (dt.hour > 12 ? dt.hour - 12 : dt.hour);
+    final minute = dt.minute.toString().padLeft(2, '0');
+    final period = dt.hour >= 12 ? 'PM' : 'AM';
+    return '$hour:$minute $period';
+  }
 
   @override
   Widget build(BuildContext context) {
     final streakAsync = ref.watch(currentStreakProvider);
-    final streakDays = streakAsync.value ?? 5;
+    final streakDays = streakAsync.value ?? 0;
     final presetsAsync = ref.watch(presetsListProvider);
     final presets = presetsAsync.value ?? [];
 
-    // Schedule items for days
-    final sessionsForDay = _getSessionsForDay(_selectedDayIndex, presets);
+    final selectedDate = _getDateForIndex(_selectedDayIndex);
+    final sessionsAsync = ref.watch(plannerSessionsForDateProvider(selectedDate));
+    final sessionsList = sessionsAsync.value ?? [];
+
+    int totalFocusSeconds = 0;
+    for (final s in sessionsList) {
+      totalFocusSeconds += (s['actual_focus_seconds'] as int? ?? 0);
+    }
+
+    final monthTitle = '${_monthNames[selectedDate.month - 1]} ${selectedDate.year}';
 
     return Scaffold(
       backgroundColor: ThemeTokens.background,
@@ -59,7 +109,7 @@ class _PlannerScreenState extends ConsumerState<PlannerScreen> {
                           ),
                           const SizedBox(height: 2),
                           Text(
-                            'March 2026',
+                            monthTitle,
                             style: AppTypography.heading1(color: ThemeTokens.textPrimary),
                             overflow: TextOverflow.ellipsis,
                           ),
@@ -72,7 +122,14 @@ class _PlannerScreenState extends ConsumerState<PlannerScreen> {
                       children: [
                         InkWell(
                           key: const Key('planner_today_button'),
-                          onTap: () => setState(() => _selectedDayIndex = 2),
+                          onTap: () {
+                            final now = DateTime.now();
+                            setState(() {
+                              _selectedDayIndex = now.weekday - 1;
+                              _weekMonday = DateTime(now.year, now.month, now.day)
+                                  .subtract(Duration(days: now.weekday - 1));
+                            });
+                          },
                           borderRadius: BorderRadius.circular(ThemeTokens.radiusPill),
                           child: Container(
                             padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
@@ -143,7 +200,7 @@ class _PlannerScreenState extends ConsumerState<PlannerScreen> {
                       const SizedBox(width: 10),
                       Expanded(
                         child: Text(
-                          'Current streak: $streakDays days',
+                          streakDays > 0 ? 'Current streak: $streakDays days' : 'Start your streak today!',
                           style: AppTypography.caption(
                             color: ThemeTokens.primary,
                             weight: FontWeight.w700,
@@ -153,7 +210,7 @@ class _PlannerScreenState extends ConsumerState<PlannerScreen> {
                       ),
                       const SizedBox(width: 8),
                       Text(
-                        'Keep pushing!',
+                        streakDays > 0 ? 'Keep pushing!' : 'Zero interruptions',
                         style: AppTypography.micro(color: ThemeTokens.textMuted),
                         overflow: TextOverflow.ellipsis,
                       ),
@@ -176,7 +233,7 @@ class _PlannerScreenState extends ConsumerState<PlannerScreen> {
                     ),
                     const SizedBox(width: AppSpacing.s),
                     Text(
-                      'Week 13',
+                      '${_dayNames[_selectedDayIndex]}, ${selectedDate.day} ${_monthNames[selectedDate.month - 1]}',
                       style: AppTypography.micro(
                         color: ThemeTokens.accent,
                         weight: FontWeight.w600,
@@ -196,6 +253,8 @@ class _PlannerScreenState extends ConsumerState<PlannerScreen> {
                   child: Row(
                     children: List.generate(7, (idx) {
                       final isSelected = idx == _selectedDayIndex;
+                      final dayDate = _getDateForIndex(idx);
+
                       return Expanded(
                         child: InkWell(
                           key: Key('day_item_$idx'),
@@ -219,7 +278,7 @@ class _PlannerScreenState extends ConsumerState<PlannerScreen> {
                                 ),
                                 const SizedBox(height: 2),
                                 Text(
-                                  _dayNumbers[idx],
+                                  '${dayDate.day}',
                                   style: AppTypography.caption(
                                     color: isSelected ? ThemeTokens.background : ThemeTokens.textPrimary,
                                     weight: FontWeight.w700,
@@ -236,7 +295,7 @@ class _PlannerScreenState extends ConsumerState<PlannerScreen> {
 
                 const SizedBox(height: AppSpacing.m),
 
-                // 4. Daily Stats Row (Focus vs Usage)
+                // 4. Daily Stats Row (Focus vs Sessions)
                 Row(
                   children: [
                     // Focus Total Card
@@ -260,12 +319,12 @@ class _PlannerScreenState extends ConsumerState<PlannerScreen> {
                             ),
                             const SizedBox(height: 6),
                             Text(
-                              _selectedDayIndex == 6 ? '0m' : '2h 27m',
+                              _formatDuration(totalFocusSeconds),
                               style: AppTypography.heading1(color: ThemeTokens.textPrimary, weight: FontWeight.w700),
                             ),
                             const SizedBox(height: 2),
                             Text(
-                              '${sessionsForDay.length} sessions logged',
+                              '${sessionsList.length} ${sessionsList.length == 1 ? "session" : "sessions"} logged',
                               style: AppTypography.micro(color: ThemeTokens.accent),
                             ),
                           ],
@@ -273,7 +332,7 @@ class _PlannerScreenState extends ConsumerState<PlannerScreen> {
                       ),
                     ),
                     const SizedBox(width: AppSpacing.m),
-                    // Usage Total Card
+                    // Presets Configured Card
                     Expanded(
                       child: Container(
                         padding: const EdgeInsets.all(AppSpacing.m),
@@ -288,18 +347,18 @@ class _PlannerScreenState extends ConsumerState<PlannerScreen> {
                             Row(
                               mainAxisAlignment: MainAxisAlignment.spaceBetween,
                               children: [
-                                Text('USAGE', style: AppTypography.micro(color: ThemeTokens.textMuted, weight: FontWeight.w700)),
-                                const Text('📱', style: TextStyle(fontSize: 14)),
+                                Text('PRESETS', style: AppTypography.micro(color: ThemeTokens.textMuted, weight: FontWeight.w700)),
+                                const Text('⚡', style: TextStyle(fontSize: 14)),
                               ],
                             ),
                             const SizedBox(height: 6),
                             Text(
-                              _selectedDayIndex == 6 ? '1h 10m' : '6h 18m',
+                              '${presets.length}',
                               style: AppTypography.heading1(color: ThemeTokens.textPrimary, weight: FontWeight.w700),
                             ),
                             const SizedBox(height: 2),
                             Text(
-                              'Screen on time',
+                              'Active templates',
                               style: AppTypography.micro(color: ThemeTokens.textMuted),
                             ),
                           ],
@@ -316,14 +375,14 @@ class _PlannerScreenState extends ConsumerState<PlannerScreen> {
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
                     Text(
-                      'SCHEDULED SESSIONS',
+                      'SESSIONS FOR DAY',
                       style: AppTypography.micro(
                         color: ThemeTokens.textMuted,
                         weight: FontWeight.w700,
                       ),
                     ),
                     Text(
-                      '${sessionsForDay.length} items',
+                      '${sessionsList.length} items',
                       style: AppTypography.micro(color: ThemeTokens.textMuted),
                     ),
                   ],
@@ -331,7 +390,7 @@ class _PlannerScreenState extends ConsumerState<PlannerScreen> {
                 const SizedBox(height: AppSpacing.s),
 
                 // Session Cards or Empty State
-                if (sessionsForDay.isEmpty)
+                if (sessionsList.isEmpty)
                   Container(
                     width: double.infinity,
                     padding: const EdgeInsets.all(AppSpacing.xxl),
@@ -351,7 +410,7 @@ class _PlannerScreenState extends ConsumerState<PlannerScreen> {
                         ),
                         const SizedBox(height: 4),
                         Text(
-                          'Enjoy your scheduled rest or tap "+ Add Preset" below to plan a focus block.',
+                          'Start focusing now or tap "+ New Preset" to configure a focus session template.',
                           textAlign: TextAlign.center,
                           style: AppTypography.caption(color: ThemeTokens.textMuted),
                         ),
@@ -363,7 +422,7 @@ class _PlannerScreenState extends ConsumerState<PlannerScreen> {
                             shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(ThemeTokens.radiusPill)),
                           ),
                           child: Text(
-                            '+ Schedule Session',
+                            '+ Create Preset',
                             style: AppTypography.caption(color: ThemeTokens.primary, weight: FontWeight.w700),
                           ),
                         ),
@@ -371,7 +430,7 @@ class _PlannerScreenState extends ConsumerState<PlannerScreen> {
                     ),
                   )
                 else
-                  ...sessionsForDay.map((session) => _buildSessionCard(session)),
+                  ...sessionsList.map((s) => _buildRealSessionCard(s, presets)),
 
                 const SizedBox(height: 120), // Spacing for floating bottom bar & FAB
               ],
@@ -398,7 +457,25 @@ class _PlannerScreenState extends ConsumerState<PlannerScreen> {
     );
   }
 
-  Widget _buildSessionCard(_PlannerSessionItem item) {
+  Widget _buildRealSessionCard(Map<String, dynamic> sessionMap, List<dynamic> presets) {
+    final name = (sessionMap['session_name'] as String?) ?? 'Focus Session';
+    final presetId = sessionMap['preset_id'] as String?;
+    final actualSeconds = (sessionMap['actual_focus_seconds'] as int?) ?? 0;
+    final source = ((sessionMap['source'] as String?) ?? 'FF').toUpperCase();
+    final startMs = sessionMap['actual_start'] as int? ?? sessionMap['scheduled_start'] as int?;
+
+    // Find emoji from preset if available
+    String emoji = '🎯';
+    if (presetId != null && presets.isNotEmpty) {
+      final matching = presets.where((p) => p.id == presetId);
+      if (matching.isNotEmpty) {
+        emoji = matching.first.emoji;
+      }
+    }
+
+    final timeString = startMs != null ? _formatTime(startMs) : 'Completed';
+    final durationString = _formatDuration(actualSeconds);
+
     return Container(
       margin: const EdgeInsets.only(bottom: AppSpacing.s),
       padding: const EdgeInsets.all(AppSpacing.m),
@@ -418,7 +495,7 @@ class _PlannerScreenState extends ConsumerState<PlannerScreen> {
               border: Border.all(color: ThemeTokens.border, width: 1),
             ),
             alignment: Alignment.center,
-            child: Text(item.emoji, style: const TextStyle(fontSize: 20)),
+            child: Text(emoji, style: const TextStyle(fontSize: 20)),
           ),
           const SizedBox(width: AppSpacing.m),
           Expanded(
@@ -429,7 +506,7 @@ class _PlannerScreenState extends ConsumerState<PlannerScreen> {
                   children: [
                     Flexible(
                       child: Text(
-                        item.name,
+                        name,
                         style: AppTypography.body(weight: FontWeight.w600),
                         overflow: TextOverflow.ellipsis,
                       ),
@@ -443,7 +520,7 @@ class _PlannerScreenState extends ConsumerState<PlannerScreen> {
                         border: Border.all(color: ThemeTokens.border, width: 1),
                       ),
                       child: Text(
-                        item.source,
+                        source,
                         style: AppTypography.micro(
                           color: ThemeTokens.primary,
                           weight: FontWeight.w700,
@@ -454,51 +531,20 @@ class _PlannerScreenState extends ConsumerState<PlannerScreen> {
                 ),
                 const SizedBox(height: 3),
                 Text(
-                  '${item.timeRange} · ${item.duration}',
+                  '$timeString · $durationString',
                   style: AppTypography.caption(color: ThemeTokens.textMuted),
                 ),
               ],
             ),
           ),
-          IconButton(
-            icon: const Icon(Icons.edit_outlined, color: ThemeTokens.textMuted, size: 20),
-            onPressed: () => context.push(AppRoutes.presetEditPath(item.presetId)),
-          ),
+          if (presetId != null)
+            IconButton(
+              icon: const Icon(Icons.edit_outlined, color: ThemeTokens.textMuted, size: 20),
+              onPressed: () => context.push(AppRoutes.presetEditPath(presetId)),
+            ),
         ],
       ),
     );
-  }
-
-  List<_PlannerSessionItem> _getSessionsForDay(int dayIndex, List<dynamic> presets) {
-    if (dayIndex == 6) {
-      return []; // Sunday empty rest day per HTML preview
-    }
-    return [
-      const _PlannerSessionItem(
-        presetId: 'preset-100',
-        emoji: '🎯',
-        name: 'Deep Work',
-        timeRange: '09:00 AM – 09:50 AM',
-        duration: '50m',
-        source: 'FF',
-      ),
-      const _PlannerSessionItem(
-        presetId: 'preset-101',
-        emoji: '⚡',
-        name: 'Math Olympiad',
-        timeRange: '02:00 PM – 03:30 PM',
-        duration: '1h 30m',
-        source: 'FF',
-      ),
-      const _PlannerSessionItem(
-        presetId: 'preset-102',
-        emoji: '📚',
-        name: 'Physics Study',
-        timeRange: '05:00 PM – 05:45 PM',
-        duration: '45m',
-        source: 'FD',
-      ),
-    ];
   }
 
   void _showHelpDialog() {
@@ -539,22 +585,4 @@ class _PlannerScreenState extends ConsumerState<PlannerScreen> {
       ),
     );
   }
-}
-
-class _PlannerSessionItem {
-  final String presetId;
-  final String emoji;
-  final String name;
-  final String timeRange;
-  final String duration;
-  final String source;
-
-  const _PlannerSessionItem({
-    required this.presetId,
-    required this.emoji,
-    required this.name,
-    required this.timeRange,
-    required this.duration,
-    required this.source,
-  });
 }

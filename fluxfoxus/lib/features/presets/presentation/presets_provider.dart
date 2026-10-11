@@ -62,6 +62,7 @@ final presetsListProvider =
 );
 
 final currentPresetProvider = FutureProvider<Preset?>((ref) async {
+  ref.watch(presetsListProvider);
   final repo = ref.watch(presetsRepositoryProvider);
   return repo.getLastUsedPreset();
 });

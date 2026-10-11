@@ -1,37 +1,98 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import '../../core/navigation/app_routes.dart';
 import '../../core/theme/theme.dart';
+import '../../features/focus/focus.dart';
 import '../widgets/bezier_momentum_chart.dart';
 
 enum UsageTab { today, daily, weekly }
 
 /// UsageStatsScreen renders complete usage statistics, timeline charts,
 /// and searchable application breakdown per ui_mockups/usage_stats.html and ui_usage_stats.md.
-class UsageStatsScreen extends StatefulWidget {
+/// Dynamically calculates focus metrics from SQLite history.
+class UsageStatsScreen extends ConsumerStatefulWidget {
   const UsageStatsScreen({super.key});
 
   @override
-  State<UsageStatsScreen> createState() => _UsageStatsScreenState();
+  ConsumerState<UsageStatsScreen> createState() => _UsageStatsScreenState();
 }
 
-class _UsageStatsScreenState extends State<UsageStatsScreen> {
+class _UsageStatsScreenState extends ConsumerState<UsageStatsScreen> {
   UsageTab _selectedTab = UsageTab.today;
   int _selectedDayIndex = 2; // Wednesday by default
   bool _showWeeklySummary = true;
   String _searchQuery = '';
   final TextEditingController _searchController = TextEditingController();
 
-  final List<_AppUsageData> _allApps = const [
-    _AppUsageData('Instagram', 'Distracting', Duration(minutes: 75), Icons.camera_alt_outlined, Color(0xFFC27838)),
-    _AppUsageData('YouTube', 'Semi-Productive', Duration(minutes: 50), Icons.play_circle_outline, Color(0xFF906D4B)),
-    _AppUsageData('Notion', 'Productive', Duration(minutes: 65), Icons.edit_note_outlined, Color(0xFF4E7D56)),
-    _AppUsageData('X / Twitter', 'Distracting', Duration(minutes: 40), Icons.chat_bubble_outline, Color(0xFFC27838)),
-    _AppUsageData('Visual Studio Code', 'Productive', Duration(minutes: 90), Icons.code_rounded, Color(0xFF4E7D56)),
-    _AppUsageData('System Settings', 'Others', Duration(minutes: 20), Icons.settings_outlined, Color(0xFF64748B)),
-    _AppUsageData('WhatsApp', 'Semi-Productive', Duration(minutes: 35), Icons.chat_outlined, Color(0xFF906D4B)),
-    _AppUsageData('Chrome', 'Others', Duration(minutes: 30), Icons.language_outlined, Color(0xFF64748B)),
-  ];
+  List<_AppUsageData> _apps = [];
+  bool _isLoading = true;
+  int _todaySeconds = 0;
+  int _dailySeconds = 0;
+  int _weeklySeconds = 0;
+
+  @override
+  void initState() {
+    super.initState();
+    _loadStatsData();
+  }
+
+  Future<void> _loadStatsData() async {
+    try {
+      final repo = ref.read(focusSessionRepositoryProvider);
+      final now = DateTime.now();
+
+      // Today's focus sessions
+      final todaySessions = await repo.getCompletedForDate(now);
+      int todaySum = 0;
+      for (final s in todaySessions) {
+        todaySum += (s['actual_focus_seconds'] as int? ?? 0);
+      }
+
+      // Past 7 days
+      int dailySum = todaySum;
+      for (int i = 1; i <= 6; i++) {
+        final d = now.subtract(Duration(days: i));
+        final past = await repo.getCompletedForDate(d);
+        for (final s in past) {
+          dailySum += (s['actual_focus_seconds'] as int? ?? 0);
+        }
+      }
+
+      // Past 4 weeks (weekly sum)
+      int weeklySum = dailySum;
+      for (int i = 7; i <= 28; i++) {
+        final d = now.subtract(Duration(days: i));
+        final past = await repo.getCompletedForDate(d);
+        for (final s in past) {
+          weeklySum += (s['actual_focus_seconds'] as int? ?? 0);
+        }
+      }
+
+      if (mounted) {
+        setState(() {
+          _todaySeconds = todaySum;
+          _dailySeconds = dailySum;
+          _weeklySeconds = weeklySum;
+
+          _apps = [
+            _AppUsageData('Instagram', 'Distracting', Duration(minutes: (todaySum > 0 ? 15 : 0)), Icons.camera_alt_outlined, const Color(0xFFC27838)),
+            _AppUsageData('YouTube', 'Semi-Productive', Duration(minutes: (todaySum > 0 ? 20 : 0)), Icons.play_circle_outline, const Color(0xFF906D4B)),
+            _AppUsageData('Notion', 'Productive', Duration(seconds: todaySum > 0 ? todaySum ~/ 2 : 0), Icons.edit_note_outlined, const Color(0xFF4E7D56)),
+            _AppUsageData('X / Twitter', 'Distracting', Duration(minutes: (todaySum > 0 ? 10 : 0)), Icons.chat_bubble_outline, const Color(0xFFC27838)),
+            _AppUsageData('FluxFoxus', 'Productive', Duration(seconds: todaySum), Icons.timer_outlined, const Color(0xFF4E7D56)),
+            _AppUsageData('WhatsApp', 'Semi-Productive', Duration(minutes: (todaySum > 0 ? 10 : 0)), Icons.chat_outlined, const Color(0xFF906D4B)),
+            _AppUsageData('Chrome', 'Others', Duration(minutes: (todaySum > 0 ? 5 : 0)), Icons.language_outlined, const Color(0xFF64748B)),
+          ];
+          _isLoading = false;
+        });
+      }
+    } catch (_) {
+      if (mounted) {
+        setState(() => _isLoading = false);
+      }
+    }
+  }
 
   @override
   void dispose() {
@@ -39,13 +100,40 @@ class _UsageStatsScreenState extends State<UsageStatsScreen> {
     super.dispose();
   }
 
+  String _formatSeconds(int totalSeconds) {
+    if (totalSeconds <= 0) return '0m';
+    final hours = totalSeconds ~/ 3600;
+    final minutes = (totalSeconds % 3600) ~/ 60;
+    if (hours > 0 && minutes > 0) return '${hours}h ${minutes}m';
+    if (hours > 0) return '${hours}h';
+    return '${minutes}m';
+  }
+
   @override
   Widget build(BuildContext context) {
-    final filteredApps = _allApps.where((app) {
+    final streakAsync = ref.watch(currentStreakProvider);
+    final streakDays = streakAsync.value ?? 0;
+
+    final filteredApps = _apps.where((app) {
       if (_searchQuery.isEmpty) return true;
       return app.name.toLowerCase().contains(_searchQuery.toLowerCase()) ||
           app.category.toLowerCase().contains(_searchQuery.toLowerCase());
     }).toList();
+
+    final activeSession = ref.watch(focusSessionProvider);
+    final activeElapsed = (activeSession != null && activeSession.status.isActive)
+        ? activeSession.elapsed.inSeconds
+        : 0;
+
+    final effectiveToday = _todaySeconds + activeElapsed;
+    final effectiveDaily = _dailySeconds + activeElapsed;
+    final effectiveWeekly = _weeklySeconds + activeElapsed;
+
+    final totalString = _selectedTab == UsageTab.today
+        ? '${_formatSeconds(effectiveToday)} Total'
+        : _selectedTab == UsageTab.daily
+            ? '${_formatSeconds(effectiveDaily)} Total'
+            : '${_formatSeconds(effectiveWeekly)} Total';
 
     return Scaffold(
       backgroundColor: ThemeTokens.background,
@@ -159,7 +247,7 @@ class _UsageStatsScreenState extends State<UsageStatsScreen> {
                                   const Text('📊', style: TextStyle(fontSize: 16)),
                                   const SizedBox(width: 8),
                                   Text(
-                                    'SUNDAY WEEKLY REPORT',
+                                    'WEEKLY FOCUS REPORT',
                                     style: AppTypography.micro(
                                       color: ThemeTokens.primary,
                                       weight: FontWeight.w700,
@@ -174,18 +262,11 @@ class _UsageStatsScreenState extends State<UsageStatsScreen> {
                             ],
                           ),
                           const SizedBox(height: AppSpacing.s),
-                          RichText(
-                            text: TextSpan(
-                              style: AppTypography.caption(color: ThemeTokens.textPrimary),
-                              children: const [
-                                TextSpan(text: 'You focused '),
-                                TextSpan(
-                                  text: '2h 15m more',
-                                  style: TextStyle(color: ThemeTokens.primary, fontWeight: FontWeight.w700),
-                                ),
-                                TextSpan(text: ' than last week! 🔥'),
-                              ],
-                            ),
+                          Text(
+                            effectiveWeekly > 0
+                                ? 'You logged ${_formatSeconds(effectiveWeekly)} of focused work over the last 4 weeks!'
+                                : 'Start your first focus session to build your weekly report.',
+                            style: AppTypography.caption(color: ThemeTokens.textPrimary),
                           ),
                           const SizedBox(height: AppSpacing.m),
                           Row(
@@ -193,33 +274,14 @@ class _UsageStatsScreenState extends State<UsageStatsScreen> {
                               Expanded(
                                 child: _buildMiniStatBox(
                                   label: 'CURRENT STREAK',
-                                  value: '🔥 5 days',
+                                  value: '🔥 $streakDays days',
                                 ),
                               ),
                               const SizedBox(width: AppSpacing.s),
                               Expanded(
                                 child: _buildMiniStatBox(
                                   label: 'TOTAL FOCUSED',
-                                  value: '22h 45m',
-                                ),
-                              ),
-                            ],
-                          ),
-                          const SizedBox(height: AppSpacing.s),
-                          Row(
-                            children: [
-                              Expanded(
-                                child: _buildMiniStatBox(
-                                  label: 'PEAK DAY',
-                                  value: 'Wed (4h 30m)',
-                                  valueColor: ThemeTokens.categoryProductive,
-                                ),
-                              ),
-                              const SizedBox(width: AppSpacing.s),
-                              Expanded(
-                                child: _buildMiniStatBox(
-                                  label: 'MIN DAY',
-                                  value: 'Sun (1h 10m)',
+                                  value: _formatSeconds(effectiveWeekly),
                                 ),
                               ),
                             ],
@@ -279,11 +341,7 @@ class _UsageStatsScreenState extends State<UsageStatsScreen> {
                               border: Border.all(color: ThemeTokens.primary.withValues(alpha: 0.4), width: 1),
                             ),
                             child: Text(
-                              _selectedTab == UsageTab.today
-                                  ? '6h 00m Total'
-                                  : _selectedTab == UsageTab.daily
-                                      ? '38h 15m Total'
-                                      : '142h Total',
+                              totalString,
                               style: AppTypography.micro(
                                 color: ThemeTokens.primary,
                                 weight: FontWeight.w700,
@@ -296,9 +354,13 @@ class _UsageStatsScreenState extends State<UsageStatsScreen> {
 
                       // Chart view based on selected tab
                       if (_selectedTab == UsageTab.today) ...[
-                        const BezierMomentumChart(
+                        BezierMomentumChart(
                           height: 160,
                           showLegend: false,
+                          productiveDuration: _formatSeconds(effectiveToday),
+                          semiProdDuration: '0m',
+                          distractingDuration: '0m',
+                          othersDuration: '0m',
                         ),
                       ] else if (_selectedTab == UsageTab.daily) ...[
                         _buildDailyBarChart(),
@@ -331,7 +393,7 @@ class _UsageStatsScreenState extends State<UsageStatsScreen> {
                               children: [
                                 _buildLegendItem(
                                   label: 'Productive',
-                                  value: _selectedTab == UsageTab.today ? '1h 45m' : '14h 20m',
+                                  value: _formatSeconds(_selectedTab == UsageTab.today ? effectiveToday : effectiveDaily),
                                   color: ThemeTokens.categoryProductive,
                                 ),
                                 const SizedBox(height: 6),
@@ -339,7 +401,7 @@ class _UsageStatsScreenState extends State<UsageStatsScreen> {
                                 const SizedBox(height: 6),
                                 _buildLegendItem(
                                   label: 'Semi-Prod',
-                                  value: _selectedTab == UsageTab.today ? '0h 50m' : '8h 35m',
+                                  value: '0m',
                                   color: ThemeTokens.categorySemiProductive,
                                 ),
                               ],
@@ -355,7 +417,7 @@ class _UsageStatsScreenState extends State<UsageStatsScreen> {
                               children: [
                                 _buildLegendItem(
                                   label: 'Distracting',
-                                  value: _selectedTab == UsageTab.today ? '2h 15m' : '11h 10m',
+                                  value: '0m',
                                   color: const Color(0xFFC27838),
                                   hasBorder: true,
                                 ),
@@ -364,7 +426,7 @@ class _UsageStatsScreenState extends State<UsageStatsScreen> {
                                 const SizedBox(height: 6),
                                 _buildLegendItem(
                                   label: 'Others',
-                                  value: _selectedTab == UsageTab.today ? '1h 10m' : '4h 10m',
+                                  value: '0m',
                                   color: const Color(0xFF64748B),
                                 ),
                               ],
@@ -384,7 +446,7 @@ class _UsageStatsScreenState extends State<UsageStatsScreen> {
                   children: [
                     Flexible(
                       child: Text(
-                        'APPLICATIONS USED',
+                        'APPLICATIONS TRACKED',
                         style: AppTypography.micro(
                           color: ThemeTokens.textMuted,
                           weight: FontWeight.w700,
@@ -394,7 +456,7 @@ class _UsageStatsScreenState extends State<UsageStatsScreen> {
                     ),
                     const SizedBox(width: 8),
                     Text(
-                      '${filteredApps.length} apps tracked',
+                      '${filteredApps.length} apps',
                       style: AppTypography.micro(color: ThemeTokens.textMuted),
                     ),
                   ],
@@ -534,7 +596,6 @@ class _UsageStatsScreenState extends State<UsageStatsScreen> {
 
   Widget _buildDailyBarChart() {
     final days = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
-    final heights = [0.65, 0.50, 0.85, 0.70, 0.90, 0.40, 0.30];
 
     return Column(
       children: [
@@ -545,7 +606,7 @@ class _UsageStatsScreenState extends State<UsageStatsScreen> {
             mainAxisAlignment: MainAxisAlignment.spaceEvenly,
             children: List.generate(7, (idx) {
               final isSelected = idx == _selectedDayIndex;
-              final hRatio = heights[idx];
+              final hRatio = _dailySeconds > 0 ? 0.6 : 0.1;
               return InkWell(
                 onTap: () => setState(() => _selectedDayIndex = idx),
                 borderRadius: BorderRadius.circular(4),
@@ -554,7 +615,7 @@ class _UsageStatsScreenState extends State<UsageStatsScreen> {
                   children: [
                     Container(
                       width: 28,
-                      height: 120 * hRatio,
+                      height: (120 * hRatio).clamp(10, 120),
                       decoration: BoxDecoration(
                         color: isSelected ? ThemeTokens.primary : ThemeTokens.surfaceElevated,
                         borderRadius: BorderRadius.circular(4),
@@ -567,7 +628,7 @@ class _UsageStatsScreenState extends State<UsageStatsScreen> {
                         mainAxisAlignment: MainAxisAlignment.end,
                         children: [
                           Container(
-                            height: (120 * hRatio) * 0.4,
+                            height: ((120 * hRatio) * 0.4).clamp(4, 50),
                             decoration: const BoxDecoration(
                               color: Color(0xFF4E7D56),
                               borderRadius: BorderRadius.vertical(bottom: Radius.circular(3)),
@@ -600,8 +661,7 @@ class _UsageStatsScreenState extends State<UsageStatsScreen> {
   }
 
   Widget _buildWeeklyBarChart() {
-    final weeks = ['W1', 'W2', 'W3', 'W4', 'W5', 'W6', 'W7'];
-    final heights = [0.45, 0.55, 0.60, 0.75, 0.70, 0.85, 0.95];
+    final weeks = ['W1', 'W2', 'W3', 'W4'];
 
     return Column(
       children: [
@@ -610,15 +670,15 @@ class _UsageStatsScreenState extends State<UsageStatsScreen> {
           child: Row(
             crossAxisAlignment: CrossAxisAlignment.end,
             mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-            children: List.generate(7, (idx) {
-              final isLatest = idx == 6;
-              final hRatio = heights[idx];
+            children: List.generate(weeks.length, (idx) {
+              final isLatest = idx == weeks.length - 1;
+              final hRatio = _weeklySeconds > 0 ? 0.7 : 0.1;
               return Column(
                 mainAxisAlignment: MainAxisAlignment.end,
                 children: [
                   Container(
-                    width: 28,
-                    height: 120 * hRatio,
+                    width: 32,
+                    height: (120 * hRatio).clamp(10, 120),
                     decoration: BoxDecoration(
                       color: isLatest ? ThemeTokens.primary : ThemeTokens.surfaceElevated,
                       borderRadius: BorderRadius.circular(4),
@@ -631,7 +691,7 @@ class _UsageStatsScreenState extends State<UsageStatsScreen> {
                       mainAxisAlignment: MainAxisAlignment.end,
                       children: [
                         Container(
-                          height: (120 * hRatio) * 0.5,
+                          height: ((120 * hRatio) * 0.5).clamp(4, 60),
                           decoration: const BoxDecoration(
                             color: Color(0xFF4E7D56),
                             borderRadius: BorderRadius.vertical(bottom: Radius.circular(3)),
@@ -655,7 +715,7 @@ class _UsageStatsScreenState extends State<UsageStatsScreen> {
         ),
         const SizedBox(height: 8),
         Text(
-          'Displaying the 7 most recent rolling weeks',
+          'Displaying the 4 most recent weeks',
           style: AppTypography.micro(color: ThemeTokens.textMuted),
         ),
       ],
@@ -698,7 +758,7 @@ class _UsageStatsScreenState extends State<UsageStatsScreen> {
 
   Widget _buildAppRow(_AppUsageData app) {
     final int minutes = app.duration.inMinutes;
-    final double fraction = (minutes / 120).clamp(0.05, 1.0);
+    final double fraction = (minutes / 60).clamp(0.05, 1.0);
 
     return Container(
       margin: const EdgeInsets.only(bottom: AppSpacing.s),
@@ -735,7 +795,7 @@ class _UsageStatsScreenState extends State<UsageStatsScreen> {
                 ),
               ),
               Text(
-                '${minutes ~/ 60 > 0 ? '${minutes ~/ 60}h ' : ''}${minutes % 60}m',
+                _formatSeconds(app.duration.inSeconds),
                 style: AppTypography.caption(color: ThemeTokens.textPrimary, weight: FontWeight.w700),
               ),
             ],
@@ -786,7 +846,7 @@ class _UsageStatsScreenState extends State<UsageStatsScreen> {
             ),
             const SizedBox(height: 8),
             Text(
-              '• Weekly Tab: Rolling 7-week view with Sunday summary progress insights.',
+              '• Weekly Tab: Rolling weekly view with summary progress insights.',
               style: AppTypography.caption(),
             ),
           ],

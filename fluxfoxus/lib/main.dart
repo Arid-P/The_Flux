@@ -7,6 +7,8 @@ import 'core/storage/hive_storage_service.dart';
 import 'core/theme/theme.dart';
 import 'features/presets/data/presets_repository.dart';
 
+import 'features/presets/presentation/presets_provider.dart';
+
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
@@ -39,6 +41,8 @@ void main() async {
   runApp(
     ProviderScope(
       overrides: [
+        hiveStorageServiceProvider.overrideWithValue(hiveStorage),
+        appDatabaseProvider.overrideWithValue(appDatabase),
         initialLocationProvider.overrideWithValue(initialRoute),
       ],
       child: const MyApp(),

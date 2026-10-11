@@ -37,10 +37,14 @@ class HiveStorageService {
   // Preferences Accessors
   // ---------------------------------------------------------------------------
   Box get preferencesBox {
-    if (_prefBox == null || !_prefBox!.isOpen) {
-      throw StateError('Preferences box has not been initialized. Call init() first.');
+    if (_prefBox != null && _prefBox!.isOpen) {
+      return _prefBox!;
     }
-    return _prefBox!;
+    if (Hive.isBoxOpen(boxPreferences)) {
+      _prefBox = Hive.box(boxPreferences);
+      return _prefBox!;
+    }
+    throw StateError('Preferences box has not been initialized. Call init() first.');
   }
 
   int get minimumSessionsPerDay =>
@@ -68,10 +72,14 @@ class HiveStorageService {
   // App Categories Accessors (packageName -> category override)
   // ---------------------------------------------------------------------------
   Box<String> get categoriesBox {
-    if (_categoriesBox == null || !_categoriesBox!.isOpen) {
-      throw StateError('App categories box has not been initialized.');
+    if (_categoriesBox != null && _categoriesBox!.isOpen) {
+      return _categoriesBox!;
     }
-    return _categoriesBox!;
+    if (Hive.isBoxOpen(boxAppCategories)) {
+      _categoriesBox = Hive.box<String>(boxAppCategories);
+      return _categoriesBox!;
+    }
+    throw StateError('App categories box has not been initialized.');
   }
 
   String? getCategory(String packageName) => categoriesBox.get(packageName);
@@ -87,10 +95,14 @@ class HiveStorageService {
   // App Metadata Accessors (packageName -> {displayName, iconPath, etc})
   // ---------------------------------------------------------------------------
   Box<Map> get metadataBox {
-    if (_metadataBox == null || !_metadataBox!.isOpen) {
-      throw StateError('App metadata box has not been initialized.');
+    if (_metadataBox != null && _metadataBox!.isOpen) {
+      return _metadataBox!;
     }
-    return _metadataBox!;
+    if (Hive.isBoxOpen(boxAppMetadata)) {
+      _metadataBox = Hive.box<Map>(boxAppMetadata);
+      return _metadataBox!;
+    }
+    throw StateError('App metadata box has not been initialized.');
   }
 
   Map? getMetadata(String packageName) => metadataBox.get(packageName);
@@ -103,10 +115,14 @@ class HiveStorageService {
   // Focus Session State Accessors
   // ---------------------------------------------------------------------------
   Box? get focusSessionBox {
-    if (_focusSessionBox == null || !_focusSessionBox!.isOpen) {
-      return null;
+    if (_focusSessionBox != null && _focusSessionBox!.isOpen) {
+      return _focusSessionBox!;
     }
-    return _focusSessionBox!;
+    if (Hive.isBoxOpen(boxFocusSessionState)) {
+      _focusSessionBox = Hive.box(boxFocusSessionState);
+      return _focusSessionBox!;
+    }
+    return null;
   }
 
   Map? getActiveFocusSession() {

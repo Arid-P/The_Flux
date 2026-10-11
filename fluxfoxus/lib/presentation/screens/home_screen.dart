@@ -9,8 +9,34 @@ import '../../features/presets/domain/preset.dart';
 import '../../features/presets/presentation/presets_provider.dart';
 import '../widgets/bezier_momentum_chart.dart';
 
+/// Provider computing today's and weekly actual focus seconds from SQLite.
+final todayFocusStatsProvider = FutureProvider.autoDispose<Map<String, int>>((ref) async {
+  final repo = ref.watch(focusSessionRepositoryProvider);
+  final now = DateTime.now();
+
+  final todaySessions = await repo.getCompletedForDate(now);
+  int todaySeconds = 0;
+  for (final s in todaySessions) {
+    todaySeconds += (s['actual_focus_seconds'] as int? ?? 0);
+  }
+
+  int weeklySeconds = todaySeconds;
+  for (int i = 1; i <= 6; i++) {
+    final pastDate = now.subtract(Duration(days: i));
+    final pastSessions = await repo.getCompletedForDate(pastDate);
+    for (final s in pastSessions) {
+      weeklySeconds += (s['actual_focus_seconds'] as int? ?? 0);
+    }
+  }
+
+  return {
+    'todaySeconds': todaySeconds,
+    'weeklySeconds': weeklySeconds,
+  };
+});
+
 /// HomeScreen renders the complete dashboard matching ui_home.md, ui_mockups/home_screen.html,
-/// and the Rustic Medley palette.
+/// and the Rustic Medley palette with dynamic SQLite data.
 class HomeScreen extends ConsumerStatefulWidget {
   const HomeScreen({super.key});
 
@@ -21,15 +47,29 @@ class HomeScreen extends ConsumerStatefulWidget {
 class _HomeScreenState extends ConsumerState<HomeScreen> {
   String? _selectedPresetId;
 
+  String _formatSeconds(int totalSeconds) {
+    if (totalSeconds <= 0) return '0m';
+    final hours = totalSeconds ~/ 3600;
+    final minutes = (totalSeconds % 3600) ~/ 60;
+    if (hours > 0 && minutes > 0) return '${hours}h ${minutes}m';
+    if (hours > 0) return '${hours}h';
+    return '${minutes}m';
+  }
+
   @override
   Widget build(BuildContext context) {
     final activeSession = ref.watch(focusSessionProvider);
     final presetsAsync = ref.watch(presetsListProvider);
+    final statsAsync = ref.watch(todayFocusStatsProvider);
 
     final List<Preset> presets = presetsAsync.value ?? [];
     final Preset? currentPreset = _resolveCurrentPreset(presets);
 
     final bool isSessionActive = activeSession != null && activeSession.status.isActive;
+
+    final int activeElapsedSeconds = isSessionActive ? activeSession.elapsed.inSeconds : 0;
+    final int todayFocusSeconds = (statsAsync.value?['todaySeconds'] ?? 0) + activeElapsedSeconds;
+    final int weeklyFocusSeconds = (statsAsync.value?['weeklySeconds'] ?? 0) + activeElapsedSeconds;
 
     return Scaffold(
       backgroundColor: ThemeTokens.background,
@@ -67,9 +107,9 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                       crossAxisAlignment: CrossAxisAlignment.end,
                       mainAxisSize: MainAxisSize.min,
                       children: [
-                        _buildHeaderPill(label: 'Focused', value: '2h 53m'),
+                        _buildHeaderPill(label: 'Focused', value: _formatSeconds(todayFocusSeconds)),
                         const SizedBox(height: 3),
-                        _buildHeaderPill(label: 'Weekly', value: '3h 20m'),
+                        _buildHeaderPill(label: 'Weekly', value: _formatSeconds(weeklyFocusSeconds)),
                       ],
                     ),
                   ],
@@ -113,7 +153,11 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                                           fontWeight: FontWeight.w700,
                                         ),
                                       ),
-                                      const TextSpan(text: ' starts in 12 min'),
+                                      TextSpan(
+                                        text: isSessionActive
+                                            ? ' is currently active'
+                                            : ' · Ready to start',
+                                      ),
                                     ],
                                   ),
                                 ),
@@ -155,12 +199,12 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                         ],
                       ),
                       const SizedBox(height: AppSpacing.m),
-                      const BezierMomentumChart(
+                      BezierMomentumChart(
                         height: 120,
-                        productiveDuration: '2h 15m',
-                        semiProdDuration: '1h 05m',
-                        distractingDuration: '45m',
-                        othersDuration: '20m',
+                        productiveDuration: _formatSeconds(todayFocusSeconds),
+                        semiProdDuration: '0m',
+                        distractingDuration: '0m',
+                        othersDuration: '0m',
                       ),
                     ],
                   ),
@@ -183,147 +227,168 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                         bottom: BorderSide(color: ThemeTokens.border, width: 1),
                       ),
                     ),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      // Preset Selector Row
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          Flexible(
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Text(
-                                  "TODAY'S FOCUS",
-                                  style: AppTypography.micro(
-                                    color: ThemeTokens.textMuted,
-                                    weight: FontWeight.w600,
-                                  ),
-                                ),
-                                const SizedBox(height: 2),
-                                Text(
-                                  '1hr 43m',
-                                  style: AppTypography.heading1(
-                                    color: ThemeTokens.textPrimary,
-                                    weight: FontWeight.w700,
-                                  ),
-                                ),
-                              ],
-                            ),
-                          ),
-                          const SizedBox(width: 8),
-                          Flexible(
-                            child: InkWell(
-                              onTap: () => _showPresetPicker(presets),
-                              borderRadius: BorderRadius.circular(ThemeTokens.radiusPill),
-                              child: Container(
-                                padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
-                                decoration: BoxDecoration(
-                                  color: ThemeTokens.background.withValues(alpha: 0.6),
-                                  borderRadius: BorderRadius.circular(ThemeTokens.radiusPill),
-                                  border: Border.all(color: ThemeTokens.border, width: 1),
-                                ),
-                                child: Row(
-                                  mainAxisSize: MainAxisSize.min,
-                                  children: [
-                                    Text(currentPreset?.emoji ?? '⚡', style: const TextStyle(fontSize: 14)),
-                                    const SizedBox(width: 6),
-                                    Flexible(
-                                      child: Text(
-                                        currentPreset?.name ?? 'Deep Work',
-                                        style: AppTypography.caption(
-                                          color: ThemeTokens.textPrimary,
-                                          weight: FontWeight.w600,
-                                        ),
-                                        overflow: TextOverflow.ellipsis,
-                                      ),
-                                    ),
-                                    const SizedBox(width: 4),
-                                    const Icon(Icons.keyboard_arrow_down, size: 16, color: ThemeTokens.textMuted),
-                                  ],
-                                ),
-                              ),
-                            ),
-                          ),
-                        ],
-                      ),
-                      const SizedBox(height: AppSpacing.m),
-                      const Divider(color: ThemeTokens.border, height: 1),
-                      const SizedBox(height: AppSpacing.s),
-
-                      // Detail Rows
-                      _buildDetailRow(
-                        label: 'Duration',
-                        value: '08:30pm — 11:00pm',
-                      ),
-                      const Divider(color: ThemeTokens.border, height: 1),
-                      _buildDetailRow(
-                        label: 'Breaks',
-                        value: '${currentPreset?.breakCount ?? 4} Sessions',
-                      ),
-                      const Divider(color: ThemeTokens.border, height: 1),
-                      _buildDetailRow(
-                        label: 'Break Time (each)',
-                        value: '${currentPreset?.breakDurationMinutes ?? 10}m',
-                      ),
-                      const Divider(color: ThemeTokens.border, height: 1),
-                      Padding(
-                        padding: const EdgeInsets.symmetric(vertical: 6),
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        // Preset Selector Row
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
                           children: [
-                            Text(
-                              'DESCRIPTION',
-                              style: AppTypography.micro(
-                                color: ThemeTokens.textMuted,
-                                weight: FontWeight.w600,
+                            Flexible(
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Text(
+                                    "TODAY'S FOCUS",
+                                    style: AppTypography.micro(
+                                      color: ThemeTokens.textMuted,
+                                      weight: FontWeight.w600,
+                                    ),
+                                  ),
+                                  const SizedBox(height: 2),
+                                  Text(
+                                    _formatSeconds(todayFocusSeconds),
+                                    style: AppTypography.heading1(
+                                      color: ThemeTokens.textPrimary,
+                                      weight: FontWeight.w700,
+                                    ),
+                                  ),
+                                ],
                               ),
                             ),
-                            const SizedBox(height: 2),
-                            Text(
-                              currentPreset?.description ??
-                                  'Deep work on IOQM Number Theory modular arithmetic & polynomials',
-                              style: AppTypography.caption(
-                                color: ThemeTokens.textPrimary,
+                            const SizedBox(width: 8),
+                            Flexible(
+                              child: InkWell(
+                                onTap: () => _showPresetPicker(presets),
+                                borderRadius: BorderRadius.circular(ThemeTokens.radiusPill),
+                                child: Container(
+                                  padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+                                  decoration: BoxDecoration(
+                                    color: ThemeTokens.background.withValues(alpha: 0.6),
+                                    borderRadius: BorderRadius.circular(ThemeTokens.radiusPill),
+                                    border: Border.all(color: ThemeTokens.border, width: 1),
+                                  ),
+                                  child: Row(
+                                    mainAxisSize: MainAxisSize.min,
+                                    children: [
+                                      Text(currentPreset?.emoji ?? '⚡', style: const TextStyle(fontSize: 14)),
+                                      const SizedBox(width: 6),
+                                      Flexible(
+                                        child: Text(
+                                          currentPreset?.name ?? 'Deep Work',
+                                          style: AppTypography.caption(
+                                            color: ThemeTokens.textPrimary,
+                                            weight: FontWeight.w600,
+                                          ),
+                                          overflow: TextOverflow.ellipsis,
+                                        ),
+                                      ),
+                                      const SizedBox(width: 4),
+                                      const Icon(Icons.keyboard_arrow_down, size: 16, color: ThemeTokens.textMuted),
+                                    ],
+                                  ),
+                                ),
                               ),
                             ),
                           ],
                         ),
-                      ),
+                        const SizedBox(height: AppSpacing.m),
+                        const Divider(color: ThemeTokens.border, height: 1),
+                        const SizedBox(height: AppSpacing.s),
 
-                      const SizedBox(height: AppSpacing.m),
-
-                      // Start / Resume Focusing CTA Button
-                      SizedBox(
-                        width: double.infinity,
-                        height: 48,
-                        child: ElevatedButton(
-                          key: const Key('home_start_focusing_button'),
-                          onPressed: () {
-                            context.push(AppRoutes.focusSession);
-                          },
-                          style: ElevatedButton.styleFrom(
-                            backgroundColor: ThemeTokens.primary,
-                            foregroundColor: ThemeTokens.background,
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(ThemeTokens.radiusPill),
-                            ),
-                            elevation: 0,
+                        // Detail Rows
+                        _buildDetailRow(
+                          label: 'Duration',
+                          value: (currentPreset?.breakCount ?? 0) > 0
+                              ? '${((currentPreset?.breakCount ?? 0) + 1) * 25}m session'
+                              : '25m sprint',
+                        ),
+                        const Divider(color: ThemeTokens.border, height: 1),
+                        _buildDetailRow(
+                          label: 'Breaks',
+                          value: '${currentPreset?.breakCount ?? 0} ${currentPreset?.breakCount == 1 ? "Break" : "Breaks"}',
+                        ),
+                        const Divider(color: ThemeTokens.border, height: 1),
+                        _buildDetailRow(
+                          label: 'Break Time (each)',
+                          value: '${currentPreset?.breakDurationMinutes ?? 5}m',
+                        ),
+                        const Divider(color: ThemeTokens.border, height: 1),
+                        Padding(
+                          padding: const EdgeInsets.symmetric(vertical: 6),
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                'DESCRIPTION',
+                                style: AppTypography.micro(
+                                  color: ThemeTokens.textMuted,
+                                  weight: FontWeight.w600,
+                                ),
+                              ),
+                              const SizedBox(height: 2),
+                              Text(
+                                currentPreset?.description ??
+                                    'No description notes added for this preset.',
+                                style: AppTypography.caption(
+                                  color: ThemeTokens.textPrimary,
+                                ),
+                              ),
+                            ],
                           ),
-                          child: Text(
-                            isSessionActive ? 'Resume Session' : 'Start Focusing',
-                            style: AppTypography.button(
-                              color: ThemeTokens.background,
-                              weight: FontWeight.w700,
+                        ),
+
+                        const SizedBox(height: AppSpacing.m),
+
+                        // Start / Resume Focusing CTA Button
+                        SizedBox(
+                          width: double.infinity,
+                          height: 48,
+                          child: ElevatedButton(
+                            key: const Key('home_start_focusing_button'),
+                            onPressed: () {
+                              if (isSessionActive) {
+                                context.push(AppRoutes.focusSession);
+                              } else {
+                                if (currentPreset != null) {
+                                  ref.read(presetsRepositoryProvider).setLastUsedPreset(currentPreset.id);
+                                }
+                                context.push(
+                                  AppRoutes.focusSession,
+                                  extra: currentPreset != null
+                                      ? {
+                                          'presetId': currentPreset.id,
+                                          'presetName': currentPreset.name,
+                                          'presetEmoji': currentPreset.emoji,
+                                          'breaksTotal': currentPreset.breakCount,
+                                          'breakDuration':
+                                              Duration(minutes: currentPreset.breakDurationMinutes),
+                                        }
+                                      : null,
+                                );
+                              }
+                            },
+                            style: ElevatedButton.styleFrom(
+                              backgroundColor: ThemeTokens.primary,
+                              foregroundColor: ThemeTokens.background,
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(ThemeTokens.radiusPill),
+                              ),
+                              elevation: 0,
+                            ),
+                            child: Text(
+                              isSessionActive ? 'Resume Session' : 'Start Focusing',
+                              style: AppTypography.button(
+                                color: ThemeTokens.background,
+                                weight: FontWeight.w700,
+                              ),
                             ),
                           ),
                         ),
-                      ),
-                    ],
+                      ],
+                    ),
                   ),
                 ),
-              ),
 
                 const SizedBox(height: 100), // Bottom padding for floating navigation bar
               ],
@@ -392,7 +457,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                         leading: Text(p.emoji, style: const TextStyle(fontSize: 22)),
                         title: Text(p.name, style: AppTypography.body(weight: FontWeight.w600)),
                         subtitle: Text(
-                          '${p.breakCount} breaks · ${p.breakDurationMinutes}m',
+                          '${p.breakCount} ${p.breakCount == 1 ? "break" : "breaks"} · ${p.breakDurationMinutes}m',
                           style: AppTypography.caption(color: ThemeTokens.textMuted),
                         ),
                         trailing: isSelected
@@ -402,6 +467,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                           setState(() {
                             _selectedPresetId = p.id;
                           });
+                          ref.read(presetsRepositoryProvider).setLastUsedPreset(p.id);
                           Navigator.pop(ctx);
                         },
                       );

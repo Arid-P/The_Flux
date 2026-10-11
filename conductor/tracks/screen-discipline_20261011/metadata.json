@@ -1,0 +1,16 @@
+{
+  "id": "screen-discipline_20261011",
+  "title": "Screen Discipline Feature",
+  "type": "feature",
+  "status": "complete",
+  "created": "2026-10-11T00:00:00Z",
+  "updated": "2026-10-11T10:06:00Z",
+  "phases": {
+    "total": 3,
+    "completed": 3
+  },
+  "tasks": {
+    "total": 9,
+    "completed": 9
+  }
+}

@@ -91,7 +91,16 @@ GoRouter createAppRouter({String initialLocation = AppRoutes.home}) {
       GoRoute(
         parentNavigatorKey: rootNavigatorKey,
         path: AppRoutes.focusSession,
-        builder: (context, state) => const FocusSessionScreen(),
+        builder: (context, state) {
+          final extra = state.extra as Map<String, dynamic>?;
+          return FocusSessionScreen(
+            presetId: extra?['presetId'] as String?,
+            presetName: extra?['presetName'] as String?,
+            presetEmoji: extra?['presetEmoji'] as String?,
+            breaksTotal: extra?['breaksTotal'] as int? ?? 2,
+            breakDuration: extra?['breakDuration'] as Duration? ?? const Duration(minutes: 5),
+          );
+        },
       ),
 
       // Pushed Screens (Slide in / overlays)
