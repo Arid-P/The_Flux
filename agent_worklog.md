@@ -9,7 +9,7 @@ This registry coordinates concurrent/subsequent AI coding agents working in this
 
 | Agent Name | Role / Specialty | Status | Branch | Current Task / Active Scope | Reserved / Active Files | Port(s) Used |
 |---|---|---|---|---|---|---|
-| **Code1** | Lead UI / Flutter Architect | **ACTIVE** | `ff` | Actively porting Phase 1 UI screens from Code2's HTML mockups into native Flutter screens (`fluxfoxus/lib/presentation/screens/`) using `fl_chart`, Riverpod, and Rustic Medley ThemeTokens (HomeScreen, UsageStatsScreen, PlannerScreen). | `fluxfoxus/lib/presentation/screens/`, `fluxfoxus/lib/features/`, `progress_tracker.md`, `agent_worklog.md` | None (all quiet) |
+| **Code1** | Lead UI / Flutter Architect | **ACTIVE** | `ff` | Resolved preset saving failure, eliminated hardcoded data across 7 screens with live SQLite/Hive persistence, added PresetEditScreen widget tests, and marked track complete. | `fluxfoxus/lib/presentation/screens/`, `fluxfoxus/lib/features/`, `progress_tracker.md`, `agent_worklog.md` | None (all quiet) |
 | **Code2** | Companion UI Designer / Responsive Architect | **ACTIVE** | `ff` | Providing design verification, token auditing, and exact math/chart specifications (Bézier splines, category colors, radii, spacing, icon mappings) for Code1's native Flutter port. | `agent_worklog.md`, `code2.md`, `ui_mockups/` (read/audit) | `8080` (Unified Hub) |
 | **Code3** | Context & Documentation Manager | **IDLE** | `ff` | Completed: (1) Updated code3.md role. (2) Created 13 context/memory files in `.c3_context/`. (3) Generated comprehensive `README.md`. (4) Expanded root `.gitignore` for full Flutter/Android/Python/Node stack. | `.c3_context/` (exclusive), `README.md`, `code3.md`, `.gitignore` | None |
 
@@ -106,12 +106,20 @@ This registry coordinates concurrent/subsequent AI coding agents working in this
     - Startup & Permissions Routing: Pre-initialized SQLite and Hive in `main.dart`; auto-routes first-launch / un-permissioned users to `AppRoutes.permissionsOnboarding`.
     - Responsive Scaling: Resolved RenderFlex overflows across all 6 viewports (320x568 to 1024x768). 48/48 responsive test assertions passing.
     - Git & Disk Cleanup: Reclaimed disk space by removing APK binary from git history (`.git` pruned from 138MB to 2.3MB) and ignored `*.apk` & `*.aab` in root `.gitignore`.
-    - Quality Gates: 167/167 tests passing (100%), `flutter analyze` 0 issues.
+    - Disparity Resolution & Hardcoded Data Elimination:
+      - Fixed preset creation/update crash: resolved `HiveStorageService` uninitialized box `StateError` by overriding `hiveStorageServiceProvider` & `appDatabaseProvider` in `ProviderScope` and making Hive box getters resilient against reconstructs.
+      - Fully implemented `PresetEditScreen` (`preset_edit_screen.dart`): `ConsumerStatefulWidget` loading preset and app restrictions from SQLite, interactive steppers/toggles, `updatePreset` persistence, and preset deletion.
+      - Transformed `FocusStartScreen` (`focus_start_screen.dart`): dynamic list of SQLite presets from `presetsListProvider`, custom preset selection, and direct session launching via `app_router.dart` route extra.
+      - Transformed `HomeScreen` (`home_screen.dart`): replaced hardcoded averages and labels with `todayFocusStatsProvider` computing live seconds from SQLite `focus_sessions`, dynamic preset durations, and active session timers.
+      - Transformed `PlannerScreen` (`planner_screen.dart`): dynamic current week dates anchored to `DateTime.now()`, month titles, and SQLite date queries for logged/scheduled focus sessions.
+      - Transformed `UsageStatsScreen` (`usage_stats_screen.dart`): dynamic focus metrics across Today, Daily, and Weekly tabs from SQLite session history.
+      - Transformed `AppLimitsScreen` (`app_limits_screen.dart`) and `ChannelWhitelistScreen` (`channel_whitelist_screen.dart`): full SQLite CRUD reading and writing directly to `app_limits` and `study_channels` tables with clean empty states.
+      - Added widget tests in `preset_edit_screen_test.dart`.
+      - Completed Conductor track `screen-discipline_20261011` (9/9 tasks complete).
 * **What `Code1` is doing right now:**
-  - Packaging latest verified build for user ADB physical device testing on `7P5SU4ZSFQV8DIDU`.
-  - Coordinating with Agent Code2 for ongoing design consistency.
+  - Logging work and coordinating documentation. Ready for user verification on Android device or next track.
 * **Next Steps for `Code1`:**
-  - Proceed with Phase 1-C Step 12: Native Android `UsageStatsManager` platform bridge and 7-day rolling metrics sync.
+  - Support mobile APK rebuild and device testing; proceed with Phase 1-C Step 12 (UsageStats platform bridge).
 * **Exclusive Resources / Do Not Overwrite:**
   - `fluxfoxus/lib/features/`
   - `fluxfoxus/lib/presentation/`

@@ -20,8 +20,10 @@ All three agents (Code1, Code2, Code3) work exclusively on `ff`. The user handle
 
 | Hash | Message | Author |
 |---|---|---|
-| `f4a81f0` (HEAD) | Created agent Code3. Updated agent workload file and persona file. | Code3 |
-| `a162962` (origin/ff) | Something done. Ran out of credits. | Code1 (Step 8 assumed) |
+| `ee0602e` (HEAD, origin/ff) | fix: resolve preset saving failure and replace hardcoded data across screens | Code1 |
+| `fece97f` | chore: update conductor track plan with comprehensive review audit | Code1 |
+| `a4b08bc` | feat: setup conductor workflow and screen-discipline track | Code1 |
+| `f4a81f0` | Created agent Code3. Updated agent workload file and persona file. | Code3 |
 | `3896aa4` | docs: update agent_worklog for Code2 responsive completion | Code2 |
 | `c3180fa` | feat(ui): implement responsive grid layouts for planner, usage stats, and preset creation | Code2 |
 | `e0e8d02` | feat(focus): implement Phase 1-B Step 7 break system, countdown, exhaustion, and tests | Code1 |
