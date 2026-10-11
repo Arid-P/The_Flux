@@ -195,6 +195,8 @@ High-fidelity HTML/Tailwind prototypes serve as the visual spec for every screen
 | 🚫 App Limits | 8088 | ✅ Complete |
 | 📅 Planner | 8089 | ✅ Complete |
 | 📊 Usage Stats | 8090 | ✅ Complete |
+| 🛡️ Distraction Intervention | file / hub | ✅ Complete |
+| 📱 4×2 Home Widget | file / hub | ✅ Complete |
 | 🖥️ Review Hub | 8080 | ✅ Active |
 
 All mockups include embedded automated test runners with assertion gates.
@@ -216,7 +218,7 @@ cd fluxfoxus
 /home/codespace/flutter/bin/flutter analyze
 ```
 
-**Current test suite:** 128/128 passing + 48 responsive assertions = **0 failures, 0 lints**
+**Current test suite:** 169/169 unit & widget tests passing + 48 responsive assertions = **0 failures, 0 lints**
 
 ---
 
