@@ -9,9 +9,9 @@ This registry coordinates concurrent/subsequent AI coding agents working in this
 
 | Agent Name | Role / Specialty | Status | Branch | Current Task / Active Scope | Reserved / Active Files | Port(s) Used |
 |---|---|---|---|---|---|---|
-| **Code1** | Lead UI / Flutter Architect | **ACTIVE** | `ff` | Resolved preset saving failure, eliminated hardcoded data across 7 screens with live SQLite/Hive persistence, validated 169/169 test passes, 0 lints, and preparing Phase 1-C Step 12. | `fluxfoxus/lib/presentation/screens/`, `fluxfoxus/lib/features/`, `progress_tracker.md`, `agent_worklog.md` | None (all quiet) |
+| **Code1** | Lead UI / Flutter Architect | **COMPLETED (Phase 1)** | `ff` | Completed all 22 steps of Phase 1 (Phase 1-A through 1-G). 216/216 unit, widget, and platform tests passing, 0 analyzer issues, release APK built. Ready for user & Code3 review. | `fluxfoxus/`, `progress_tracker.md`, `agent_worklog.md`, `code1.md` | None (all quiet) |
 | **Code2** | Companion UI Designer / Responsive Architect | **ACTIVE** | `ff` | Providing design verification, token auditing, and exact math/chart specifications (Bézier splines, category colors, radii, spacing, icon mappings) for Code1's native Flutter port. | `agent_worklog.md`, `code2.md`, `ui_mockups/` (read/audit) | `8080` (Unified Hub) |
-| **Code3** | Context & Documentation Manager | **ACTIVE** | `ff` | Synchronized `.c3_context/` memory files with recent milestones by Code1 & Code2 (Phase 1-B Steps 9-10, Phase 1-C Step 11, prototype port, 169/169 tests, mockups). | `.c3_context/` (exclusive), `code3.md`, `agent_worklog.md` | None |
+| **Code3** | Context & Documentation Manager | **ACTIVE** | `ff` | Synchronized `.c3_context/` memory files with recent milestones by Code1 & Code2; handles builds, APK distribution, and device testing workflows. | `.c3_context/` (exclusive), `code3.md`, `agent_worklog.md` | None |
 
 ---
 
@@ -21,7 +21,7 @@ This registry coordinates concurrent/subsequent AI coding agents working in this
 * **Assigned Identity:** `Code1`
 * **Role:** Lead UI Designer
 * **Current Working Branch:** `ff` (Strict branch lock — DO NOT SWITCH BRANCHES)
-* **Status:** `ACTIVE` (Step 8 & 9 Completed; Executing Phase 1-B Step 10: Streaks & Daily Evaluation)
+* **Status:** `COMPLETED (Phase 1)` (All 22 Steps of Phase 1 fully implemented, verified with 216 tests, 0 lints)
 * **Completed:**
   - Built static HTML/Tailwind preview of the **Active Focus Session Screen** (`ui_mockups/active_focus_session.html`) with split-line mechanical flip-clock, bottom controls, and Rustic Medley palette override.
   - Preview reviewed and approved by user.
@@ -116,10 +116,47 @@ This registry coordinates concurrent/subsequent AI coding agents working in this
       - Transformed `AppLimitsScreen` (`app_limits_screen.dart`) and `ChannelWhitelistScreen` (`channel_whitelist_screen.dart`): full SQLite CRUD reading and writing directly to `app_limits` and `study_channels` tables with clean empty states.
       - Added widget tests in `preset_edit_screen_test.dart`.
       - Completed Conductor track `screen-discipline_20261011` (9/9 tasks complete).
+  - Implemented Phase 1-C Step 12: UsageStats Integration:
+    - Android native Kotlin `UsageStatsHelper.kt` querying Android `UsageStatsManager`.
+    - MethodChannel `com.fluxfoxus/usage_stats` in `MainActivity.kt` handling permission checks and range querying.
+    - Dart `UsageStatsService`, `MethodChannelUsageStatsService`, and hermetic `FakeUsageStatsService`.
+    - 7-day rolling daily usage averages stored in Hive and automatic app categorization (`AppCategorizer`).
+    - 10 unit tests passing in `usage_stats_service_test.dart`.
+  - Implemented Phase 1-C Step 13 & Step 14: App Limits & Distraction Intervention:
+    - Domain model `AppLimit` with 60m / 6-session extra time cap.
+    - `AppLimitsRepository` with SQLite CRUD & default seeds.
+    - `AppLimitsListNotifier` Riverpod provider.
+    - `DistractionInterventionDialog` implementing 2/5/10/20 time window overlay per `ui_distracted_intervention.md`.
+    - `AppLimitsScreen` updated with 3s friction countdown pause sheet, duration picker chips (1h, today, tomorrow), streak warning, paused badge, and extra sessions handler.
+    - Dedicated test suites: `app_limits_repository_test.dart` and `distraction_intervention_dialog_test.dart` (22 tests passing).
+  - Implemented Phase 1-D Step 15 & 16: YouTube Study Mode & Channel Whitelist:
+    - `StudyChannel` domain model (`study_channel.dart`).
+    - `ConfirmationSentences` with 5 short pool sentences (≤25 channels) and 50 long pool sentences (>25 channels), with duplicate prevention logic.
+    - `StudyChannelsRepository` with SQLite CRUD & seed defaults (`study_channels_repository.dart`).
+    - `YouTubeStudyService` coordinating study mode state and whitelist evaluation.
+    - `YouTubeStudyEdgeGrabber` collapsible edge grabber per `ui_distracted_intervention.md` §3.5.
+    - `AddChannelConfirmationSheet` requiring exact confirmation sentence typing before enabling submission.
+    - `ChannelWhitelistScreen` updated with real-time search filtering, delete confirmation, and Riverpod integration.
+    - Unit & widget test suites: `youtube_study_test.dart` and `youtube_study_widget_test.dart` (11 tests passing).
+  - Implemented Phase 1-E Steps 17–19: Tracking, Planner, and Home Dashboard Port:
+    - Native Flutter `HomeScreen`, `UsageStatsScreen`, and `PlannerScreen` with full live SQLite/Hive persistence, dynamic averages, Bézier area charts, and responsive layouts.
+  - Implemented Phase 1-F Steps 20 & 21: Home Screen Widget & Notifications:
+    - Android 4x2 widget layout `ff_widget.xml`, background drawable `ff_widget_background.xml`, and metadata `ff_widget_info.xml`.
+    - Kotlin `FFWidgetProvider.kt` extending `HomeWidgetProvider` and registered receiver in `AndroidManifest.xml`.
+    - `DonutRingPainter` for 4-segment canvas donut ring and `FFWidgetService` updating HomeWidget data.
+    - `NotificationService` implementing 4 TRD §5.7.1 channels (`focus_session`, `session_complete`, `weekly_report`, `app_limit`).
+    - Unit tests: `widget_service_test.dart` and `notification_service_test.dart` (11 tests passing).
+  - Implemented Phase 1-G Step 22: MethodChannel IPC — FF Side:
+    - `FocusBlockRequest` domain model (`focus_block_request.dart`).
+    - `FdIntegrationService` listening on `com.fluxfoxus/fd_integration` handling CREATE/UPDATE/DELETE of focus sessions with `source='fd'`, and outbound `createTask` / `getTaskLists` with graceful fallbacks.
+    - SQLite repository integration for FD external session logging.
+    - Unit tests in `fd_integration_service_test.dart` (5 tests passing).
 * **What `Code1` is doing right now:**
-  - Logging work and coordinating documentation. Ready for user verification on Android device or next track.
+  - Entire Phase 1 (Steps 1–22) is 100% complete.
+  - Test suite: 216/216 tests passing, 0 analyzer issues.
+  - Ready for user review and handoff to Code3 for device install and review verification.
 * **Next Steps for `Code1`:**
-  - Support mobile APK rebuild and device testing; proceed with Phase 1-C Step 12 (UsageStats platform bridge).
+  - Stand by for user feedback on Phase 1 review; prepare for Phase 2 implementation.
 * **Exclusive Resources / Do Not Overwrite:**
   - `fluxfoxus/lib/features/`
   - `fluxfoxus/lib/presentation/`

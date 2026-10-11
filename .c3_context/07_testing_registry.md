@@ -75,6 +75,14 @@
 |---|---|---|
 | `test/features/blocking/app_detection_service_test.dart` | Platform Mock | Platform channel `com.fluxfoxus/accessibility_service`, package detection |
 | `test/features/blocking/session_blocking_enforcer_test.dart` | Unit | Focus session blocking enforcement, preset restrictions, auto-redirect |
+| `test/features/usage_stats/usage_stats_service_test.dart` | 10 | UsageStats platform channel, interval queries, 7-day rolling average, categorizer |
+| `test/features/blocking/app_limits_repository_test.dart` | 5 | App limits SQLite CRUD, pause countdown duration logic, extra sessions |
+| `test/features/blocking/distraction_intervention_dialog_test.dart` | 5 | 2/5/10/20 window overlay, streak warning, YouTube mode trigger, exit button |
+| `test/features/youtube_study/youtube_study_test.dart` | 8 | StudyChannel domain, 5 short/50 long confirmation sentences, SQLite repository |
+| `test/features/youtube_study/youtube_study_widget_test.dart` | 3 | Edge grabber expand/collapse, exact confirmation sentence verification |
+| `test/features/widget/widget_service_test.dart` | 5 | HomeWidget update bridge, 4-segment DonutRingPainter math |
+| `test/features/notifications/notification_service_test.dart` | 5 | Notification channels (focus_session, session_complete, weekly_report, app_limit) |
+| `test/features/fd_integration/fd_integration_service_test.dart` | 5 | MethodChannel com.fluxfoxus/fd_integration, session CRUD sync, outbound task calls |
 
 ---
 

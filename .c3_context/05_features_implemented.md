@@ -293,6 +293,66 @@ All implemented screens use `ResponsiveContent` to constrain width on tablets, a
 
 ---
 
+---
+
+## Phase 1-C Step 12: UsageStats Integration (Complete ✅)
+
+- Native Android Kotlin `UsageStatsHelper.kt` querying `UsageStatsManager`
+- MethodChannel `com.fluxfoxus/usage_stats` in `MainActivity.kt`
+- Dart `UsageStatsService`, `MethodChannelUsageStatsService`, and `FakeUsageStatsService`
+- 7-day rolling daily usage averages stored in Hive and automatic app categorization (`AppCategorizer`)
+- **Tests:** `test/features/usage_stats/usage_stats_service_test.dart` (10 tests)
+
+---
+
+## Phase 1-C Step 13 & 14: App Limits & Distraction Intervention (Complete ✅)
+
+- `AppLimit` domain model with 60m / 6-session extra time limits
+- `AppLimitsRepository` with SQLite CRUD & default seeds
+- `AppLimitsListNotifier` Riverpod provider
+- `DistractionInterventionDialog` implementing 2/5/10/20 time window overlay per `ui_distracted_intervention.md`
+- `AppLimitsScreen` with 3s friction countdown pause sheet, duration picker chips, streak warning, paused badge
+- **Tests:** `test/features/blocking/app_limits_repository_test.dart` (5 tests) + `test/features/blocking/distraction_intervention_dialog_test.dart` (5 tests)
+
+---
+
+## Phase 1-D Step 15 & 16: YouTube Study Mode & Channel Whitelist (Complete ✅)
+
+- `StudyChannel` entity & `StudyChannelsRepository` SQLite CRUD
+- `ConfirmationSentences` with 5 short pool sentences (≤25 channels) and 50 long pool sentences (>25 channels) with duplicate prevention logic
+- `YouTubeStudyService` state machine and URL/package whitelist evaluator
+- `YouTubeStudyEdgeGrabber` collapsible edge grabber widget
+- `AddChannelConfirmationSheet` requiring exact confirmation sentence typing before submission
+- `ChannelWhitelistScreen` with search filtering and delete confirmation
+- **Tests:** `test/features/youtube_study/youtube_study_test.dart` (8 tests) + `test/features/youtube_study/youtube_study_widget_test.dart` (3 tests)
+
+---
+
+## Phase 1-E Steps 17–19: Tracking, Planner, and Home Dashboard Port (Complete ✅)
+
+- Native Flutter `HomeScreen`, `UsageStatsScreen`, and `PlannerScreen` with live SQLite queries, Bézier momentum chart, 7-day calendar strip, and 3-tab usage history.
+
+---
+
+## Phase 1-F Steps 20 & 21: Home Screen Widget & Notifications (Complete ✅)
+
+- Android 4x2 widget layout `ff_widget.xml`, background drawable `ff_widget_background.xml`, and metadata `ff_widget_info.xml`
+- Kotlin `FFWidgetProvider.kt` extending `HomeWidgetProvider` and receiver registration in `AndroidManifest.xml`
+- `DonutRingPainter` for 4-segment canvas donut ring and `FFWidgetService` updating HomeWidget data
+- `NotificationService` implementing 4 TRD §5.7.1 channels (`focus_session`, `session_complete`, `weekly_report`, `app_limit`)
+- **Tests:** `test/features/widget/widget_service_test.dart` (5 tests) + `test/features/notifications/notification_service_test.dart` (5 tests)
+
+---
+
+## Phase 1-G Step 22: MethodChannel IPC — FF Side (Complete ✅)
+
+- `FocusBlockRequest` domain model
+- `FdIntegrationService` listening on `com.fluxfoxus/fd_integration` handling CREATE/UPDATE/DELETE with `source='fd'`, and outbound `createTask` / `getTaskLists`
+- SQLite focus session repository integration for FD external session logging
+- **Tests:** `test/features/fd_integration/fd_integration_service_test.dart` (5 tests)
+
+---
+
 ## Summary Table
 
 | Step | Phase | Status | Tests |
@@ -309,8 +369,14 @@ All implemented screens use `ResponsiveContent` to constrain width on tablets, a
 | Step 9: Focus Session Screen Polish & Completion | 1-B | ✅ Done | 6 |
 | Step 10: Streaks System & Daily Evaluation | 1-B | ✅ Done | 15 |
 | Step 11: Accessibility Service & App Detection | 1-C | ✅ Done | 12 |
-| Prototype Port & Preset Edit Screen | 1-Disparity | ✅ Done | 47 (widgets/screens) |
-| Step 12: UsageStats Integration | 1-C | 🟡 In Progress | — |
-| Steps 13–22 | 1-C to 1-G | ⏳ Backlog | — |
+| Prototype Port & Preset Edit Screen | 1-Disparity | ✅ Done | 47 |
+| Step 12: UsageStats Integration | 1-C | ✅ Done | 10 |
+| Step 13: App Limits Screen | 1-C | ✅ Done | 5 |
+| Step 14: Distraction Intervention Window | 1-C | ✅ Done | 5 |
+| Step 15 & 16: YouTube Study Mode & Whitelist | 1-D | ✅ Done | 11 |
+| Steps 17–19: Tracking, Planner, Home Dashboard | 1-E | ✅ Done | Widget suites |
+| Step 20: Android Home Screen Widget | 1-F | ✅ Done | 5 |
+| Step 21: Notifications System (4 channels) | 1-F | ✅ Done | 5 |
+| Step 22: MethodChannel IPC (FF Side) | 1-G | ✅ Done | 5 |
 
-**Total Flutter test suite: 169/169 unit & widget tests + 48 responsive layout assertions = 217 total assertions, 0 lints**
+**Total Flutter test suite: 216 unit, widget, and platform tests passing + 48 responsive layout assertions, 0 analyzer issues**

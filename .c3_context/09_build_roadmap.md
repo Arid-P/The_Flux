@@ -43,9 +43,9 @@
 | Step | Task | Status | Commit |
 |---|---|---|---|
 | 11 | Accessibility Service + App Detection (Kotlin) | ✅ Done | `0fd9e9f` |
-| 12 | UsageStats Integration (Kotlin MethodChannel) | 🟡 In Progress | Active (Code1) |
-| 13 | App Limits Screen (Blocks Tab — SQLite CRUD) | ✅ Done (Ported) | `ee0602e` |
-| 14 | 2/5/10/20 Distraction Intervention Window (overlay) | ⏳ Backlog | Mockup Done |
+| 12 | UsageStats Integration (Kotlin MethodChannel) | ✅ Done | `5a01a41` |
+| 13 | App Limits Screen (Blocks Tab — SQLite CRUD) | ✅ Done | `7cbb282` |
+| 14 | 2/5/10/20 Distraction Intervention Window (overlay) | ✅ Done | `7cbb282` |
 
 ---
 
@@ -53,8 +53,8 @@
 
 | Step | Task | Status | Commit |
 |---|---|---|---|
-| 15 | YouTube Study Mode (channel whitelist enforcement) | ⏳ Backlog | — |
-| 16 | Channel Whitelist Screen (full UI + SQLite CRUD) | ✅ Done (Ported) | `ee0602e` |
+| 15 | YouTube Study Mode (channel whitelist enforcement) | ✅ Done | `aad26fa` |
+| 16 | Channel Whitelist Screen (full UI + SQLite CRUD) | ✅ Done | `aad26fa` |
 
 ---
 
@@ -62,26 +62,26 @@
 
 | Step | Task | Status | Commit |
 |---|---|---|---|
-| 17 | Usage Stats Screen (fl_chart: area + bar charts + SQLite) | ✅ Done (Ported) | `7fb1ca9`, `ee0602e` |
-| 18 | Planner Screen (calendar strip + session cards + SQLite) | ✅ Done (Ported) | `7fb1ca9`, `ee0602e` |
-| 19 | Home Screen (momentum chart + live session stats) | ✅ Done (Ported) | `7fb1ca9`, `ee0602e` |
+| 17 | Usage Stats Screen (fl_chart: area + bar charts + SQLite) | ✅ Done | `7fb1ca9`, `ee0602e` |
+| 18 | Planner Screen (calendar strip + session cards + SQLite) | ✅ Done | `7fb1ca9`, `ee0602e` |
+| 19 | Home Screen (momentum chart + live session stats) | ✅ Done | `7fb1ca9`, `ee0602e` |
 
 ---
 
 ## Phase 1-F: Widget + Notifications
 
-| Step | Task | Status |
-|---|---|---|
-| 20 | Home Screen Widget (donut ring, WorkManager refresh) | ⏳ Backlog |
-| 21 | Notifications (channels, alarm, weekly report) | ⏳ Backlog |
+| Step | Task | Status | Commit |
+|---|---|---|---|
+| 20 | Home Screen Widget (donut ring, HomeWidget bridge) | ✅ Done | Phase 1 Final |
+| 21 | Notifications (4 TRD channels, alerts, progress) | ✅ Done | Phase 1 Final |
 
 ---
 
 ## Phase 1-G: FD↔FF IPC Bridge
 
-| Step | Task | Status |
-|---|---|---|
-| 22 | MethodChannel IPC — FF side (receive + send) | ⏳ Backlog |
+| Step | Task | Status | Commit |
+|---|---|---|---|
+| 22 | MethodChannel IPC — FF side (receive + send) | ✅ Done | Phase 1 Final |
 
 ---
 

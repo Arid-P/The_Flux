@@ -119,6 +119,81 @@ class FocusSessionRepository {
       orderBy: '${DatabaseTables.colSessionScheduledStart} ASC',
     );
   }
+
+  /// Creates a scheduled session originating from FluxDo (source='fd', status='pending').
+  Future<void> createFdSession({
+    required String id,
+    required String presetId,
+    required String fdTaskId,
+    required String name,
+    required DateTime? scheduledStart,
+    required DateTime? scheduledEnd,
+    required int? plannedDurationMinutes,
+  }) async {
+    final db = await appDatabase.database;
+    await db.insert(
+      DatabaseTables.focusSessions,
+      {
+        DatabaseTables.colSessionId: id,
+        DatabaseTables.colSessionPresetId: presetId,
+        DatabaseTables.colSessionFdTaskId: fdTaskId,
+        DatabaseTables.colSessionName: name,
+        DatabaseTables.colSessionMode: 'countdown',
+        DatabaseTables.colSessionScheduledStart: scheduledStart?.millisecondsSinceEpoch,
+        DatabaseTables.colSessionScheduledEnd: scheduledEnd?.millisecondsSinceEpoch,
+        DatabaseTables.colSessionPlannedDuration: (plannedDurationMinutes ?? 25) * 60,
+        DatabaseTables.colSessionStatus: 'pending',
+        DatabaseTables.colSessionBreaksUsed: 0,
+        DatabaseTables.colSessionSource: 'fd',
+        DatabaseTables.colSessionCreatedAt: DateTime.now().millisecondsSinceEpoch,
+      },
+    );
+  }
+
+  /// Updates a scheduled session originating from FluxDo.
+  Future<void> updateFdSession({
+    required String fdTaskId,
+    required DateTime? scheduledStart,
+    required DateTime? scheduledEnd,
+    required int? plannedDurationMinutes,
+  }) async {
+    final db = await appDatabase.database;
+    await db.update(
+      DatabaseTables.focusSessions,
+      {
+        if (scheduledStart != null)
+          DatabaseTables.colSessionScheduledStart: scheduledStart.millisecondsSinceEpoch,
+        if (scheduledEnd != null)
+          DatabaseTables.colSessionScheduledEnd: scheduledEnd.millisecondsSinceEpoch,
+        if (plannedDurationMinutes != null)
+          DatabaseTables.colSessionPlannedDuration: plannedDurationMinutes * 60,
+      },
+      where: '${DatabaseTables.colSessionFdTaskId} = ?',
+      whereArgs: [fdTaskId],
+    );
+  }
+
+  /// Deletes a scheduled session originating from FluxDo by its fdTaskId.
+  Future<void> deleteFdSession(String fdTaskId) async {
+    final db = await appDatabase.database;
+    await db.delete(
+      DatabaseTables.focusSessions,
+      where: '${DatabaseTables.colSessionFdTaskId} = ?',
+      whereArgs: [fdTaskId],
+    );
+  }
+
+  /// Finds a focus session by its fdTaskId.
+  Future<Map<String, dynamic>?> findSessionByFdTaskId(String fdTaskId) async {
+    final db = await appDatabase.database;
+    final rows = await db.query(
+      DatabaseTables.focusSessions,
+      where: '${DatabaseTables.colSessionFdTaskId} = ?',
+      whereArgs: [fdTaskId],
+      limit: 1,
+    );
+    return rows.isNotEmpty ? rows.first : null;
+  }
 }
 
 /// Fake implementation of [FocusSessionRepository] for hermetic testing.
@@ -188,6 +263,31 @@ class FakeFocusSessionRepository implements FocusSessionRepository {
         .map((s) => s.toMap())
         .toList();
   }
+
+  @override
+  Future<void> createFdSession({
+    required String id,
+    required String presetId,
+    required String fdTaskId,
+    required String name,
+    required DateTime? scheduledStart,
+    required DateTime? scheduledEnd,
+    required int? plannedDurationMinutes,
+  }) async {}
+
+  @override
+  Future<void> updateFdSession({
+    required String fdTaskId,
+    required DateTime? scheduledStart,
+    required DateTime? scheduledEnd,
+    required int? plannedDurationMinutes,
+  }) async {}
+
+  @override
+  Future<void> deleteFdSession(String fdTaskId) async {}
+
+  @override
+  Future<Map<String, dynamic>?> findSessionByFdTaskId(String fdTaskId) async => null;
 }
 
 /// Provider for FocusSessionRepository.

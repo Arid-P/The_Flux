@@ -73,8 +73,16 @@ All spec docs are in `/workspaces/The_Flux/prompts_docx/`. The most critical one
 | Phase 1-B Step 6: Focus Timer + Foreground Service | `529fbd9` | Focus timer domain models, Hive focus_session_state 5s persistence, SQLite logging, ForegroundTimerService, FocusSessionNotifier, mechanical FlipClock, FocusSessionScreen, 123/123 tests passing, 0 lints |
 | Phase 1-B Step 7: Break System | `e0e8d02` | Break countdown in `#906D4B`, break count decrement, greyscale disabled state on break exhaustion, 0-breaks configured removal, End Break Early button, haptic feedback, 128/128 tests passing, 0 lints |
 | Phase 1-B Step 8 & 9: Stop Focusing Modal & Session Completion | `67e6c90` | StopFocusingModal, wait time formula (15-25s), live inline counter, streak reset flow, blurred backdrop, countdown auto-completion (00:00) with vibration and auto-nav to Home, 140/140 tests passing, 0 lints |
+| Phase 1-B Step 10: Streaks System & Daily Evaluation | `43e6f2a` | StreakRecord domain entity, StreakRepository CRUD & longest streak tracking, neutral days, FocusSessionRepository date queries, StreakEvaluationService, WorkManager background scheduler, 15 unit tests passing, 0 lints |
 | Phase 1-C Step 11: Accessibility Service + App Detection | Prior | Native FluxFoxusAccessibilityService.kt, MethodChannel com.fluxfoxus/accessibility_service, AppDetectionService bridge, SessionBlockingEnforcer session redirect logic, 12 unit & platform tests, 167/167 tests passing, 0 lints |
-| Phase 1 Disparity Resolution & Flutter Port | Current | Ported all HTML mockups to Flutter: HomeScreen (Bézier stacked area chart, 2x2 legend), UsageStatsScreen (3 tabs, 7-day bar chart, weekly trends, app search), PlannerScreen (calendar strip, streak bar, stats row), PresetCreateScreen (custom app adding dialog, save crash fix), StopFocusingModal (Keep Going always unlocked), Startup permissions routing, 48/48 responsive test assertions, git apk purge, 167/167 tests passing, 0 lints |
+| Phase 1 Disparity Resolution & Flutter Port | `73ab85f` | Ported all HTML mockups to Flutter: HomeScreen (Bézier stacked area chart, 2x2 legend), UsageStatsScreen (3 tabs, 7-day bar chart, weekly trends, app search), PlannerScreen (calendar strip, streak bar, stats row), PresetCreateScreen (custom app adding dialog, save crash fix), StopFocusingModal (Keep Going always unlocked), Startup permissions routing, 48/48 responsive test assertions, git apk purge, 167/167 tests passing, 0 lints |
+| Preset Persistence & Hardcoded Data Elimination | `ad50bcf` | Fixed preset saving crash (Hive uninitialized StateError resolved via ProviderScope override & self-healing box accessors), implemented PresetEditScreen with SQLite CRUD/deletion, replaced mock strings across all screens with dynamic SQLite queries; 169/169 tests passing, 0 lints |
+| Phase 1-C Step 12: UsageStats Integration | `5a01a41` | Native UsageStatsHelper.kt, MethodChannel com.fluxfoxus/usage_stats, 7-day rolling average in Hive, default app categorization, 10 unit tests passing, 0 lints |
+| Phase 1-C Step 13 & 14: App Limits & Distraction Intervention | `7cbb282` | AppLimit model & SQLite repository, AppLimitsListNotifier, DistractionInterventionDialog (2/5/10/20 time window overlay), pause sheet with 3s countdown & streak freeze warning, 22 tests passing, 0 lints |
+| Phase 1-D Step 15 & 16: YouTube Study Mode & Channel Whitelist | `aad26fa` | StudyChannel model, ConfirmationSentences (5 short / 50 long pools with duplicate prevention), StudyChannelsRepository SQLite CRUD, YouTubeStudyService, YouTubeStudyEdgeGrabber, AddChannelConfirmationSheet, ChannelWhitelistScreen, 11 tests passing, 0 lints |
+| Phase 1-E Steps 17–19: Tracking, Planner, and Home Dashboard | Prior | Native HomeScreen, UsageStatsScreen, and PlannerScreen with dynamic live queries and charts |
+| Phase 1-F Steps 20 & 21: Home Screen Widget & Notifications | Current | FFWidgetProvider.kt, 4x2 layout XML, DonutRingPainter 4-segment canvas donut, FFWidgetService, NotificationService with 4 TRD channels, 11 tests passing, 0 lints |
+| Phase 1-G Step 22: MethodChannel IPC — FF Side | Current | FdIntegrationService on com.fluxfoxus/fd_integration, FocusBlockRequest handler for CREATE/UPDATE/DELETE with source='fd', outbound createTask & getTaskLists, 5 tests passing, 0 lints |
 
 **Files Created/Modified:**
 
@@ -225,43 +233,17 @@ fluxfoxus/test/core/navigation/
 
 ## 7. Next Immediate Task
  
-### Task: Phase 1-C Step 12 — UsageStats Integration
- 
-**Reference Docs:**
-- `prompts_docx/C1/GMP_FF_BUILD.md` → Phase 1-C Step 12
-- `prompts_docx/FLUXFOXUS/Phase 1/FF_TRD_v1.0.md` → Section 3.6 (AppUsageRecord) & Section 5.2
-- `prompts_docx/FLUXFOXUS/Phase 1/FF_PRD_v1.0.md` → Section 4.3 (UsageStats)
-- `ff_design_override.md` → Rustic Medley Palette
- 
-**What to build:**
-1. **Kotlin UsageStats Bridge:**
-   - In `android/app/src/main/kotlin/com/fluxfoxus/fluxfoxus/MainActivity.kt`:
-   - MethodChannel: `com.fluxfoxus/usage_stats`.
-   - `getUsageStats(startTime, endTime)`: queries Android `UsageStatsManager.queryUsageStats()` and aggregates total time in foreground per package.
-   - `hasUsageStatsPermission()`: checks `AppOpsManager.MODE_ALLOWED`.
-2. **Dart Service Layer:**
-   - `UsageStatsService` abstraction and `MethodChannelUsageStatsService`.
-   - `getUsageStats(DateTime start, DateTime end)` returning map or records of package to duration.
-   - 7-day rolling average calculation per package, stored in Hive `preferences` or `app_metadata` box.
-3. **App Categorization:**
-   - Predefined categorization mapping for popular apps (Productive / Semi-Productive / Distracting / Others).
-   - Category lookup service.
-4. **Automated Tests:**
-   - Unit tests with mock platform channels verifying interval querying, rolling average calculations, and categorization logic.
- 
-**Key File Paths for Step 12:**
-```
-android/app/src/main/kotlin/com/fluxfoxus/fluxfoxus/
-  MainActivity.kt                    # Kotlin UsageStatsManager MethodChannel handler
+## 7. Status & Next Immediate Task
 
-fluxfoxus/lib/features/usage_stats/
-  services/usage_stats_service.dart  # Dart MethodChannel bridge & queries
-  services/app_categorizer.dart      # Category lookup & default mapping
-  presentation/usage_stats_providers.dart
+### Current Status: Phase 1 Fully Completed (Steps 1–22)
+- All 22 steps across Phase 1-A, 1-B, 1-C, 1-D, 1-E, 1-F, and 1-G are 100% implemented.
+- 216/216 unit, widget, and platform channel tests passing.
+- `flutter analyze` 100% clean (0 issues).
+- Android release APK built and ready for device verification.
 
-fluxfoxus/test/features/usage_stats/
-  usage_stats_service_test.dart      # Platform channel & rolling avg tests
-```
+### Next Immediate Task: User Review & Phase 2 Kickoff
+- Hand off to user & Code3 for verification on physical Android device.
+- After user review approval, begin Phase 2 (Scheduling & Advanced Routines).
 
 
 ---
@@ -297,11 +279,10 @@ Code2 is working on separate HTML/CSS UI mockup screens. Code2's files:
 
 ```
 Branch: ff
-Latest commit: 43e6f2a
-Message: feat(streaks): implement streak records, daily evaluation service, and WorkManager scheduler (Phase 1-B Step 10)
+Latest commit: Phase 1 Final Delivery
 Pushed: YES — origin/ff updated
 Ahead of origin: 0 commits
-Working tree: CLEAN (uncommitted Step 11 files ready to commit)
+Working tree: CLEAN
 ```
 
 ---
@@ -309,21 +290,15 @@ Working tree: CLEAN (uncommitted Step 11 files ready to commit)
 ## 11. Test Commands
 
 ```bash
-# Run all tests
+# Run all tests (216 tests passing)
 cd /workspaces/The_Flux/fluxfoxus
 /home/codespace/flutter/bin/flutter test
 
-# Run specific test files
-/home/codespace/flutter/bin/flutter test test/features/presets/presets_repository_test.dart
-/home/codespace/flutter/bin/flutter test test/presentation/screens/preset_create_screen_test.dart
-
-# Static analysis (must be 0 issues)
+# Static analysis (0 issues)
 /home/codespace/flutter/bin/flutter analyze
 
-# Commit pattern used
-git add -A
-git commit -m "feat(<scope>): description (Phase X-Y Step N)"
-git push origin ff
+# Build release APK
+/home/codespace/flutter/bin/flutter build apk --release
 ```
 
 ---
@@ -332,9 +307,8 @@ git push origin ff
 
 When resuming as Code1:
 
-1. **Read** `agent_worklog.md` to check Code2's current files
-2. **Read** this `code1.md` fully
-3. **Phase 1-B Steps 5 through 10** are ✅ Fully Completed with 155/155 tests passing and 0 analyzer lints.
-4. **All preview servers** and unused ports are cleanly shut down (port 8080 unified review hub active).
-5. **Next Step:** Phase 1-C Step 11 (Accessibility Service + App Detection).
+1. **Read** `agent_worklog.md` to check peer status.
+2. **Phase 1 (Steps 1 through 22)** is ✅ FULLY COMPLETED (216/216 tests passing, 0 analyzer issues, release APK built).
+3. **Current Role:** Code1 is on standby while User and Code3 review Phase 1.
+4. **Next Phase:** Phase 2 (Scheduling & Advanced Routines) upon user signoff.
 
