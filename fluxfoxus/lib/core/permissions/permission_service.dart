@@ -1,4 +1,5 @@
 import 'package:flutter/foundation.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'app_permission.dart';
@@ -34,10 +35,21 @@ class DefaultPermissionService implements PermissionService {
           final status = await Permission.systemAlertWindow.status;
           return status.isGranted;
         case AppPermission.usageStats:
+          try {
+            const channel = MethodChannel('com.fluxfoxus/usage_stats');
+            final granted = await channel.invokeMethod<bool>('hasUsageStatsPermission');
+            return granted ?? false;
+          } catch (_) {
+            return false;
+          }
         case AppPermission.accessibilityService:
-          // Special system settings on Android require intent check via MethodChannel in production
-          // Default to false unless granted or overridden
-          return false;
+          try {
+            const channel = MethodChannel('com.fluxfoxus/accessibility_service');
+            final granted = await channel.invokeMethod<bool>('isAccessibilityServiceEnabled');
+            return granted ?? false;
+          } catch (_) {
+            return false;
+          }
       }
     } catch (e) {
       debugPrint('Error checking permission $permission: $e');
@@ -73,6 +85,13 @@ class DefaultPermissionService implements PermissionService {
   @override
   Future<void> openPermissionSettings(AppPermission permission) async {
     try {
+      if (permission == AppPermission.usageStats) {
+        try {
+          const channel = MethodChannel('com.fluxfoxus/usage_stats');
+          await channel.invokeMethod<void>('openUsageAccessSettings');
+          return;
+        } catch (_) {}
+      }
       await openAppSettings();
     } catch (e) {
       debugPrint('Error opening app settings for $permission: $e');

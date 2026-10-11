@@ -9,15 +9,17 @@ import io.flutter.embedding.engine.FlutterEngine
 import io.flutter.plugin.common.MethodChannel
 
 class MainActivity : FlutterActivity() {
-    private val channelName = "com.fluxfoxus/accessibility_service"
+    private val accessibilityChannelName = "com.fluxfoxus/accessibility_service"
+    private val usageStatsChannelName = "com.fluxfoxus/usage_stats"
 
     override fun configureFlutterEngine(flutterEngine: FlutterEngine) {
         super.configureFlutterEngine(flutterEngine)
 
-        val channel = MethodChannel(flutterEngine.dartExecutor.binaryMessenger, channelName)
-        FluxFoxusAccessibilityService.methodChannel = channel
+        // 1. Accessibility Service Channel
+        val accChannel = MethodChannel(flutterEngine.dartExecutor.binaryMessenger, accessibilityChannelName)
+        FluxFoxusAccessibilityService.methodChannel = accChannel
 
-        channel.setMethodCallHandler { call, result ->
+        accChannel.setMethodCallHandler { call, result ->
             when (call.method) {
                 "isAccessibilityServiceEnabled" -> {
                     result.success(isAccessibilityServiceEnabled(context))
@@ -45,6 +47,32 @@ class MainActivity : FlutterActivity() {
                         }
                     }
                     result.success(true)
+                }
+                else -> {
+                    result.notImplemented()
+                }
+            }
+        }
+
+        // 2. Usage Stats Channel
+        val usageChannel = MethodChannel(flutterEngine.dartExecutor.binaryMessenger, usageStatsChannelName)
+        usageChannel.setMethodCallHandler { call, result ->
+            when (call.method) {
+                "hasUsageStatsPermission" -> {
+                    result.success(UsageStatsHelper.hasUsageStatsPermission(context))
+                }
+                "openUsageAccessSettings" -> {
+                    val intent = Intent(Settings.ACTION_USAGE_ACCESS_SETTINGS).apply {
+                        addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+                    }
+                    startActivity(intent)
+                    result.success(true)
+                }
+                "getUsageStats" -> {
+                    val startTime = (call.argument<Number>("startTime"))?.toLong() ?: 0L
+                    val endTime = (call.argument<Number>("endTime"))?.toLong() ?: System.currentTimeMillis()
+                    val stats = UsageStatsHelper.queryUsageStats(context, startTime, endTime)
+                    result.success(stats)
                 }
                 else -> {
                     result.notImplemented()
