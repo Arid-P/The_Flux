@@ -6,7 +6,7 @@
 
 ---
 
-## Current State: 128/128 passing + 48 responsive = **176 total assertions, 0 lints**
+## Current State: 169/169 unit & widget tests passing + 48 responsive layout assertions = **217 total assertions, 0 lints**
 
 ---
 
@@ -52,10 +52,11 @@
 |---|---|---|
 | `test/features/presets/presets_repository_test.dart` | 5 | SQLite CRUD: save, getAll, update, delete, foreign key cascade |
 | `test/presentation/screens/preset_create_screen_test.dart` | 7 | Break stepper increments/decrements, emoji picker trigger, YouTube radio selection, save with validation, async teardown fix via `_FakePresetsRepository` |
+| `test/presentation/screens/preset_edit_screen_test.dart` | Widget | Loading preset & restrictions from SQLite, interactive edits, deletion flow |
 
 ---
 
-### Features — Focus
+### Features — Focus & Streaks
 
 | File | Tests | What It Tests |
 |---|---|---|
@@ -63,6 +64,17 @@
 | `test/features/focus/focus_session_notifier_test.dart` | Part of 24 | `FocusSessionNotifier` state machine: start, pause, resume, break, endBreak, stop, complete, auto-complete at countdown end |
 | `test/features/focus/break_system_test.dart` | 5 | Break guard (`canTakeBreak`), break count decrement, exhaustion state, haptic calls, auto-expiry |
 | `test/features/focus/wait_time_calculator_test.dart` | Part of tests | `WaitTimeCalculator.calculateWaitSeconds()` formula validation, weight lookup table, clamp behavior |
+| `test/features/focus/streak_repository_test.dart` | Unit | Streak CRUD, atomic increment, longest streak update, streak dates |
+| `test/features/focus/streak_evaluation_service_test.dart` | Unit | Daily evaluation algorithm, neutral days (`min=0`), scaled rules per TRD §5.3.1 |
+
+---
+
+### Features — App Blocking (Accessibility & Platform Bridge)
+
+| File | Tests | What It Tests |
+|---|---|---|
+| `test/features/blocking/app_detection_service_test.dart` | Platform Mock | Platform channel `com.fluxfoxus/accessibility_service`, package detection |
+| `test/features/blocking/session_blocking_enforcer_test.dart` | Unit | Focus session blocking enforcement, preset restrictions, auto-redirect |
 
 ---
 
@@ -71,7 +83,7 @@
 | File | Tests | What It Tests |
 |---|---|---|
 | `test/presentation/widgets/flip_clock_test.dart` | Part of 24 | FlipClock rendering, digit display, color in focus vs break mode, seam line presence |
-| `test/presentation/widgets/stop_focusing_modal_test.dart` | ~8 | Modal display, countdown timer shows, buttons locked during countdown, unlock at 0, Keep Going callback, Quit callback, countdownOverride param |
+| `test/presentation/widgets/stop_focusing_modal_test.dart` | ~8 | Modal display, countdown timer shows, Quit locked during countdown, Keep Going unlocked, unlock at 0 |
 
 ---
 

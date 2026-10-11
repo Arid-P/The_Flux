@@ -27,9 +27,12 @@
 - `ui_mockups/app_limits.html`
 - `ui_mockups/planner.html`
 - `ui_mockups/usage_stats.html`
+- `ui_mockups/distraction_intervention.html`
+- `ui_mockups/widget.html`
 - `ui_mockups/index.html`
-- `fluxfoxus/lib/core/theme/responsive_layout.dart` (claimed by Code2)
-- `fluxfoxus/test/responsive_test.dart` (claimed by Code2)
+- `test_code2_screens.js`, `test_intervention_screen.js`, `test_widget_screen.js`
+- `fluxfoxus/lib/core/theme/responsive_layout.dart` (verified by Code2)
+- `fluxfoxus/test/responsive_test.dart` (verified by Code2)
 
 ### Shared Files (Collaborative — all agents can update)
 - `agent_worklog.md` — update at task start and end

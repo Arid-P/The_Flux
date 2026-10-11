@@ -47,13 +47,20 @@
 
 ---
 
+## Packages Actively Used in Recent Milestones
+
+| Package | Used By |
+|---|---|
+| `fl_chart` | `BezierMomentumChart` on HomeScreen & multi-horizon charts on UsageStatsScreen |
+| `workmanager` | Daily streak evaluation (`StreakBackgroundWorker` at 11:59 PM) |
+
+---
+
 ## Packages NOT Yet Used (Installed for Future Steps)
 
 | Package | Used By (Planned) |
 |---|---|
-| `fl_chart` | Usage Stats Screen (Step 17), Home Screen (Step 19) |
 | `home_widget` | Home Screen Widget (Step 20) |
-| `workmanager` | Streak evaluation (Step 10), Widget refresh (Step 20) |
 | `android_alarm_manager_plus` | Pre-session notifications (Step 21) |
 | `flutter_local_notifications` | All notifications (Step 21) |
 | `rxdart` | Cross-module event bus |

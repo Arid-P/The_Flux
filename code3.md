@@ -112,23 +112,31 @@ All info below reflects what Code1 & Code2 had completed as of handoff to Code3.
 | Phase 1-A Step 2: Database & Hive Persistence | ✅ Done | 11/11 |
 | Phase 1-A Step 3: Navigation Shell | ✅ Done | 10/10 |
 | Phase 1-A Step 4: Permissions Onboarding | ✅ Done | 13/13 |
-| Phase 1-B Step 5: Preset System | ✅ Done | 12/12 |
+| Phase 1-B Step 5: Preset System & Create Screen | ✅ Done | 12/12 |
+| Responsive Layout Scaling System | ✅ Done | 48 assertions |
 | Phase 1-B Step 6: Focus Timer + Foreground Service | ✅ Done | 24/24 |
 | Phase 1-B Step 7: Break System | ✅ Done | 5/5 |
-| **Total Flutter test suite** | **128/128 ✅** | 0 lints |
+| Phase 1-B Step 8: Stop Focusing Modal | ✅ Done | 8/8 |
+| Phase 1-B Step 9: Focus Session Screen Polish & Completion | ✅ Done | 6/6 |
+| Phase 1-B Step 10: Streaks System & Daily Evaluation | ✅ Done | 15/15 |
+| Phase 1-C Step 11: Accessibility Service + App Detection | ✅ Done | 12/12 |
+| Prototype Port & Preset Edit Screen (SQLite CRUD on all screens) | ✅ Done | 47/47 |
+| **Total Flutter test suite** | **169/169 ✅ (+ 48 responsive)** | 0 lints |
 
-**Phase 1-B Step 8 (Stop Focusing Modal)** was the last recorded next task for Code1 at handoff.
+**Phase 1-C Step 12 (UsageStats Integration)** is the active next task for Code1.
 
 ### HTML Mockups (Code2)
 
-All 6 screens complete and served:
+All 8 mockups complete, tested, and served:
 - Port 8085: Active Focus Session (Code1)
 - Port 8086: Home Screen (Code2)
 - Port 8087: Preset Creation (Code1)
 - Port 8088: App Limits (Code2)
 - Port 8089: Planner Screen (Code2)
 - Port 8090: Usage Stats (Code2)
-- Port 8080: Unified Review Hub (Code2)
+- `distraction_intervention.html`: 5/10/20/40 overlay & YouTube Study Mode (Code2)
+- `widget.html`: Android 4×2 Home Widget (Code2)
+- Port 8080: Unified Review Hub with Island Navigation Bridge & Viewport Simulator (Code2)
 
 ---
 

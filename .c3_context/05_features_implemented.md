@@ -191,15 +191,95 @@ Weight lookup by streak length:
 | 60–99 days | 0.10 | 0.90 |
 | ≥ 100 days | 0.00 | 1.00 |
 
-**Modal UI:**
+**Modal UI & Behavior:**
 - Alert bell icon in `#CA9C68` circle
 - "Finish the goal?" heading + streak warning subtitle
 - Streak row: [Amber dot] X days → [Grey dot] 0 days
-- Two action buttons side-by-side, both 35% opacity until countdown reaches 0
-- "Keep Going" (primary, `#CA9C68`) — closes modal, resumes session
-- "Quit Session (Xs)" (secondary, outlined `#906D4B`) — live countdown in label until unlocked
+- "Keep Going" button is always unlocked (primary `#CA9C68`), allowing immediate return to focus.
+- "Quit Session (Xs)" button (secondary, outlined `#906D4B`) is locked behind the live countdown timer (15–25s) before unlocking to prevent impulsive abandonment.
 
 **Tests:** `test/presentation/widgets/stop_focusing_modal_test.dart` + `test/features/focus/wait_time_calculator_test.dart`
+
+---
+
+### Step 9 — Focus Session Completion & Polish
+
+**What it does:** Complete countdown zero (00:00) handling with haptic vibration, notification, and automated navigation returning to the Home screen and restoring the bottom navigation bar.
+
+**Files:**
+- `lib/presentation/screens/focus_session_screen.dart`
+- `test/presentation/screens/focus_session_screen_test.dart`
+
+**Key behaviors:**
+- Listens to `focusSessionProvider` state transitions via `ref.listen`.
+- On completion: triggers vibration, posts local notification, and routes back to `/` via GoRouter.
+
+---
+
+### Step 10 — Streaks System & Daily Evaluation
+
+**What it does:** Comprehensive streak calculation and evaluation engine adhering to TRD §5.3.1, tracking current and longest streaks, handling neutral days, and running daily WorkManager evaluation.
+
+**Files:**
+- `lib/features/focus/domain/streak_record.dart` — `StreakRecord` entity
+- `lib/features/focus/data/streak_repository.dart` — SQLite CRUD operations on `streak_records` table, atomic increment, longest streak update, and reset
+- `lib/features/focus/services/streak_evaluation_service.dart` — Daily evaluation algorithm (minimum sessions per day, neutral days with 0 threshold, grace handling)
+- `lib/features/focus/services/streak_background_worker.dart` — WorkManager scheduler at 11:59 PM (`com.fluxfoxus.task.evaluate_daily_streak`)
+
+**Tests:** `test/features/focus/streak_repository_test.dart` + `test/features/focus/streak_evaluation_service_test.dart` (15 tests)
+
+---
+
+## Phase 1-C: App Blocking (Step 11 Complete ✅)
+
+### Step 11 — Accessibility Service + App Detection
+
+**What it does:** Native Android accessibility service monitoring active windows, communicating over MethodChannel, and executing instant redirects away from blocked apps during active focus sessions.
+
+**Files:**
+- `android/app/src/main/kotlin/com/fluxfoxus/fluxfoxus/FluxFoxusAccessibilityService.kt` — Native accessibility service monitoring `TYPE_WINDOW_STATE_CHANGED`
+- `android/app/src/main/res/xml/accessibility_service_config.xml` — Service configuration
+- `android/app/src/main/kotlin/com/fluxfoxus/fluxfoxus/MainActivity.kt` — MethodChannel `com.fluxfoxus/accessibility_service` handler
+- `lib/features/blocking/services/app_detection_service.dart` — `AppDetectionService` interface, `MethodChannelAppDetectionService`, and hermetic fake
+- `lib/features/blocking/services/session_blocking_enforcer.dart` — Intercepts foreground app changes during focus sessions and triggers redirect
+- `lib/features/blocking/presentation/blocking_providers.dart` — Riverpod providers wired to active `focusSessionProvider`
+
+**Tests:** `test/features/blocking/app_detection_service_test.dart` + `test/features/blocking/session_blocking_enforcer_test.dart` (12 tests)
+
+---
+
+## Prototype-to-Flutter Port & Disparity Resolution (Complete ✅)
+
+**What it does:** Ported all HTML mockups into native Flutter screens with live SQLite/Hive persistence, eliminating all hardcoded and mock data.
+
+**Implemented Screens & Features:**
+1. **`HomeScreen` (`home_screen.dart`):**
+   - 24h Bézier stacked area momentum chart (`BezierMomentumChart`) with Category layers
+   - 2×2 Category Legend grid with vertical/horizontal dividers
+   - Dynamic session card displaying live daily focus time from SQLite `focus_sessions` via `todayFocusStatsProvider`
+   - Active preset selector and primary "Start Focusing" action
+2. **`UsageStatsScreen` (`usage_stats_screen.dart`):**
+   - 3-tab horizon switcher: Today, Daily, Weekly
+   - Today 24h Bézier area chart
+   - Daily 7-day interactive stacked bar chart (selected day colored, others greyscale)
+   - Weekly 7-week trend stacked bar chart + Sunday summary card
+   - Searchable app usage list backed by database records
+3. **`PlannerScreen` (`planner_screen.dart`):**
+   - Dynamic 7-day calendar strip anchored to current date (`DateTime.now()`)
+   - Streak status banner
+   - Daily comparison stats row (Focus vs Usage)
+   - Scheduled & completed session cards populated from SQLite
+   - Floating "+ Add Preset" button
+4. **`PresetCreateScreen` (`preset_create_screen.dart`) & `PresetEditScreen` (`preset_edit_screen.dart`):**
+   - Hive initialization crash resolved with self-healing getters and `ProviderScope` overrides
+   - Dynamic custom app addition dialog per category
+   - Full edit screen supporting loading from SQLite, updating settings, and preset deletion
+5. **`FocusStartScreen` (`focus_start_screen.dart`):**
+   - Dynamic SQLite preset selection from `presetsListProvider`
+   - Direct launch of focus sessions with route extra parameters
+6. **`AppLimitsScreen` (`app_limits_screen.dart`) & `ChannelWhitelistScreen` (`channel_whitelist_screen.dart`):**
+   - Direct SQLite CRUD operations for `app_limits` and `study_channels`
+   - Clean empty states and dialog flows
 
 ---
 
@@ -217,15 +297,20 @@ All implemented screens use `ResponsiveContent` to constrain width on tablets, a
 
 | Step | Phase | Status | Tests |
 |---|---|---|---|
-| Step 1: Design Tokens | 1-A | ✅ Done | 5 |
-| Step 2: Database & Hive | 1-A | ✅ Done | 11 |
+| Step 1: Design Tokens & Theme | 1-A | ✅ Done | 5 |
+| Step 2: Database & Hive Persistence | 1-A | ✅ Done | 11 |
 | Step 3: Navigation Shell | 1-A | ✅ Done | 10 |
 | Step 4: Permissions Onboarding | 1-A | ✅ Done | 13 |
-| Step 5: Preset System | 1-B | ✅ Done | 12 |
-| Responsive Layout System | 1-A/B | ✅ Done | 48 |
-| Step 6: Focus Timer + Foreground | 1-B | ✅ Done | 24 |
+| Step 5: Preset System & Creation Screen | 1-B | ✅ Done | 12 |
+| Responsive Layout System | 1-A/B | ✅ Done | 48 assertions |
+| Step 6: Focus Timer + Foreground Service | 1-B | ✅ Done | 24 |
 | Step 7: Break System | 1-B | ✅ Done | 5 |
-| Step 8: Stop Focusing Modal | 1-B | ✅ Done | ~8 |
-| Steps 9–22 | 1-B to 1-G | ⏳ Backlog | — |
+| Step 8: Stop Focusing Modal | 1-B | ✅ Done | 8 |
+| Step 9: Focus Session Screen Polish & Completion | 1-B | ✅ Done | 6 |
+| Step 10: Streaks System & Daily Evaluation | 1-B | ✅ Done | 15 |
+| Step 11: Accessibility Service & App Detection | 1-C | ✅ Done | 12 |
+| Prototype Port & Preset Edit Screen | 1-Disparity | ✅ Done | 47 (widgets/screens) |
+| Step 12: UsageStats Integration | 1-C | 🟡 In Progress | — |
+| Steps 13–22 | 1-C to 1-G | ⏳ Backlog | — |
 
-**Total Flutter test suite: 128/128 + 48 responsive = 176 assertions, 0 lints**
+**Total Flutter test suite: 169/169 unit & widget tests + 48 responsive layout assertions = 217 total assertions, 0 lints**

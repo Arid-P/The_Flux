@@ -66,10 +66,11 @@ FluxFoxus is an Android-only digital focus app. It helps users:
 
 ---
 
-## Current Build Status (as of 2026-10-10)
+## Current Build Status (as of October 2026)
 
-- **Phase 1-A:** Fully complete (Steps 1–4)
-- **Phase 1-B:** Steps 5–8 complete (Presets, Focus Timer, Break System, Stop Focusing Modal)
-- **Phase 1-C through 1-G:** Not yet started (App Blocking, UsageStats, Planner, Home, Widget, Notifications, IPC)
-- **HTML mockups:** All 6 screens designed and served (Code2)
-- **Flutter test suite:** 128/128 passing (+ 48 responsive layout tests), 0 lints
+- **Phase 1-A:** Fully complete (Steps 1–4: Design Tokens, Database/Hive, Navigation Shell, Permissions Onboarding).
+- **Phase 1-B:** Fully complete (Steps 5–10: Presets, Focus Timer + Foreground Service, Break System, Stop Focusing Modal, Session Completion & Polish, Streaks & Daily Evaluation).
+- **Phase 1-C:** Step 11 complete (Accessibility Service, Native App Detection Bridge, Session Blocking Enforcer). Step 12 (UsageStats Integration) in progress.
+- **Prototype-to-Flutter Port & Disparity Resolution:** Fully complete across all 7 screens (Home, Usage Stats, Planner, Presets, App Limits, Channel Whitelist, Stop Focusing Modal) with live SQLite/Hive persistence.
+- **HTML Mockups:** All 8 screens completed, served, and verified (Home, Usage Stats, Planner, Limits, Preset Creation, Active Session, Distraction Intervention, 4×2 Home Widget, and Unified Review Hub on port 8080).
+- **Flutter Test Suite:** 169/169 unit & widget tests passing (+ 48 responsive layout tests), 0 analyzer lints.

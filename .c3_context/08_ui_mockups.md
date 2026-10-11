@@ -18,6 +18,8 @@
 | 8088 | `app_limits.html` | Code2 | ✅ Complete | App limits (Blocks tab): CRUD engine, dual-column time picker, Turn-Off streak warning |
 | 8089 | `planner.html` | Code2 | ✅ Complete | Planner: 7-day calendar strip, session cards (completed/live/scheduled), FAB |
 | 8090 | `usage_stats.html` | Code2 | ✅ Complete | Usage stats: 3-tab (Today/Daily/Weekly), searchable app list, app detail sheet |
+| — | `distraction_intervention.html` | Code2 | ✅ Complete | 5/10/20/40 time window overlay, 5s auto-vanishing banner, YouTube Study Mode grabber, sentence friction |
+| — | `widget.html` | Code2 | ✅ Complete | Android Home Screen Widget (4×2): glance time, SVG donut ring, category legend, FF aperture branding |
 
 ---
 
@@ -39,12 +41,16 @@ Every Code2 screen has an embedded `#auto-test-modal` — a floating test runner
 | `app_limits.html` | (CRUD lifecycle) | ✅ All |
 | `planner.html` | 10 | ✅ All |
 | `usage_stats.html` | 10 | ✅ All |
+| `distraction_intervention.html` | 10 | ✅ All |
+| `widget.html` | 10 | ✅ All |
 
 External Node.js test scripts:
-- `test_code2_screens.js` — runs headless assertions across all 4 Code2 screens
+- `test_code2_screens.js` — runs headless assertions across all Code2 screens
 - `test_usage_stats.js` — specific usage stats assertions
 - `test_planner_screen.js` — planner-specific assertions
 - `test_preset_creation.js` — preset creation assertions
+- `test_intervention_screen.js` — distraction intervention & study mode assertions
+- `test_widget_screen.js` — home widget layout & state assertions
 
 ---
 
@@ -112,3 +118,29 @@ All mockups were converted from hardcoded narrow containers (`w-[390px] h-[830px
 - Daily: 7-day interactive bar chart (selected bar full color, others greyscale)
 - Weekly: 7-week stacked bar chart + Sunday summary card
 - Searchable app list, App Detail bottom sheet
+
+### Distraction Intervention (`distraction_intervention.html`)
+- 5/10/20/40 time window overlay over blurred background
+- 5s auto-vanishing active countdown banner
+- YouTube Study Mode card & edge grabber (hidden by default, expands when ON, auto-dismisses when toggled OFF)
+- Cooldown wait countdown (10s/15s/20s) preventing bypass
+- Non-whitelisted channel interception sheet ("Got it" vs "Add to Study List")
+- Random sentence typing confirmation with exact-match verification
+
+### Android Home Screen Widget (`widget.html`)
+- Standard 4×2 Android widget container in Rustic Medley palette (`#2B2F2E` surface, `#594C3D` border, rounded-2xl)
+- Left Zone: glance time display ("3h 9m" in Ghost White `#F8FAFC`) + "Today's usage" sub-label
+- Center Zone: 4-segment SVG donut ring (Productive `#4E7D56`, Semi-Prod `#906D4B`, Distracting `#38332B`, Others `#94A3B8`) with 2px gaps
+- Right Zone: Category legend rows with color dots, labels, and individual time breakdowns
+- Bottom-Right Branding: Tiny FF aperture emblem (opacity 0.4)
+- Interactive states: Normal today breakdown, Live Focus active (pulsing `#CA9C68` dot + ticking time), No-data first launch ("--")
+- Simulated Android Launcher canvas with wallpaper, dock, and app icons
+
+---
+
+## Island Navigation Bridge & Viewport Preservation
+- Cross-frame `navigateTo(url)` bridge across all 6 primary mockups to delegate navigation to `window.parent.selectScreen`
+- Timestamp cache-busting (`?t=Date.now()`) across transitions to prevent stale browser cache
+- `#device-bezel` with `box-sizing: content-box` in `index.html` ensuring strict 768px inner viewport width triggers `@media (min-width: 768px)` Tailwind breakpoints cleanly
+- Automatic iframe `load` listener in `index.html` synchronizing top header tabs and standalone link upon any screen navigation
+- Removed redundant `min-h-screen` container styles across mockups to eliminate unwanted scrollbars

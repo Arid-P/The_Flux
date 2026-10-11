@@ -10,22 +10,23 @@
 ```
 FluxFoxus Flutter App
 │
-├── main.dart                        # Entry point: ProviderScope + MaterialApp.router
+├── main.dart                        # Entry point: ProviderScope + AppDatabase/Hive pre-init
 │
 ├── core/                            # Cross-feature shared infrastructure
-│   ├── database/                    # SQLite via sqflite
-│   ├── storage/                     # Hive key-value boxes
-│   ├── navigation/                  # GoRouter + nav bar shell
-│   ├── permissions/                 # Permission service abstractions
-│   └── theme/                       # Design tokens, typography, spacing, responsive
+│   ├── database/                    # SQLite via sqflite (6 tables + indexes)
+│   ├── storage/                     # Hive key-value boxes (4 boxes)
+│   ├── navigation/                  # GoRouter + 5-tab pill nav shell + root takeover
+│   ├── permissions/                 # Permission service abstractions & onboarding wizard
+│   └── theme/                       # Rustic Medley design tokens, typography, spacing, responsive
 │
 ├── features/                        # Feature modules (domain-first)
-│   ├── presets/                     # Preset CRUD + Riverpod providers
-│   └── focus/                       # Focus session domain, services, state notifier
+│   ├── presets/                     # Preset CRUD, models, emoji sheet & Riverpod providers
+│   ├── focus/                       # Focus session domain, timer service, streaks, state notifier
+│   └── blocking/                    # Accessibility service bridge & session blocking enforcer
 │
 └── presentation/                    # App-level screens and shared widgets
-    ├── screens/                     # All screen widgets
-    └── widgets/                     # Shared reusable widgets (FlipClock, StopFocusingModal)
+    ├── screens/                     # All screens (Home, Usage, Focus, Planner, Limits, Presets, etc.)
+    └── widgets/                     # Shared reusable widgets (FlipClock, StopFocusingModal, BezierMomentumChart)
 ```
 
 ---
@@ -37,20 +38,25 @@ Framework: `flutter_riverpod ^3.4.3`
 | Provider | Type | What It Does |
 |---|---|---|
 | `routerProvider` | `Provider<GoRouter>` | GoRouter singleton |
-| `appDatabaseProvider` | `Provider<AppDatabase>` | SQLite database lifecycle |
-| `hiveStorageServiceProvider` | `Provider<HiveStorageService>` | Hive boxes wrapper |
+| `appDatabaseProvider` | `Provider<AppDatabase>` | SQLite database lifecycle (ProviderScope overridden) |
+| `hiveStorageServiceProvider` | `Provider<HiveStorageService>` | Hive boxes wrapper (ProviderScope overridden) |
 | `presetsRepositoryProvider` | `Provider<PresetsRepository>` | Preset SQLite CRUD repo |
 | `presetsListProvider` | `AsyncNotifierProvider<PresetsListNotifier, List<Preset>>` | Active preset list |
 | `currentPresetProvider` | `FutureProvider<Preset?>` | Last-used preset |
-| `focusSessionRepositoryProvider` | `Provider<FocusSessionRepository>` | Session persistence repo |
-| `foregroundTimerServiceProvider` | `Provider<ForegroundTimerService>` | Foreground service adapter |
+| `focusSessionRepositoryProvider` | `Provider<FocusSessionRepository>` | Session persistence repo (Hive active + SQLite history) |
+| `streakRepositoryProvider` | `Provider<StreakRepository>` | Focus streak record SQLite repository |
+| `streakEvaluationServiceProvider` | `Provider<StreakEvaluationService>` | Daily streak evaluation service per TRD §5.3.1 |
+| `foregroundTimerServiceProvider` | `Provider<ForegroundTimerService>` | Foreground notification service adapter |
 | `focusSessionProvider` | `NotifierProvider<FocusSessionNotifier, FocusSession?>` | Active session state machine |
+| `appDetectionServiceProvider` | `Provider<AppDetectionService>` | Platform channel bridge (`com.fluxfoxus/accessibility_service`) |
+| `sessionBlockingEnforcerProvider` | `Provider<SessionBlockingEnforcer>` | Intercepts blocked apps during active focus sessions |
+| `todayFocusStatsProvider` | `FutureProvider<TodayFocusStats>` | Computes live focus duration & session counts from SQLite |
 
 ### Architecture Pattern (per feature)
 
 ```
-domain/     ← Pure Dart models, enums, business logic (no Flutter deps)
-data/       ← Repository: SQLite/Hive read-write, Fake impls for testing
+domain/       ← Pure Dart models, enums, business logic (no Flutter deps)
+data/         ← Repository: SQLite/Hive read-write, Fake impls for testing
 presentation/ ← Riverpod Notifiers, Providers, Widget sub-folders
 ```
 
