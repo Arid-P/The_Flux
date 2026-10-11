@@ -14,6 +14,7 @@ abstract class UsageStatsService {
   Future<List<AppUsageInfo>> getWeeklyUsageStats({DateTime? endDate});
   Future<Duration> get7DayRollingAverage(String packageName);
   Map<AppCategory, Duration> getCategoryBreakdown(List<AppUsageInfo> apps);
+  Future<List<AppUsageInfo>> getInstalledApps();
 }
 
 /// Production implementation using MethodChannel and Hive persistence.
@@ -131,5 +132,32 @@ class MethodChannelUsageStatsService implements UsageStatsService {
     }
 
     return breakdown;
+  }
+
+  @override
+  Future<List<AppUsageInfo>> getInstalledApps() async {
+    try {
+      final rawApps = await _channel.invokeListMethod<dynamic>('getInstalledApps');
+      if (rawApps == null) return [];
+
+      final List<AppUsageInfo> result = [];
+      for (final item in rawApps) {
+        if (item is Map) {
+          final pkg = item['packageName'] as String? ?? '';
+          if (pkg.isEmpty) continue;
+
+          final customCategory = _hiveStorage?.getCategory(pkg);
+          final category = customCategory != null
+              ? AppCategory.fromString(customCategory)
+              : DefaultAppCategories.resolveCategory(pkg);
+
+          final usageInfo = AppUsageInfo.fromMap(item, categoryOverride: category);
+          result.add(usageInfo);
+        }
+      }
+      return result;
+    } on PlatformException {
+      return [];
+    }
   }
 }

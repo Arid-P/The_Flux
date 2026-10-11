@@ -8,6 +8,7 @@ class AppUsageInfo {
   final DateTime lastTimeUsed;
   final bool isSystemApp;
   final AppCategory category;
+  final String? appIcon;
 
   const AppUsageInfo({
     required this.packageName,
@@ -16,6 +17,7 @@ class AppUsageInfo {
     required this.lastTimeUsed,
     required this.isSystemApp,
     required this.category,
+    this.appIcon,
   });
 
   AppUsageInfo copyWith({
@@ -25,6 +27,7 @@ class AppUsageInfo {
     DateTime? lastTimeUsed,
     bool? isSystemApp,
     AppCategory? category,
+    String? appIcon,
   }) {
     return AppUsageInfo(
       packageName: packageName ?? this.packageName,
@@ -33,6 +36,7 @@ class AppUsageInfo {
       lastTimeUsed: lastTimeUsed ?? this.lastTimeUsed,
       isSystemApp: isSystemApp ?? this.isSystemApp,
       category: category ?? this.category,
+      appIcon: appIcon ?? this.appIcon,
     );
   }
 
@@ -44,6 +48,7 @@ class AppUsageInfo {
       'lastTimeUsed': lastTimeUsed.millisecondsSinceEpoch,
       'isSystemApp': isSystemApp,
       'category': category.toStorageString(),
+      'appIcon': appIcon,
     };
   }
 
@@ -60,6 +65,7 @@ class AppUsageInfo {
       ),
       isSystemApp: map['isSystemApp'] as bool? ?? false,
       category: resolvedCategory,
+      appIcon: map['appIcon'] as String?,
     );
   }
 

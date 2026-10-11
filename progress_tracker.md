@@ -33,6 +33,7 @@
 | **Phase 1-F Steps 20 & 21: Home Screen Widget & Notifications** | Completed | `FFWidgetProvider.kt`, `ff_widget.xml` 4x2 layout, `DonutRingPainter` 4-segment canvas donut, `FFWidgetService` HomeWidget sync, `NotificationService` with 4 TRD channels (`focus_session`, `session_complete`, `weekly_report`, `app_limit`), 10 unit tests passing. |
 | **Phase 1-G Step 22: MethodChannel IPC — FF Side** | Completed | `FdIntegrationService` on `com.fluxfoxus/fd_integration`, `FocusBlockRequest` handler for CREATE/UPDATE/DELETE with `source='fd'`, outbound `createTask` and `getTaskLists` with graceful try-catch fallbacks, 5 unit tests passing. |
 | **Phase 1 Completion** | Completed | All 22 steps of Phase 1 fully implemented, verified with 100% test pass rate and 0 analyzer issues, pushed to `origin/ff`. |
+| **Phase 1 Polish Pass (Task Blocks 1–4)** | Completed | Native PackageManager app labels & Base64 icons, Bézier 24h & Daily/Weekly stacked bar charts with pagination, 3D mechanical flip clock, App Limits dynamic app picker & extra limit selector, Planner preset time-block scheduling, Rustic Medley contrast palette update, accessibility settings routing, and production launcher icons. 217/217 tests passing, 0 lints. |
 
 ---
 

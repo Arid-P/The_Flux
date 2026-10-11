@@ -4,6 +4,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../core/database/database_tables.dart';
 import '../../core/theme/theme.dart';
 import '../../features/presets/presentation/presets_provider.dart';
+import '../../features/usage_stats/usage_stats.dart';
 
 /// AppLimitsScreen renders the Blocks tab and allows managing app limits per ui_app_limits.md.
 /// Persists limits in SQLite database table `app_limits`.
@@ -44,7 +45,13 @@ class _AppLimitsScreenState extends ConsumerState<AppLimitsScreen> {
     }
   }
 
-  Future<void> _addLimit(String appName, String packageName, String category, int limitMinutes) async {
+  Future<void> _addLimit(
+    String appName,
+    String packageName,
+    String category,
+    int limitMinutes, {
+    int extraLimitMinutes = 5,
+  }) async {
     try {
       final db = await ref.read(appDatabaseProvider).database;
       await db.insert(
@@ -55,7 +62,7 @@ class _AppLimitsScreenState extends ConsumerState<AppLimitsScreen> {
           DatabaseTables.colLimitCategory: category,
           DatabaseTables.colLimitDailySeconds: limitMinutes * 60,
           DatabaseTables.colLimitExtraSessionCount: 0,
-          DatabaseTables.colLimitExtraSessionDuration: 300,
+          DatabaseTables.colLimitExtraSessionDuration: extraLimitMinutes * 60,
           DatabaseTables.colLimitIsActive: 1,
           DatabaseTables.colLimitPausedUntil: null,
           DatabaseTables.colLimitStreakDays: 0,
@@ -243,94 +250,227 @@ class _AppLimitsScreenState extends ConsumerState<AppLimitsScreen> {
   }
 
   void _showAddDialog() {
-    final nameCtrl = TextEditingController();
-    final pkgCtrl = TextEditingController();
+    final searchCtrl = TextEditingController();
     final minsCtrl = TextEditingController(text: '30');
+    int extraLimitMins = 5;
+    AppUsageInfo? selectedApp;
     String selectedCategory = 'Distracting';
+    String customAppName = '';
+    String customPkgName = '';
 
     showDialog(
       context: context,
       builder: (ctx) => StatefulBuilder(
-        builder: (context, setDialogState) => AlertDialog(
-          backgroundColor: ThemeTokens.surface,
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(AppRadius.card),
-            side: const BorderSide(color: ThemeTokens.border, width: 1),
-          ),
-          title: Text('Add App Limit', style: AppTypography.heading2()),
-          content: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              TextField(
-                controller: nameCtrl,
-                style: AppTypography.body(),
-                decoration: InputDecoration(
-                  labelText: 'App Name',
-                  hintText: 'e.g. Instagram',
-                  border: OutlineInputBorder(borderRadius: BorderRadius.circular(AppRadius.sm)),
+        builder: (context, setDialogState) {
+          final installedAppsAsync = ref.watch(installedAppsProvider);
+          final allApps = installedAppsAsync.value ?? const <AppUsageInfo>[];
+          final query = searchCtrl.text.trim().toLowerCase();
+          final filteredApps = allApps.where((a) {
+            if (query.isEmpty) return true;
+            return a.appName.toLowerCase().contains(query) ||
+                a.packageName.toLowerCase().contains(query);
+          }).toList();
+
+          return AlertDialog(
+            backgroundColor: ThemeTokens.surface,
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(AppRadius.card),
+              side: const BorderSide(color: ThemeTokens.border, width: 1),
+            ),
+            title: Text('Add App Limit', style: AppTypography.heading2()),
+            content: SizedBox(
+              width: double.maxFinite,
+              child: SingleChildScrollView(
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    // Search bar
+                    TextField(
+                      controller: searchCtrl,
+                      style: AppTypography.body(),
+                      decoration: InputDecoration(
+                        hintText: 'Search installed apps...',
+                        prefixIcon: const Icon(Icons.search, size: 20, color: ThemeTokens.textMuted),
+                        border: OutlineInputBorder(borderRadius: BorderRadius.circular(AppRadius.sm)),
+                        isDense: true,
+                      ),
+                      onChanged: (val) {
+                        setDialogState(() {
+                          customAppName = val;
+                          customPkgName = 'com.${val.toLowerCase().replaceAll(RegExp(r'[^a-z0-9]'), '')}';
+                        });
+                      },
+                    ),
+                    const SizedBox(height: AppSpacing.s),
+
+                    // App picker list
+                    Container(
+                      height: 140,
+                      decoration: BoxDecoration(
+                        color: ThemeTokens.background,
+                        borderRadius: BorderRadius.circular(AppRadius.sm),
+                        border: Border.all(color: ThemeTokens.border),
+                      ),
+                      child: filteredApps.isEmpty
+                          ? Center(
+                              child: Text(
+                                query.isEmpty ? 'Loading installed apps...' : 'No matching apps found',
+                                style: AppTypography.caption(color: ThemeTokens.textMuted),
+                              ),
+                            )
+                          : ListView.builder(
+                              shrinkWrap: true,
+                              itemCount: filteredApps.length,
+                              itemBuilder: (context, idx) {
+                                final app = filteredApps[idx];
+                                final isSelected = selectedApp?.packageName == app.packageName;
+                                return InkWell(
+                                  onTap: () {
+                                    setDialogState(() {
+                                      selectedApp = app;
+                                      customAppName = app.appName;
+                                      customPkgName = app.packageName;
+                                      selectedCategory = app.category.displayName;
+                                    });
+                                  },
+                                  child: Container(
+                                    padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
+                                    color: isSelected ? ThemeTokens.primary.withValues(alpha: 0.2) : Colors.transparent,
+                                    child: Row(
+                                      children: [
+                                        Icon(
+                                          isSelected ? Icons.check_circle : Icons.apps,
+                                          size: 18,
+                                          color: isSelected ? ThemeTokens.primary : ThemeTokens.textMuted,
+                                        ),
+                                        const SizedBox(width: 8),
+                                        Expanded(
+                                          child: Column(
+                                            crossAxisAlignment: CrossAxisAlignment.start,
+                                            children: [
+                                              Text(
+                                                app.appName,
+                                                style: AppTypography.caption(
+                                                  color: isSelected ? ThemeTokens.primary : ThemeTokens.textPrimary,
+                                                  weight: isSelected ? FontWeight.w700 : FontWeight.w500,
+                                                ),
+                                                overflow: TextOverflow.ellipsis,
+                                              ),
+                                              Text(
+                                                app.packageName,
+                                                style: AppTypography.micro(color: ThemeTokens.textMuted),
+                                                overflow: TextOverflow.ellipsis,
+                                              ),
+                                            ],
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                  ),
+                                );
+                              },
+                            ),
+                    ),
+                    const SizedBox(height: AppSpacing.s),
+
+                    // Selected App label
+                    if (selectedApp != null || customAppName.isNotEmpty) ...[
+                      Text(
+                        'Target: ${selectedApp?.appName ?? customAppName}',
+                        style: AppTypography.caption(color: ThemeTokens.primary, weight: FontWeight.w700),
+                      ),
+                      const SizedBox(height: AppSpacing.s),
+                    ],
+
+                    // Daily Limit Minutes
+                    TextField(
+                      controller: minsCtrl,
+                      keyboardType: TextInputType.number,
+                      style: AppTypography.body(),
+                      decoration: InputDecoration(
+                        labelText: 'Daily Limit (Minutes)',
+                        hintText: 'e.g. 30',
+                        border: OutlineInputBorder(borderRadius: BorderRadius.circular(AppRadius.sm)),
+                        isDense: true,
+                      ),
+                    ),
+                    const SizedBox(height: AppSpacing.s),
+
+                    // Extra Limit Allowance Selector
+                    Text(
+                      'EXTRA LIMIT TIME ALLOWANCE',
+                      style: AppTypography.micro(color: ThemeTokens.textMuted, weight: FontWeight.w700),
+                    ),
+                    const SizedBox(height: 4),
+                    Wrap(
+                      spacing: 8,
+                      children: [5, 10, 15].map((mins) {
+                        final isSel = extraLimitMins == mins;
+                        return ChoiceChip(
+                          label: Text('$mins min'),
+                          selected: isSel,
+                          onSelected: (_) => setDialogState(() => extraLimitMins = mins),
+                        );
+                      }).toList(),
+                    ),
+                    const SizedBox(height: AppSpacing.s),
+
+                    // Category Selector
+                    DropdownButtonFormField<String>(
+                      initialValue: selectedCategory,
+                      dropdownColor: ThemeTokens.surfaceElevated,
+                      items: const [
+                        DropdownMenuItem(value: 'Distracting', child: Text('Distracting')),
+                        DropdownMenuItem(value: 'Productive', child: Text('Productive')),
+                        DropdownMenuItem(value: 'Semi-Productive', child: Text('Semi-Productive')),
+                        DropdownMenuItem(value: 'Others', child: Text('Others')),
+                      ],
+                      onChanged: (val) {
+                        if (val != null) {
+                          setDialogState(() => selectedCategory = val);
+                        }
+                      },
+                      decoration: InputDecoration(
+                        labelText: 'Category',
+                        border: OutlineInputBorder(borderRadius: BorderRadius.circular(AppRadius.sm)),
+                        isDense: true,
+                      ),
+                    ),
+                  ],
                 ),
-                onChanged: (val) {
-                  if (pkgCtrl.text.isEmpty || pkgCtrl.text.startsWith('com.')) {
-                    pkgCtrl.text = 'com.${val.toLowerCase().replaceAll(RegExp(r'[^a-z0-9]'), '')}';
+              ),
+            ),
+            actions: [
+              TextButton(
+                onPressed: () => Navigator.pop(ctx),
+                child: Text('Cancel', style: AppTypography.caption(color: ThemeTokens.textMuted)),
+              ),
+              ElevatedButton(
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: ThemeTokens.primary,
+                  foregroundColor: ThemeTokens.background,
+                ),
+                onPressed: () {
+                  final name = selectedApp?.appName ?? customAppName.trim();
+                  final pkg = selectedApp?.packageName ?? customPkgName.trim();
+                  final mins = int.tryParse(minsCtrl.text.trim()) ?? 30;
+                  if (name.isNotEmpty) {
+                    _addLimit(
+                      name,
+                      pkg.isNotEmpty ? pkg : 'com.${name.toLowerCase()}',
+                      selectedCategory,
+                      mins,
+                      extraLimitMinutes: extraLimitMins,
+                    );
+                    Navigator.pop(ctx);
                   }
                 },
-              ),
-              const SizedBox(height: AppSpacing.s),
-              TextField(
-                controller: minsCtrl,
-                keyboardType: TextInputType.number,
-                style: AppTypography.body(),
-                decoration: InputDecoration(
-                  labelText: 'Daily Limit (Minutes)',
-                  hintText: 'e.g. 30',
-                  border: OutlineInputBorder(borderRadius: BorderRadius.circular(AppRadius.sm)),
-                ),
-              ),
-              const SizedBox(height: AppSpacing.s),
-              DropdownButtonFormField<String>(
-                initialValue: selectedCategory,
-                dropdownColor: ThemeTokens.surfaceElevated,
-                items: const [
-                  DropdownMenuItem(value: 'Distracting', child: Text('Distracting')),
-                  DropdownMenuItem(value: 'Productive', child: Text('Productive')),
-                  DropdownMenuItem(value: 'Semi-Productive', child: Text('Semi-Productive')),
-                  DropdownMenuItem(value: 'Others', child: Text('Others')),
-                ],
-                onChanged: (val) {
-                  if (val != null) {
-                    setDialogState(() => selectedCategory = val);
-                  }
-                },
-                decoration: InputDecoration(
-                  labelText: 'Category',
-                  border: OutlineInputBorder(borderRadius: BorderRadius.circular(AppRadius.sm)),
-                ),
+                child: const Text('Save Limit'),
               ),
             ],
-          ),
-          actions: [
-            TextButton(
-              onPressed: () => Navigator.pop(ctx),
-              child: Text('Cancel', style: AppTypography.caption(color: ThemeTokens.textMuted)),
-            ),
-            ElevatedButton(
-              style: ElevatedButton.styleFrom(
-                backgroundColor: ThemeTokens.primary,
-                foregroundColor: ThemeTokens.background,
-              ),
-              onPressed: () {
-                final name = nameCtrl.text.trim();
-                final pkg = pkgCtrl.text.trim();
-                final mins = int.tryParse(minsCtrl.text.trim()) ?? 30;
-                if (name.isNotEmpty) {
-                  _addLimit(name, pkg.isNotEmpty ? pkg : 'com.${name.toLowerCase()}', selectedCategory, mins);
-                  Navigator.pop(ctx);
-                }
-              },
-              child: const Text('Save'),
-            ),
-          ],
-        ),
+          );
+        },
       ),
     );
   }

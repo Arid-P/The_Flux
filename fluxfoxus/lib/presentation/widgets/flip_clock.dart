@@ -1,3 +1,4 @@
+import 'dart:math' as math;
 import 'package:flutter/material.dart';
 import '../../core/theme/theme.dart';
 
@@ -131,15 +132,48 @@ class _MechanicalFlipCard extends StatelessWidget {
             ),
           ),
 
-          // Large Monospace Digit
-          Text(
-            text,
-            style: TextStyle(
-              fontFamily: 'monospace',
-              fontSize: 76,
-              fontWeight: FontWeight.bold,
-              color: digitColor,
-              letterSpacing: 2,
+          // Large Monospace Digit with Mechanical Split-Flap Card-Flip Animation
+          AnimatedSwitcher(
+            duration: const Duration(milliseconds: 320),
+            transitionBuilder: (Widget child, Animation<double> animation) {
+              final isIncoming = child.key == ValueKey<String>(text);
+              return AnimatedBuilder(
+                animation: animation,
+                child: child,
+                builder: (context, animChild) {
+                  // Simulate falling split-line flap rotated on horizontal X-axis
+                  final angle = isIncoming
+                      ? (1.0 - animation.value) * (math.pi / 2)
+                      : animation.value * -(math.pi / 2);
+                  return Transform(
+                    transform: Matrix4.identity()
+                      ..setEntry(3, 2, 0.002) // Perspective depth
+                      ..rotateX(angle),
+                    alignment: Alignment.center,
+                    child: animChild,
+                  );
+                },
+              );
+            },
+            layoutBuilder: (Widget? currentChild, List<Widget> previousChildren) {
+              return Stack(
+                alignment: Alignment.center,
+                children: <Widget>[
+                  ...previousChildren,
+                  ?currentChild,
+                ],
+              );
+            },
+            child: Text(
+              text,
+              key: ValueKey<String>(text),
+              style: TextStyle(
+                fontFamily: 'monospace',
+                fontSize: 76,
+                fontWeight: FontWeight.bold,
+                color: digitColor,
+                letterSpacing: 2,
+              ),
             ),
           ),
 

@@ -53,11 +53,11 @@ class ThemeTokens {
   /// Productive category (Olive / Forest Muted Green)
   static const Color categoryProductive = Color(0xFF4E7D56);
 
-  /// Semi-Productive category (Tanned Wood)
-  static const Color categorySemiProductive = Color(0xFF906D4B);
+  /// Semi-Productive category (Rusty Greenish tone)
+  static const Color categorySemiProductive = Color(0xFF7A6C44);
 
-  /// Distracting category (Dark Carbon Slate)
-  static const Color categoryDistracting = Color(0xFF232726);
+  /// Distracting category (Contrasting Orange / Rusty tone)
+  static const Color categoryDistracting = Color(0xFFC27838);
 
   /// Others category (Neutral Slate Grey)
   static const Color categoryOthers = Color(0xFF94A3B8);

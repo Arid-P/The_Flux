@@ -9,7 +9,7 @@ This registry coordinates concurrent/subsequent AI coding agents working in this
 
 | Agent Name | Role / Specialty | Status | Branch | Current Task / Active Scope | Reserved / Active Files | Port(s) Used |
 |---|---|---|---|---|---|---|
-| **Code1** | Lead UI / Flutter Architect | **COMPLETED (Phase 1)** | `ff` | Completed all 22 steps of Phase 1 (Phase 1-A through 1-G). 216/216 unit, widget, and platform tests passing, 0 analyzer issues, release APK built. Ready for user & Code3 review. | `fluxfoxus/`, `progress_tracker.md`, `agent_worklog.md`, `code1.md` | None (all quiet) |
+| **Code1** | Lead UI / Flutter Architect | **COMPLETED (Phase 1 & Polish Pass)** | `ff` | Completed all 22 steps of Phase 1 + Phase 1 Polish Pass (Task Blocks 1–4). 217/217 tests passing, 0 analyzer issues, release APK built & uploaded. | `fluxfoxus/`, `progress_tracker.md`, `agent_worklog.md`, `code1.md` | None (all quiet) |
 | **Code2** | Companion UI Designer / Responsive Architect | **ACTIVE** | `ff` | Providing design verification, token auditing, and exact math/chart specifications (Bézier splines, category colors, radii, spacing, icon mappings) for Code1's native Flutter port. | `agent_worklog.md`, `code2.md`, `ui_mockups/` (read/audit) | `8080` (Unified Hub) |
 | **Code3** | Context & Documentation Manager | **ACTIVE** | `ff` | Synchronized `.c3_context/` memory files with recent milestones by Code1 & Code2; handles builds, APK distribution, and device testing workflows. | `.c3_context/` (exclusive), `code3.md`, `agent_worklog.md` | None |
 

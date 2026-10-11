@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import 'package:uuid/uuid.dart';
 import '../../core/navigation/app_routes.dart';
 import '../../core/theme/theme.dart';
 import '../../features/focus/focus.dart';
@@ -370,10 +371,14 @@ class _PlannerScreenState extends ConsumerState<PlannerScreen> {
 
                 const SizedBox(height: AppSpacing.m),
 
-                // 5. Scheduled Sessions Header
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
+                SizedBox(
+                  width: double.infinity,
+                  child: Wrap(
+                    alignment: WrapAlignment.spaceBetween,
+                    crossAxisAlignment: WrapCrossAlignment.center,
+                    spacing: AppSpacing.s,
+                    runSpacing: 4,
+                    children: [
                     Text(
                       'SESSIONS FOR DAY',
                       style: AppTypography.micro(
@@ -381,12 +386,27 @@ class _PlannerScreenState extends ConsumerState<PlannerScreen> {
                         weight: FontWeight.w700,
                       ),
                     ),
-                    Text(
-                      '${sessionsList.length} items',
-                      style: AppTypography.micro(color: ThemeTokens.textMuted),
+                    Row(
+                      children: [
+                        TextButton.icon(
+                          key: const Key('schedule_session_button'),
+                          onPressed: () => _showScheduleSessionDialog(selectedDate, presets),
+                          icon: const Icon(Icons.alarm_add, size: 16, color: ThemeTokens.primary),
+                          label: Text(
+                            'Schedule Block',
+                            style: AppTypography.micro(color: ThemeTokens.primary, weight: FontWeight.w700),
+                          ),
+                        ),
+                        const SizedBox(width: 4),
+                        Text(
+                          '${sessionsList.length} items',
+                          style: AppTypography.micro(color: ThemeTokens.textMuted),
+                        ),
+                      ],
                     ),
                   ],
                 ),
+              ),
                 const SizedBox(height: AppSpacing.s),
 
                 // Session Cards or Empty State
@@ -410,21 +430,39 @@ class _PlannerScreenState extends ConsumerState<PlannerScreen> {
                         ),
                         const SizedBox(height: 4),
                         Text(
-                          'Start focusing now or tap "+ New Preset" to configure a focus session template.',
+                          'Assign a specific focus block (e.g. 3:00 PM – 5:00 PM) to structure your day.',
                           textAlign: TextAlign.center,
                           style: AppTypography.caption(color: ThemeTokens.textMuted),
                         ),
                         const SizedBox(height: AppSpacing.m),
-                        OutlinedButton(
-                          onPressed: () => context.push(AppRoutes.presetCreate),
-                          style: OutlinedButton.styleFrom(
-                            side: const BorderSide(color: ThemeTokens.primary),
-                            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(ThemeTokens.radiusPill)),
-                          ),
-                          child: Text(
-                            '+ Create Preset',
-                            style: AppTypography.caption(color: ThemeTokens.primary, weight: FontWeight.w700),
-                          ),
+                        Wrap(
+                          alignment: WrapAlignment.center,
+                          spacing: AppSpacing.s,
+                          runSpacing: AppSpacing.s,
+                          children: [
+                            ElevatedButton.icon(
+                              key: const Key('empty_schedule_block_button'),
+                              onPressed: () => _showScheduleSessionDialog(selectedDate, presets),
+                              icon: const Icon(Icons.alarm_add, size: 16),
+                              label: const Text('Schedule Block'),
+                              style: ElevatedButton.styleFrom(
+                                backgroundColor: ThemeTokens.primary,
+                                foregroundColor: ThemeTokens.background,
+                              ),
+                            ),
+                            const SizedBox(width: AppSpacing.s),
+                            OutlinedButton(
+                              onPressed: () => context.push(AppRoutes.presetCreate),
+                              style: OutlinedButton.styleFrom(
+                                side: const BorderSide(color: ThemeTokens.border),
+                                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(ThemeTokens.radiusPill)),
+                              ),
+                              child: Text(
+                                '+ Create Preset',
+                                style: AppTypography.caption(color: ThemeTokens.textMuted, weight: FontWeight.w600),
+                              ),
+                            ),
+                          ],
                         ),
                       ],
                     ),
@@ -462,7 +500,20 @@ class _PlannerScreenState extends ConsumerState<PlannerScreen> {
     final presetId = sessionMap['preset_id'] as String?;
     final actualSeconds = (sessionMap['actual_focus_seconds'] as int?) ?? 0;
     final source = ((sessionMap['source'] as String?) ?? 'FF').toUpperCase();
-    final startMs = sessionMap['actual_start'] as int? ?? sessionMap['scheduled_start'] as int?;
+    final startMs = sessionMap['scheduled_start'] as int? ?? sessionMap['actual_start'] as int?;
+    final endMs = sessionMap['scheduled_end'] as int? ?? sessionMap['actual_end'] as int?;
+
+    String timeString;
+    if (startMs != null && endMs != null) {
+      timeString = '${_formatTime(startMs)} – ${_formatTime(endMs)}';
+    } else if (startMs != null) {
+      timeString = _formatTime(startMs);
+    } else {
+      timeString = 'Scheduled';
+    }
+
+    final plannedSeconds = sessionMap['planned_duration_seconds'] as int? ?? 0;
+    final durationString = _formatDuration(actualSeconds > 0 ? actualSeconds : plannedSeconds);
 
     // Find emoji from preset if available
     String emoji = '🎯';
@@ -472,9 +523,6 @@ class _PlannerScreenState extends ConsumerState<PlannerScreen> {
         emoji = matching.first.emoji;
       }
     }
-
-    final timeString = startMs != null ? _formatTime(startMs) : 'Completed';
-    final durationString = _formatDuration(actualSeconds);
 
     return Container(
       margin: const EdgeInsets.only(bottom: AppSpacing.s),
@@ -544,6 +592,269 @@ class _PlannerScreenState extends ConsumerState<PlannerScreen> {
             ),
         ],
       ),
+    );
+  }
+
+  Future<void> _showScheduleSessionDialog(DateTime selectedDate, List<dynamic> presets) async {
+    if (presets.isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('Please create at least one preset first.', style: AppTypography.caption()),
+          backgroundColor: ThemeTokens.surface,
+          action: SnackBarAction(
+            label: 'Create',
+            textColor: ThemeTokens.primary,
+            onPressed: () => context.push(AppRoutes.presetCreate),
+          ),
+        ),
+      );
+      return;
+    }
+
+    dynamic selectedPreset = presets.first;
+    TimeOfDay startTime = const TimeOfDay(hour: 15, minute: 0); // 3:00 PM
+    TimeOfDay endTime = const TimeOfDay(hour: 17, minute: 0);   // 5:00 PM
+
+    await showModalBottomSheet<void>(
+      context: context,
+      isScrollControlled: true,
+      backgroundColor: ThemeTokens.surface,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(AppRadius.modalTop)),
+      ),
+      builder: (ctx) {
+        return StatefulBuilder(
+          builder: (ctx, setModalState) {
+            final startDateTime = DateTime(
+              selectedDate.year,
+              selectedDate.month,
+              selectedDate.day,
+              startTime.hour,
+              startTime.minute,
+            );
+            DateTime endDateTime = DateTime(
+              selectedDate.year,
+              selectedDate.month,
+              selectedDate.day,
+              endTime.hour,
+              endTime.minute,
+            );
+            if (endDateTime.isBefore(startDateTime)) {
+              endDateTime = endDateTime.add(const Duration(days: 1));
+            }
+            final durationMins = endDateTime.difference(startDateTime).inMinutes;
+
+            return Padding(
+              padding: EdgeInsets.only(
+                left: AppSpacing.l,
+                right: AppSpacing.l,
+                top: AppSpacing.l,
+                bottom: MediaQuery.of(ctx).viewInsets.bottom + AppSpacing.xl,
+              ),
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Text('Schedule Focus Block', style: AppTypography.heading2()),
+                      IconButton(
+                        icon: const Icon(Icons.close, color: ThemeTokens.textMuted),
+                        onPressed: () => Navigator.pop(ctx),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: AppSpacing.s),
+                  Text(
+                    'Assign a temporal time block for ${selectedDate.day}/${selectedDate.month}/${selectedDate.year}:',
+                    style: AppTypography.caption(color: ThemeTokens.textMuted),
+                  ),
+                  const SizedBox(height: AppSpacing.m),
+
+                  // Preset Picker
+                  Text('SELECT PRESET', style: AppTypography.micro(color: ThemeTokens.textMuted, weight: FontWeight.w700)),
+                  const SizedBox(height: 6),
+                  Container(
+                    padding: const EdgeInsets.symmetric(horizontal: 12),
+                    decoration: BoxDecoration(
+                      color: ThemeTokens.background,
+                      borderRadius: BorderRadius.circular(AppRadius.sm),
+                      border: Border.all(color: ThemeTokens.border),
+                    ),
+                    child: DropdownButtonHideUnderline(
+                      child: DropdownButton<dynamic>(
+                        value: selectedPreset,
+                        isExpanded: true,
+                        dropdownColor: ThemeTokens.surface,
+                        items: presets.map((p) {
+                          return DropdownMenuItem<dynamic>(
+                            value: p,
+                            child: Row(
+                              children: [
+                                Text(p.emoji as String? ?? '🎯', style: const TextStyle(fontSize: 18)),
+                                const SizedBox(width: 8),
+                                Text(p.name as String, style: AppTypography.body(color: ThemeTokens.textPrimary)),
+                              ],
+                            ),
+                          );
+                        }).toList(),
+                        onChanged: (val) {
+                          if (val != null) {
+                            setModalState(() => selectedPreset = val);
+                          }
+                        },
+                      ),
+                    ),
+                  ),
+                  const SizedBox(height: AppSpacing.l),
+
+                  // Time Pickers Row
+                  Row(
+                    children: [
+                      Expanded(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text('START TIME', style: AppTypography.micro(color: ThemeTokens.textMuted, weight: FontWeight.w700)),
+                            const SizedBox(height: 6),
+                            InkWell(
+                              onTap: () async {
+                                final picked = await showTimePicker(
+                                  context: ctx,
+                                  initialTime: startTime,
+                                );
+                                if (picked != null) {
+                                  setModalState(() => startTime = picked);
+                                }
+                              },
+                              child: Container(
+                                padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 12),
+                                decoration: BoxDecoration(
+                                  color: ThemeTokens.background,
+                                  borderRadius: BorderRadius.circular(AppRadius.sm),
+                                  border: Border.all(color: ThemeTokens.border),
+                                ),
+                                child: Row(
+                                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                  children: [
+                                    Text(startTime.format(ctx), style: AppTypography.body(weight: FontWeight.w700)),
+                                    const Icon(Icons.access_time, size: 16, color: ThemeTokens.primary),
+                                  ],
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                      const SizedBox(width: AppSpacing.m),
+                      Expanded(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text('END TIME', style: AppTypography.micro(color: ThemeTokens.textMuted, weight: FontWeight.w700)),
+                            const SizedBox(height: 6),
+                            InkWell(
+                              onTap: () async {
+                                final picked = await showTimePicker(
+                                  context: ctx,
+                                  initialTime: endTime,
+                                );
+                                if (picked != null) {
+                                  setModalState(() => endTime = picked);
+                                }
+                              },
+                              child: Container(
+                                padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 12),
+                                decoration: BoxDecoration(
+                                  color: ThemeTokens.background,
+                                  borderRadius: BorderRadius.circular(AppRadius.sm),
+                                  border: Border.all(color: ThemeTokens.border),
+                                ),
+                                child: Row(
+                                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                  children: [
+                                    Text(endTime.format(ctx), style: AppTypography.body(weight: FontWeight.w700)),
+                                    const Icon(Icons.access_time, size: 16, color: ThemeTokens.primary),
+                                  ],
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: AppSpacing.m),
+
+                  // Duration summary
+                  Container(
+                    padding: const EdgeInsets.all(AppSpacing.s),
+                    decoration: BoxDecoration(
+                      color: ThemeTokens.background.withValues(alpha: 0.5),
+                      borderRadius: BorderRadius.circular(AppRadius.sm),
+                      border: Border.all(color: ThemeTokens.border.withValues(alpha: 0.5)),
+                    ),
+                    child: Row(
+                      children: [
+                        const Icon(Icons.timelapse, size: 16, color: ThemeTokens.accent),
+                        const SizedBox(width: 8),
+                        Text(
+                          'Total Planned Duration: ${_formatDuration(durationMins * 60)}',
+                          style: AppTypography.caption(color: ThemeTokens.textPrimary, weight: FontWeight.w600),
+                        ),
+                      ],
+                    ),
+                  ),
+                  const SizedBox(height: AppSpacing.l),
+
+                  // Confirm button
+                  SizedBox(
+                    width: double.infinity,
+                    height: 48,
+                    child: ElevatedButton(
+                      key: const Key('confirm_schedule_session_button'),
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: ThemeTokens.primary,
+                        foregroundColor: ThemeTokens.background,
+                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(ThemeTokens.radiusPill)),
+                      ),
+                      onPressed: () async {
+                        final formattedStart = startTime.format(ctx);
+                        final formattedEnd = endTime.format(ctx);
+                        final messenger = ScaffoldMessenger.of(context);
+                        final presetName = selectedPreset.name as String;
+
+                        final repo = ref.read(focusSessionRepositoryProvider);
+                        final uuid = const Uuid().v4();
+                        await repo.createScheduledSession(
+                          id: uuid,
+                          presetId: selectedPreset.id as String,
+                          name: presetName,
+                          scheduledStart: startDateTime,
+                          scheduledEnd: endDateTime,
+                          source: 'ff',
+                        );
+                        ref.invalidate(plannerSessionsForDateProvider(selectedDate));
+                        if (ctx.mounted) Navigator.pop(ctx);
+                        if (mounted) {
+                          messenger.showSnackBar(
+                            SnackBar(
+                              content: Text('Scheduled "$presetName" for $formattedStart – $formattedEnd'),
+                              backgroundColor: ThemeTokens.surface,
+                            ),
+                          );
+                        }
+                      },
+                      child: Text('Confirm & Schedule Block', style: AppTypography.button(color: ThemeTokens.background)),
+                    ),
+                  ),
+                ],
+              ),
+            );
+          },
+        );
+      },
     );
   }
 

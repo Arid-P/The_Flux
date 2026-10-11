@@ -48,6 +48,13 @@ class MainActivity : FlutterActivity() {
                     }
                     result.success(true)
                 }
+                "openAccessibilitySettings" -> {
+                    val intent = Intent(Settings.ACTION_ACCESSIBILITY_SETTINGS).apply {
+                        addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+                    }
+                    startActivity(intent)
+                    result.success(true)
+                }
                 else -> {
                     result.notImplemented()
                 }
@@ -67,6 +74,40 @@ class MainActivity : FlutterActivity() {
                     }
                     startActivity(intent)
                     result.success(true)
+                }
+                "getUsageStats" -> {
+                    val startTime = (call.argument<Number>("startTime"))?.toLong() ?: 0L
+                    val endTime = (call.argument<Number>("endTime"))?.toLong() ?: System.currentTimeMillis()
+                    val stats = UsageStatsHelper.queryUsageStats(context, startTime, endTime)
+                    result.success(stats)
+                }
+                "getInstalledApps" -> {
+                    val apps = UsageStatsHelper.getInstalledApps(context)
+                    result.success(apps)
+                }
+                "getAppIcon" -> {
+                    val pkg = call.argument<String>("packageName") ?: ""
+                    val icon = UsageStatsHelper.getAppIconBase64(context, pkg)
+                    result.success(icon)
+                }
+                else -> {
+                    result.notImplemented()
+                }
+            }
+        }
+
+        // 3. FD Integration Channel (queries for app packages, labels, icons, stats)
+        val fdChannel = MethodChannel(flutterEngine.dartExecutor.binaryMessenger, "com.fluxfoxus/fd_integration")
+        fdChannel.setMethodCallHandler { call, result ->
+            when (call.method) {
+                "getInstalledApps" -> {
+                    val apps = UsageStatsHelper.getInstalledApps(context)
+                    result.success(apps)
+                }
+                "getAppIcon" -> {
+                    val pkg = call.argument<String>("packageName") ?: ""
+                    val icon = UsageStatsHelper.getAppIconBase64(context, pkg)
+                    result.success(icon)
                 }
                 "getUsageStats" -> {
                     val startTime = (call.argument<Number>("startTime"))?.toLong() ?: 0L

@@ -129,6 +129,15 @@ void main() {
                 'isSystemApp': false,
               },
             ];
+          case 'getInstalledApps':
+            return [
+              {
+                'packageName': 'com.instagram.android',
+                'appName': 'Instagram',
+                'isSystemApp': false,
+                'appIcon': '',
+              },
+            ];
           default:
             return null;
         }
@@ -213,6 +222,15 @@ void main() {
       final avg = await service.get7DayRollingAverage('com.instagram.android');
       // 3600000 ms / 7 = ~514,285 ms (~8.5 mins)
       expect(avg.inMinutes, 8);
+    });
+
+    test('getInstalledApps queries installed packages and resolves categories', () async {
+      final service = MethodChannelUsageStatsService(channel: channel);
+      final apps = await service.getInstalledApps();
+      expect(apps, isNotEmpty);
+      expect(apps.first.packageName, 'com.instagram.android');
+      expect(apps.first.appName, 'Instagram');
+      expect(apps.first.category, AppCategory.distracting);
     });
   });
 }

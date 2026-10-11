@@ -9,6 +9,7 @@ import '../../features/presets/domain/preset_app_restriction.dart';
 import '../../features/presets/domain/youtube_mode.dart';
 import '../../features/presets/presentation/presets_provider.dart';
 import '../../features/presets/presentation/widgets/emoji_picker_sheet.dart';
+import '../../features/usage_stats/usage_stats.dart';
 
 /// PresetCreateScreen implements the full preset creation flow matching ui_preset.md.
 class PresetCreateScreen extends ConsumerStatefulWidget {
@@ -63,6 +64,52 @@ class _PresetCreateScreenState extends ConsumerState<PresetCreateScreen> {
       'com.android.chrome': const _MockAppItem('Chrome', 'Others', Icons.language_outlined, false),
       'com.spotify.music': const _MockAppItem('Spotify', 'Others', Icons.music_note_outlined, false),
     };
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      _loadInstalledApps();
+    });
+  }
+
+  Future<void> _loadInstalledApps() async {
+    try {
+      final installed = await ref.read(usageStatsServiceProvider).getInstalledApps();
+      if (installed.isNotEmpty && mounted) {
+        setState(() {
+          final Map<String, _MockAppItem> merged = {};
+          for (final app in installed) {
+            final isBlocked = _apps[app.packageName]?.isBlocked ??
+                (app.category == AppCategory.distracting &&
+                    (app.packageName.contains('instagram') ||
+                     app.packageName.contains('musically') ||
+                     app.packageName.contains('twitter')));
+            merged[app.packageName] = _MockAppItem(
+              app.appName,
+              app.category.displayName,
+              _iconForCategory(app.category),
+              isBlocked,
+            );
+          }
+          for (final entry in _apps.entries) {
+            if (!merged.containsKey(entry.key)) {
+              merged[entry.key] = entry.value;
+            }
+          }
+          _apps = merged;
+        });
+      }
+    } catch (_) {}
+  }
+
+  IconData _iconForCategory(AppCategory category) {
+    switch (category) {
+      case AppCategory.productive:
+        return Icons.edit_note_outlined;
+      case AppCategory.semiProductive:
+        return Icons.play_circle_outline;
+      case AppCategory.distracting:
+        return Icons.camera_alt_outlined;
+      case AppCategory.others:
+        return Icons.apps_outlined;
+    }
   }
 
   @override

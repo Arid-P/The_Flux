@@ -1,17 +1,25 @@
-# fluxfoxus
+# FluxFoxus (Flutter App)
 
-A new Flutter project.
+> **Focus. Block. Streak.**  
+> Native Flutter client for FluxFoxus, part of the **The Flux** ecosystem.
 
-## Getting Started
+For the comprehensive project documentation, design system tokens, architecture overview, and APK installation instructions, please refer to the root [README.md](../../README.md).
 
-This project is a starting point for a Flutter application.
+---
 
-A few resources to get you started if this is your first Flutter project:
+## Quick Start & Verification
 
-- [Learn Flutter](https://docs.flutter.dev/get-started/learn-flutter)
-- [Write your first Flutter app](https://docs.flutter.dev/get-started/codelab)
-- [Flutter learning resources](https://docs.flutter.dev/reference/learning-resources)
+### Static Analysis
+```bash
+/home/codespace/flutter/bin/flutter analyze
+```
 
-For help getting started with Flutter development, view the
-[online documentation](https://docs.flutter.dev/), which offers tutorials,
-samples, guidance on mobile development, and a full API reference.
+### Run Tests
+```bash
+/home/codespace/flutter/bin/flutter test
+```
+
+### Build Release APK
+```bash
+/home/codespace/flutter/bin/flutter build apk --release
+```

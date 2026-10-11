@@ -92,6 +92,13 @@ class DefaultPermissionService implements PermissionService {
           return;
         } catch (_) {}
       }
+      if (permission == AppPermission.accessibilityService) {
+        try {
+          const channel = MethodChannel('com.fluxfoxus/accessibility_service');
+          await channel.invokeMethod<void>('openAccessibilitySettings');
+          return;
+        } catch (_) {}
+      }
       await openAppSettings();
     } catch (e) {
       debugPrint('Error opening app settings for $permission: $e');

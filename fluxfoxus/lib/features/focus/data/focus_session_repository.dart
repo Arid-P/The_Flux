@@ -120,6 +120,35 @@ class FocusSessionRepository {
     );
   }
 
+  /// Creates a scheduled focus session block (e.g. from PlannerScreen).
+  Future<void> createScheduledSession({
+    required String id,
+    required String presetId,
+    required String name,
+    required DateTime scheduledStart,
+    required DateTime scheduledEnd,
+    String source = 'ff',
+  }) async {
+    final db = await appDatabase.database;
+    final durationSeconds = scheduledEnd.difference(scheduledStart).inSeconds;
+    await db.insert(
+      DatabaseTables.focusSessions,
+      {
+        DatabaseTables.colSessionId: id,
+        DatabaseTables.colSessionPresetId: presetId,
+        DatabaseTables.colSessionName: name,
+        DatabaseTables.colSessionMode: 'countdown',
+        DatabaseTables.colSessionScheduledStart: scheduledStart.millisecondsSinceEpoch,
+        DatabaseTables.colSessionScheduledEnd: scheduledEnd.millisecondsSinceEpoch,
+        DatabaseTables.colSessionPlannedDuration: durationSeconds > 0 ? durationSeconds : 1500,
+        DatabaseTables.colSessionStatus: 'scheduled',
+        DatabaseTables.colSessionBreaksUsed: 0,
+        DatabaseTables.colSessionSource: source,
+        DatabaseTables.colSessionCreatedAt: DateTime.now().millisecondsSinceEpoch,
+      },
+    );
+  }
+
   /// Creates a scheduled session originating from FluxDo (source='fd', status='pending').
   Future<void> createFdSession({
     required String id,
@@ -263,6 +292,16 @@ class FakeFocusSessionRepository implements FocusSessionRepository {
         .map((s) => s.toMap())
         .toList();
   }
+
+  @override
+  Future<void> createScheduledSession({
+    required String id,
+    required String presetId,
+    required String name,
+    required DateTime scheduledStart,
+    required DateTime scheduledEnd,
+    String source = 'ff',
+  }) async {}
 
   @override
   Future<void> createFdSession({

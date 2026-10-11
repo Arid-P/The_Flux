@@ -4,10 +4,17 @@ import android.app.AppOpsManager
 import android.app.usage.UsageStats
 import android.app.usage.UsageStatsManager
 import android.content.Context
+import android.content.Intent
 import android.content.pm.ApplicationInfo
 import android.content.pm.PackageManager
+import android.graphics.Bitmap
+import android.graphics.Canvas
+import android.graphics.drawable.BitmapDrawable
+import android.graphics.drawable.Drawable
 import android.os.Build
 import android.os.Process
+import android.util.Base64
+import java.io.ByteArrayOutputStream
 
 /**
  * UsageStatsHelper provides utilities to verify usage access permissions
@@ -98,13 +105,16 @@ object UsageStatsHelper {
                 // Uninstalled or hidden package; keep package name as fallback
             }
 
+            val iconBase64 = getAppIconBase64(context, pkgName) ?: ""
+
             result.add(
                 mapOf(
                     "packageName" to pkgName,
                     "appName" to appName,
                     "foregroundTimeMs" to timeMs,
                     "lastTimeUsed" to (lastUsedMap[pkgName] ?: 0L),
-                    "isSystemApp" to isSystemApp
+                    "isSystemApp" to isSystemApp,
+                    "appIcon" to iconBase64
                 )
             )
         }
@@ -112,5 +122,69 @@ object UsageStatsHelper {
         // Sort descending by foreground time
         result.sortByDescending { (it["foregroundTimeMs"] as? Long) ?: 0L }
         return result
+    }
+
+    fun getAppIconBase64(context: Context, packageName: String): String? {
+        return try {
+            val pm = context.packageManager
+            val appInfo = pm.getApplicationInfo(packageName, 0)
+            val drawable = pm.getApplicationIcon(appInfo)
+            val bitmap = drawableToBitmap(drawable)
+            val stream = ByteArrayOutputStream()
+            bitmap.compress(Bitmap.CompressFormat.PNG, 90, stream)
+            Base64.encodeToString(stream.toByteArray(), Base64.NO_WRAP)
+        } catch (_: Exception) {
+            null
+        }
+    }
+
+    fun getInstalledApps(context: Context): List<Map<String, Any?>> {
+        val pm = context.packageManager
+        val intent = Intent(Intent.ACTION_MAIN, null).apply {
+            addCategory(Intent.CATEGORY_LAUNCHER)
+        }
+        val resolveInfos = pm.queryIntentActivities(intent, 0)
+        val list = mutableListOf<Map<String, Any?>>()
+        val seen = mutableSetOf<String>()
+
+        for (ri in resolveInfos) {
+            val pkg = ri.activityInfo.packageName
+            if (seen.contains(pkg)) continue
+            seen.add(pkg)
+            val appName = ri.loadLabel(pm).toString()
+            val isSystemApp = (ri.activityInfo.applicationInfo.flags and ApplicationInfo.FLAG_SYSTEM) != 0
+            val iconBase64 = try {
+                val drawable = ri.loadIcon(pm)
+                val bitmap = drawableToBitmap(drawable)
+                val stream = ByteArrayOutputStream()
+                bitmap.compress(Bitmap.CompressFormat.PNG, 90, stream)
+                Base64.encodeToString(stream.toByteArray(), Base64.NO_WRAP)
+            } catch (_: Exception) {
+                null
+            }
+            list.add(
+                mapOf(
+                    "packageName" to pkg,
+                    "appName" to appName,
+                    "isSystemApp" to isSystemApp,
+                    "appIcon" to (iconBase64 ?: "")
+                )
+            )
+        }
+        list.sortBy { (it["appName"] as? String)?.lowercase() ?: "" }
+        return list
+    }
+
+    private fun drawableToBitmap(drawable: Drawable): Bitmap {
+        if (drawable is BitmapDrawable && drawable.bitmap != null) {
+            return drawable.bitmap
+        }
+        val width = if (drawable.intrinsicWidth > 0) Math.min(drawable.intrinsicWidth, 96) else 48
+        val height = if (drawable.intrinsicHeight > 0) Math.min(drawable.intrinsicHeight, 96) else 48
+        val bitmap = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888)
+        val canvas = Canvas(bitmap)
+        drawable.setBounds(0, 0, canvas.width, canvas.height)
+        drawable.draw(canvas)
+        return bitmap
     }
 }
