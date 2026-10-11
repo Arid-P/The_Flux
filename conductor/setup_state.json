@@ -1,0 +1,39 @@
+{
+  "status": "complete",
+  "project_type": "greenfield",
+  "current_section": "",
+  "current_question": 0,
+  "completed_sections": ["product","guidelines","tech_stack","workflow","tracks"],
+  "answers": {
+    "project_name": "The_Flux",
+    "description": "An offline-first Android productivity and screen discipline app built with Flutter, focused on strict app blocking and time‑blocking via Accessibility Services.",
+    "problem_statement": "Passive wellness apps lack the friction needed to prevent distraction. This project solves that by enforcing strict screen discipline through mechanical flip‑clock focus sessions, YouTube Study Mode whitelists, and 2/5/10/20 minute intervention overlays.",
+    "target_users": "Students and individuals undertaking high‑stakes, intense academic workflows (such as IOQM, INMO, or JEE Advanced preparation) who require absolute focus and accountability through a streak‑based system.",
+    "key_goals": [
+      "Strictly enforce the offline‑first architecture using SQLite, Hive, and Riverpod 3.x, alongside the Android MethodChannel IPC bridge.",
+      "Maintain strict adherence to the flat 2D \"Rustic Medley\" design system across all generated UI components.",
+      "Seamlessly coordinate tasks between the Flutter/UI agent (Code1) and the Tailwind mockup agent (Code2) while maintaining the centralized agent worklog."
+    ],
+    "voice_tone": "Professional and technical, concise and direct with no buttering, flattery, or unnecessary compliments.",
+    "design_principles": [
+      "Consistent UI/UX: Enforces the strict flat 2D, zero‑blue color palette across Code1 and Code2.",
+      "Accessibility‑first: Prioritizes core Android Accessibility Services for app blocking and friction mechanics.",
+      "Performance first: Protects the offline‑first SQLite/Hive architecture and drift‑free delta arithmetic used in the focus timer."
+    ],
+    "primary_language": "Flutter/Dart",
+    "tdd_strictness": "moderate",
+    "commit_strategy": "conventional",
+    "code_review_policy": "required",
+    "verification_checkpoints": "after each phase and after each task"
+  },
+  "files_created": [
+    "conductor/product.md",
+    "conductor/product-guidelines.md",
+    "conductor/tech-stack.md",
+    "conductor/workflow.md",
+    "conductor/tracks.md",
+    "conductor/index.md"
+  ],
+  "started_at": "2026-10-11T08:56:00Z",
+  "last_updated": "2026-10-11T08:58:55Z"
+}
